@@ -67,6 +67,16 @@ export function needsYouCount(state: PortalState): number {
   return approval + cards + timeOff;
 }
 
+/** "5:00 PM" <-> "17:00" for native time inputs */
+export function to24h(t: string): string {
+  const mins = toMins(t);
+  return `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
+}
+export function from24h(v: string): string {
+  const [h, m] = v.split(":").map((n) => parseInt(n, 10));
+  return fmtClock(h * 60 + m);
+}
+
 let idc = 100;
 export const uid = (p: string) => `${p}-${++idc}-${Math.random().toString(36).slice(2, 6)}`;
 
@@ -93,7 +103,10 @@ type Action =
   | { type: "SECTION_SET"; shiftId: string; section: string }
   | { type: "PAUSE_TOGGLE" }
   | { type: "TABLE_CYCLE"; id: string; sections: string[] }
-  | { type: "FLOOR_BALANCE" }
+  | { type: "TABLE_ADD"; seats: number; section: string; shape: "round" | "square" }
+  | { type: "TABLE_REMOVE"; id: string }
+  | { type: "TABLE_PATCH"; id: string; patch: Partial<import("./data").Table> }
+  | { type: "FLOOR_BALANCE"; sections: string[] }
   | { type: "ROTATION_SET"; mode: import("./data").RotationMode }
   | { type: "STAFF_REMOVE"; id: string }
   | { type: "APPROVE_LIVE_COVER" };
@@ -171,6 +184,11 @@ function reducer(state: PortalState, a: Action): PortalState {
             hoursWeek: 0,
             status: "invited",
             availNote: "Invite just texted · waiting on YES",
+            rate: 12,
+            since: "Today",
+            certs: [],
+            picks90: 0,
+            drops90: 0,
           },
         ],
       };
@@ -195,14 +213,43 @@ function reducer(state: PortalState, a: Action): PortalState {
           return { ...t, section: a.sections[(i + 1) % a.sections.length] };
         }),
       };
-    case "FLOOR_BALANCE":
+    case "TABLE_ADD": {
+      const nextNum =
+        Math.max(0, ...state.tables.map((t) => parseInt(t.label, 10)).filter((n) => !isNaN(n))) + 1;
+      return {
+        ...state,
+        floorBalanced: false,
+        tables: [
+          ...state.tables,
+          { id: uid("t"), label: String(nextNum), seats: a.seats, section: a.section, shape: a.shape },
+        ],
+      };
+    }
+    case "TABLE_REMOVE":
+      return { ...state, floorBalanced: false, tables: state.tables.filter((t) => t.id !== a.id) };
+    case "TABLE_PATCH":
+      return {
+        ...state,
+        floorBalanced: false,
+        tables: state.tables.map((t) => (t.id === a.id ? { ...t, ...a.patch } : t)),
+      };
+    case "FLOOR_BALANCE": {
+      // real greedy rebalance: biggest tables first, each into the lightest section
+      const totals = new Map<string, number>(a.sections.map((s) => [s, 0]));
+      const sorted = [...state.tables].sort((x, y) => y.seats - x.seats);
+      const assigned = new Map<string, string>();
+      for (const t of sorted) {
+        let best = a.sections[0];
+        for (const s of a.sections) if ((totals.get(s) ?? 0) < (totals.get(best) ?? 0)) best = s;
+        assigned.set(t.id, best);
+        totals.set(best, (totals.get(best) ?? 0) + t.seats);
+      }
       return {
         ...state,
         floorBalanced: true,
-        tables: state.tables.map((t) =>
-          t.id === "t5" ? { ...t, section: "Bar side" } : t.id === "t13" ? { ...t, section: "Main" } : t
-        ),
+        tables: state.tables.map((t) => ({ ...t, section: assigned.get(t.id) ?? t.section })),
       };
+    }
     case "ROTATION_SET":
       return { ...state, rotation: a.mode };
     case "STAFF_REMOVE":

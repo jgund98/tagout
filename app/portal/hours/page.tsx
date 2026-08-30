@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePortal, fmtClock, uid } from "@/lib/portal/store";
-import { Avatar, Chip, GreenBtn, PageTitle, LiveDot, DemoNote } from "@/components/portal/ui";
+import { Avatar, Chip, GreenBtn, PageTitle, LiveDot } from "@/components/portal/ui";
 
 /** The demo clock: it's 6:12 PM at Harbor & Vine, and it keeps ticking for real. */
 function useDemoNow() {
@@ -20,6 +20,7 @@ export default function HoursPage() {
   const now = useDemoNow();
   const staffOf = (id: string) => state.staff.find((s) => s.id === id) ?? null;
 
+  const [adjusting, setAdjusting] = useState<string | null>(null);
   const onClock = state.punches.filter((p) => p.outAt === null);
   const doneToday = state.punches.filter((p) => p.outAt !== null);
 
@@ -80,10 +81,7 @@ export default function HoursPage() {
             );
           })}
         </div>
-        <DemoNote>
-          Crew clocks in by texting IN when they arrive; Tagout checks they&apos;re at the right place and time.
-          Geofenced punch-in turns on with the SMS provider.
-        </DemoNote>
+
       </section>
 
       {/* today's timecards */}
@@ -109,6 +107,16 @@ export default function HoursPage() {
                 </div>
                 {p.approved ? (
                   <p className="mt-2.5 text-center text-[12.5px] font-extrabold text-green-deep">Approved ✓</p>
+                ) : adjusting === p.id ? (
+                  <div className="mt-2.5 flex items-center justify-between rounded-xl bg-white px-3 py-2">
+                    <span className="text-[12.5px] font-bold text-ink/55">Break minutes</span>
+                    <span className="flex items-center gap-2">
+                      <button onClick={() => dispatch({ type: "PUNCH_PATCH", id: p.id, patch: { breakMins: Math.max(0, p.breakMins - 5) } })} className="flex h-8 w-8 items-center justify-center rounded-full bg-cream font-extrabold">−</button>
+                      <span className="w-8 text-center text-[14px] font-extrabold text-ink">{p.breakMins}</span>
+                      <button onClick={() => dispatch({ type: "PUNCH_PATCH", id: p.id, patch: { breakMins: p.breakMins + 5 } })} className="flex h-8 w-8 items-center justify-center rounded-full bg-cream font-extrabold">+</button>
+                      <button onClick={() => setAdjusting(null)} className="ml-1 text-[12.5px] font-extrabold text-green-deep">Done</button>
+                    </span>
+                  </div>
                 ) : (
                   <button
                     onClick={() => {
@@ -118,9 +126,14 @@ export default function HoursPage() {
                         event: { id: uid("f"), kind: "clock", who: p.staffId, text: `You approved ${person?.first}'s timecard`, sub: `${hrs} hours, ready for payroll`, when: "Just now" },
                       });
                     }}
-                    className="mt-2.5 w-full rounded-full bg-ink py-2.5 text-[13.5px] font-extrabold text-paper"
+                    className="mt-2.5 w-full rounded-full bg-green-dark py-2.5 text-[13.5px] font-extrabold text-white"
                   >
                     Approve timecard
+                  </button>
+                )}
+                {!p.approved && adjusting !== p.id && (
+                  <button onClick={() => setAdjusting(p.id)} className="mt-1.5 w-full text-center text-[12px] font-bold text-ink/40">
+                    Adjust break
                   </button>
                 )}
               </div>
@@ -173,7 +186,7 @@ export default function HoursPage() {
                               event: { id: uid("f"), kind: "clock", who: p.staffId, text: `You approved ${person?.first}'s timecard`, sub: `${hrs} hours, ready for payroll`, when: "Just now" },
                             });
                           }}
-                          className="rounded-full bg-ink px-4 py-1.5 text-[12.5px] font-extrabold text-paper transition-all hover:bg-green-dark"
+                          className="rounded-full bg-green-dark px-4 py-1.5 text-[12.5px] font-extrabold text-white transition-all hover:bg-green-deep"
                         >
                           Approve
                         </button>

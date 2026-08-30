@@ -3,66 +3,40 @@
 import { useEffect } from "react";
 
 /**
- * Horizontal strips vs. vertical page scrolling, settled for good.
+ * Horizontal strips vs. vertical page scrolling, v3.
  *
- * iOS Safari decides a gesture's scroll axis at touch-start, so flipping
- * overflow mid-gesture can't stop a diagonal page-scroll from briefly
- * dragging a carousel. The only reliable fix: strips get
- * `touch-action: pan-y`, which means the browser NEVER horizontally
- * scrolls them natively on touch — vertical pans always belong to the
- * page. Horizontal swipes are re-implemented here by hand: direct drag,
- * momentum on release, then a settle onto the nearest card.
+ * The `touch-action: pan-y` that makes vertical pans un-hijackable lives in
+ * globals.css now, so it applies at first paint with no hydration gap.
+ * This component only supplies the horizontal gesture: 1:1 drag with CSS
+ * snap suspended (so the browser can't fight the drag), then one native
+ * smooth scroll to the card the throw was headed for. No frame loops.
  */
 export default function StripGuard() {
   useEffect(() => {
-    const isStrip = (el: Element): el is HTMLElement =>
-      el instanceof HTMLElement && el.className.includes?.("overflow-x-auto");
-
-    const arm = (root: ParentNode) => {
-      root.querySelectorAll('[class*="overflow-x-auto"]').forEach((el) => {
-        if (el instanceof HTMLElement) el.style.touchAction = "pan-y";
-      });
-    };
-    arm(document);
-    const mo = new MutationObserver((muts) => {
-      for (const m of muts) {
-        m.addedNodes.forEach((n) => {
-          if (n instanceof HTMLElement) {
-            if (isStrip(n)) n.style.touchAction = "pan-y";
-            arm(n);
-          }
-        });
-      }
-    });
-    mo.observe(document.body, { childList: true, subtree: true });
-
     let strip: HTMLElement | null = null;
+    let snapWas = "";
     let x0 = 0, y0 = 0, sl0 = 0;
-    let lastX = 0, lastT = 0, vx = 0;
+    let lastX = 0, lastT = 0, vx = 0; // px per ms, negative = swiping left
     let axis: "x" | "y" | null = null;
-    let raf = 0;
 
     const settle = (el: HTMLElement) => {
-      // glide to a stop, then ease onto the nearest card edge
-      const glide = () => {
-        if (Math.abs(vx) > 0.08) {
-          el.scrollLeft -= vx * 16;
-          vx *= 0.94;
-          raf = requestAnimationFrame(glide);
-          return;
+      // project the throw ~180ms out, then land on the nearest card edge
+      const projected = el.scrollLeft - vx * 180;
+      const kids = Array.from(el.children) as HTMLElement[];
+      let target = projected;
+      if (kids.length) {
+        let bestDist = Infinity;
+        for (const k of kids) {
+          const d = Math.abs(k.offsetLeft - projected);
+          if (d < bestDist) { bestDist = d; target = k.offsetLeft; }
         }
-        const kids = Array.from(el.children) as HTMLElement[];
-        if (kids.length) {
-          let best = 0, bestDist = Infinity;
-          for (const k of kids) {
-            const d = Math.abs(k.offsetLeft - el.scrollLeft);
-            if (d < bestDist) { bestDist = d; best = k.offsetLeft; }
-          }
-          const max = el.scrollWidth - el.clientWidth;
-          el.scrollTo({ left: Math.min(best, max), behavior: "smooth" });
-        }
-      };
-      raf = requestAnimationFrame(glide);
+      }
+      const max = el.scrollWidth - el.clientWidth;
+      el.scrollTo({ left: Math.max(0, Math.min(target, max)), behavior: "smooth" });
+      // give the smooth scroll time to finish before snap comes back
+      const restoreTo = el;
+      const was = snapWas;
+      setTimeout(() => { restoreTo.style.scrollSnapType = was; }, 450);
     };
 
     const onMove = (e: TouchEvent) => {
@@ -71,14 +45,19 @@ export default function StripGuard() {
       if (axis === null) {
         const dx = Math.abs(t.clientX - x0);
         const dy = Math.abs(t.clientY - y0);
-        if (dx < 7 && dy < 7) return;
+        if (dx < 6 && dy < 6) return;
         axis = dx > dy ? "x" : "y";
+        if (axis === "x") {
+          snapWas = strip.style.scrollSnapType;
+          strip.style.scrollSnapType = "none"; // snap can't fight the drag
+        }
       }
       if (axis === "x") {
         if (e.cancelable) e.preventDefault();
         strip.scrollLeft = sl0 - (t.clientX - x0);
         const now = performance.now();
-        if (now - lastT > 0) vx = ((t.clientX - lastX) / (now - lastT)) * 16;
+        const dt = now - lastT;
+        if (dt > 0) vx = 0.8 * vx + 0.2 * ((t.clientX - lastX) / dt);
         lastX = t.clientX;
         lastT = now;
       }
@@ -86,6 +65,7 @@ export default function StripGuard() {
 
     const onEnd = () => {
       if (strip && axis === "x") settle(strip);
+      else if (strip) strip.style.scrollSnapType = snapWas;
       document.removeEventListener("touchmove", onMove);
       document.removeEventListener("touchend", onEnd);
       document.removeEventListener("touchcancel", onEnd);
@@ -97,15 +77,14 @@ export default function StripGuard() {
       const target = e.target as HTMLElement | null;
       const hit = target?.closest?.('[class*="overflow-x-auto"]') as HTMLElement | null;
       if (!hit || hit.scrollWidth <= hit.clientWidth + 4) return;
-      cancelAnimationFrame(raf);
       strip = hit;
       axis = null;
+      snapWas = hit.style.scrollSnapType;
       x0 = lastX = e.touches[0].clientX;
       y0 = e.touches[0].clientY;
       sl0 = hit.scrollLeft;
       lastT = performance.now();
       vx = 0;
-      // non-passive only while a strip gesture is possible
       document.addEventListener("touchmove", onMove, { passive: false });
       document.addEventListener("touchend", onEnd, { passive: true });
       document.addEventListener("touchcancel", onEnd, { passive: true });
@@ -113,8 +92,6 @@ export default function StripGuard() {
 
     document.addEventListener("touchstart", onStart, { passive: true });
     return () => {
-      mo.disconnect();
-      cancelAnimationFrame(raf);
       document.removeEventListener("touchstart", onStart);
       document.removeEventListener("touchmove", onMove);
       document.removeEventListener("touchend", onEnd);

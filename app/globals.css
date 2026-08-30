@@ -19,7 +19,7 @@
   --color-lav: #ebe7ff;
 
   --color-amber: #ffb020;
-  --color-butter: #fff2d2;
+  --color-butter: #f4f6f5;
   --color-coral: #ff5c48;
   --color-blush: #ffe4df;
 
@@ -40,6 +40,14 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* horizontal strips never natively pan on touch: vertical page scrolling
+   can't hook them, and StripGuard supplies the horizontal gesture */
+@media (pointer: coarse) {
+  [class*="overflow-x-auto"] {
+    touch-action: pan-y;
+  }
 }
 
 body {

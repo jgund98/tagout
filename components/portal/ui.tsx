@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import type { Staff } from "@/lib/portal/data";
 
 /* ---------- avatar: photo when they have one, warm initials while onboarding ---------- */
@@ -89,7 +89,7 @@ export function Chip({
     lav: "bg-lav text-violet-mid",
     butter: "bg-butter text-[#9a6a00]",
     blush: "bg-blush text-coral",
-    ink: "bg-ink text-paper",
+    ink: "bg-pine text-paper",
     white: "bg-white text-ink shadow-[0_1px_3px_rgb(15_21_18/0.08)]",
   };
   return (
@@ -132,7 +132,7 @@ export function StatTile({
         {live && <LiveDot />}
         <span className="truncate">{label}</span>
       </p>
-      <p className="mt-1.5 truncate font-display text-[26px] font-extrabold leading-none tracking-tight text-ink sm:text-[32px]">
+      <p className="mt-1.5 truncate font-display text-[26px] font-extrabold leading-[1.2] tracking-tight text-ink sm:text-[32px]">
         {value}
       </p>
       {sub && <p className="mt-1.5 truncate text-[12.5px] font-semibold text-ink/50 sm:text-[13px]">{sub}</p>}
@@ -236,6 +236,41 @@ export function GhostBtn({
     >
       {children}
     </button>
+  );
+}
+
+/* ---------- a quick celebration when something real gets done ---------- */
+
+export function Burst({ show }: { show: boolean }) {
+  const colors = ["#0ecf7f", "#6d5bff", "#ffb020", "#ff5c48"];
+  return (
+    <AnimatePresence>
+      {show && (
+        <div className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center">
+          {Array.from({ length: 18 }).map((_, i) => {
+            const angle = (i / 18) * Math.PI * 2;
+            const dist = 90 + (i % 4) * 36;
+            return (
+              <motion.span
+                key={i}
+                initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
+                animate={{
+                  x: Math.cos(angle) * dist,
+                  y: Math.sin(angle) * dist + 50,
+                  scale: 0,
+                  opacity: 0,
+                  rotate: 180,
+                }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.85, ease: "easeOut" }}
+                className="absolute h-3 w-3"
+                style={{ background: colors[i % 4], borderRadius: i % 3 === 0 ? 2 : 999 }}
+              />
+            );
+          })}
+        </div>
+      )}
+    </AnimatePresence>
   );
 }
 

@@ -64,9 +64,9 @@ export default function InboxPage() {
       {needs > 0 && (
         <Link
           href="/portal/coverage"
-          className="mb-5 flex items-center justify-between gap-3 rounded-2xl bg-ink px-4 py-3.5"
+          className="mb-5 flex items-center justify-between gap-3 rounded-2xl border-2 border-coral/25 bg-white px-4 py-3.5 shadow-pop"
         >
-          <span className="text-[14.5px] font-extrabold text-paper">
+          <span className="text-[14.5px] font-extrabold text-ink">
             {needs === 1 ? "1 item needs" : `${needs} items need`} your call
           </span>
           <span className="rounded-full bg-coral px-3.5 py-1.5 text-[12.5px] font-extrabold text-white">

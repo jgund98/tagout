@@ -19,6 +19,11 @@ export type Staff = {
   hoursWeek: number; // scheduled hours this week
   status: "active" | "invited" | "pending";
   availNote: string;
+  rate: number; // $/hr
+  since: string; // on the roster since
+  certs: string[];
+  picks90: number; // shifts picked up, last 90 days
+  drops90: number; // shifts dropped, last 90 days
 };
 
 export type Shift = {
@@ -30,6 +35,7 @@ export type Shift = {
   role: Role;
   state: "published" | "draft" | "open" | "covering";
   section?: string;
+  note?: string;
 };
 
 export type Punch = {
@@ -119,18 +125,18 @@ export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export function makeSeed(): PortalState {
   const staff: Staff[] = [
-    { id: "marisa", name: "Marisa Torres", first: "Marisa", role: "Server", phone: "(561) 555-0184", photo: av("marisa"), color: "#0ecf7f", yesRate: 0.89, hoursWeek: 31, status: "active", availNote: "Not Sundays" },
-    { id: "jake", name: "Jake Reyes", first: "Jake", role: "Server", phone: "(561) 555-0119", photo: av("jake"), color: "#7c6cf6", yesRate: 0.62, hoursWeek: 34, status: "active", availNote: "Anytime" },
-    { id: "katie", name: "Katie Shaw", first: "Katie", role: "Server", phone: "(561) 555-0177", photo: av("katie"), color: "#f4b53f", yesRate: 0.74, hoursWeek: 28, status: "active", availNote: "No doubles" },
-    { id: "devon", name: "Devon King", first: "Devon", role: "Busser", phone: "(561) 555-0152", photo: av("devon"), color: "#ff7a68", yesRate: 0.91, hoursWeek: 26, status: "active", availNote: "Wants more hours" },
-    { id: "dana", name: "Dana Whitfield", first: "Dana", role: "Server", phone: "(561) 555-0146", photo: av("dana"), color: "#0ecf7f", yesRate: 0.55, hoursWeek: 22, status: "active", availNote: "In school Tue/Thu" },
-    { id: "luis", name: "Luis Mendoza", first: "Luis", role: "Prep", phone: "(561) 555-0128", photo: av("luis"), color: "#7c6cf6", yesRate: 0.83, hoursWeek: 36, status: "active", availNote: "Mornings only" },
-    { id: "sasha", name: "Sasha Bell", first: "Sasha", role: "Server", phone: "(561) 555-0139", photo: av("sasha"), color: "#f4b53f", yesRate: 0.7, hoursWeek: 30, status: "active", availNote: "Anytime" },
-    { id: "sam", name: "Sam Okafor", first: "Sam", role: "Bartender", phone: "(561) 555-0163", photo: av("sam"), color: "#ff7a68", keyholder: true, yesRate: 0.66, hoursWeek: 38, status: "active", availNote: "Closes only" },
-    { id: "erin", name: "Erin Castillo", first: "Erin", role: "Host", phone: "(561) 555-0171", photo: av("erin"), color: "#0ecf7f", minor: true, yesRate: 0.8, hoursWeek: 16, status: "active", availNote: "17 · school nights out by 10" },
-    { id: "rosa", name: "Rosa Vega", first: "Rosa", role: "Line cook", phone: "(561) 555-0195", photo: av("rosa"), color: "#7c6cf6", keyholder: true, yesRate: 0.77, hoursWeek: 39, status: "active", availNote: "Not Mondays" },
-    { id: "tyler", name: "Tyler James", first: "Tyler", role: "Server", phone: "(561) 555-0102", photo: null, color: "#0ecf7f", yesRate: 0, hoursWeek: 0, status: "invited", availNote: "Invite sent 2:14 PM · waiting on YES" },
-    { id: "alex", name: "Alex Price", first: "Alex", role: "Busser", phone: "(561) 555-0187", photo: null, color: "#f4b53f", yesRate: 0, hoursWeek: 12, status: "pending", availNote: "Replied YES · picking photo & availability" },
+    { id: "marisa", name: "Marisa Torres", first: "Marisa", role: "Server", phone: "(561) 555-0184", photo: av("marisa"), color: "#0ecf7f", yesRate: 0.89, hoursWeek: 31, status: "active", availNote: "Not Sundays", rate: 12, since: "May 2026", certs: ["Food handler"], picks90: 9, drops90: 1 },
+    { id: "jake", name: "Jake Reyes", first: "Jake", role: "Server", phone: "(561) 555-0119", photo: av("jake"), color: "#7c6cf6", yesRate: 0.62, hoursWeek: 34, status: "active", availNote: "Anytime", rate: 12, since: "Jan 2026", certs: ["Food handler"], picks90: 5, drops90: 2 },
+    { id: "katie", name: "Katie Shaw", first: "Katie", role: "Server", phone: "(561) 555-0177", photo: av("katie"), color: "#f4b53f", yesRate: 0.74, hoursWeek: 28, status: "active", availNote: "No doubles", rate: 12, since: "Aug 2025", certs: ["Food handler", "Trainer"], picks90: 7, drops90: 0 },
+    { id: "devon", name: "Devon King", first: "Devon", role: "Busser", phone: "(561) 555-0152", photo: av("devon"), color: "#ff7a68", yesRate: 0.91, hoursWeek: 26, status: "active", availNote: "Wants more hours", rate: 11, since: "Jun 2026", certs: ["Food handler"], picks90: 12, drops90: 0 },
+    { id: "dana", name: "Dana Whitfield", first: "Dana", role: "Server", phone: "(561) 555-0146", photo: av("dana"), color: "#0ecf7f", yesRate: 0.55, hoursWeek: 22, status: "active", availNote: "In school Tue/Thu", rate: 12, since: "Feb 2026", certs: ["Food handler"], picks90: 3, drops90: 4 },
+    { id: "luis", name: "Luis Mendoza", first: "Luis", role: "Prep", phone: "(561) 555-0128", photo: av("luis"), color: "#7c6cf6", yesRate: 0.83, hoursWeek: 36, status: "active", availNote: "Mornings only", rate: 17, since: "Sep 2024", certs: ["Food handler"], picks90: 6, drops90: 1 },
+    { id: "sasha", name: "Sasha Bell", first: "Sasha", role: "Server", phone: "(561) 555-0139", photo: av("sasha"), color: "#f4b53f", yesRate: 0.7, hoursWeek: 30, status: "active", availNote: "Anytime", rate: 12, since: "Nov 2025", certs: ["Food handler"], picks90: 8, drops90: 1 },
+    { id: "sam", name: "Sam Okafor", first: "Sam", role: "Bartender", phone: "(561) 555-0163", photo: av("sam"), color: "#ff7a68", keyholder: true, yesRate: 0.66, hoursWeek: 38, status: "active", availNote: "Closes only", rate: 15, since: "Mar 2024", certs: ["Alcohol service", "Food handler"], picks90: 4, drops90: 1 },
+    { id: "erin", name: "Erin Castillo", first: "Erin", role: "Host", phone: "(561) 555-0171", photo: av("erin"), color: "#0ecf7f", minor: true, yesRate: 0.8, hoursWeek: 16, status: "active", availNote: "School nights out by 10", rate: 13, since: "Jul 2026", certs: [], picks90: 4, drops90: 0 },
+    { id: "rosa", name: "Rosa Vega", first: "Rosa", role: "Line cook", phone: "(561) 555-0195", photo: av("rosa"), color: "#7c6cf6", keyholder: true, yesRate: 0.77, hoursWeek: 39, status: "active", availNote: "Not Mondays", rate: 19, since: "Oct 2023", certs: ["Alcohol service", "Food handler", "Trainer"], picks90: 5, drops90: 0 },
+    { id: "tyler", name: "Tyler James", first: "Tyler", role: "Server", phone: "(561) 555-0102", photo: null, color: "#0ecf7f", yesRate: 0, hoursWeek: 0, status: "invited", availNote: "Invite sent 2:14 PM · waiting on YES", rate: 12, since: "Today", certs: [], picks90: 0, drops90: 0 },
+    { id: "alex", name: "Alex Price", first: "Alex", role: "Busser", phone: "(561) 555-0187", photo: null, color: "#f4b53f", yesRate: 0, hoursWeek: 12, status: "pending", availNote: "Replied YES · picking photo & availability", rate: 11, since: "This week", certs: [], picks90: 0, drops90: 0 },
   ];
 
   // A believable week: dinner-heavy, Friday stacked.
@@ -139,7 +145,7 @@ export function makeSeed(): PortalState {
   const shifts: Shift[] = [
     S("s1", "marisa", 0, "5:00 PM", "11:00 PM", "Server", "published", "Patio"),
     S("s2", "marisa", 2, "5:00 PM", "11:00 PM", "Server", "published", "Main"),
-    S("s3", "marisa", 4, "5:00 PM", "11:00 PM", "Server", "covering", "Main"),
+    S("s3", "dana", 4, "5:00 PM", "11:00 PM", "Server", "covering", "Main"),
     S("s4", "marisa", 5, "11:00 AM", "5:00 PM", "Server", "published", "Patio"),
     S("s5", "jake", 0, "11:00 AM", "5:00 PM", "Server", "published", "Main"),
     S("s6", "jake", 1, "11:00 AM", "5:00 PM", "Server"),
@@ -233,7 +239,7 @@ export function makeSeed(): PortalState {
     {
       id: "r-3",
       title: "Sunday brunch server · handed to you",
-      sub: "The one that shows what happens when everyone says no",
+      sub: "7 AM server shift · all 5 eligible passed",
       state: "handed-off",
       when: "Last Sunday",
       outcome: "All 5 eligible passed · you got the dial list at 8:12 AM · you called Rosa, marked it covered",
@@ -255,7 +261,7 @@ export function makeSeed(): PortalState {
       sub: "Rain flipped the forecast",
       state: "covered",
       when: "Tuesday",
-      outcome: "2 volunteers in 9 min · saved ~$118 labor",
+      outcome: "2 volunteers in 9 min · saved about $118 in labor",
       steps: [
         { label: "Rain forecast for service", detail: "patio covers projected to drop", state: "done" },
         { label: "Offered voluntary cuts", detail: "first replies win, nobody forced", state: "done" },
@@ -276,33 +282,40 @@ export function makeSeed(): PortalState {
     { id: "f4", kind: "onboard", who: "tyler", text: "Invite texted to Tyler James", sub: "he replies YES, he's on the roster", when: "2:14 PM" },
     { id: "f5", kind: "swap", who: "erin", text: "Erin ↔ Katie Sunday swap approved", sub: "you tapped Approve · both confirmed by text", when: "Yesterday" },
     { id: "f6", kind: "headsup", who: "dana", text: "Heads-up: Dana has dropped 3 straight Fridays", sub: "kept private · pattern + history in her file", when: "Yesterday" },
-    { id: "f7", kind: "cover", who: "jake", text: "Rained-out patio: Jake & Devon took voluntary cuts", sub: "saved ~$118 in labor", when: "Tuesday" },
+    { id: "f7", kind: "cover", who: "jake", text: "Rained-out patio: Jake & Devon took voluntary cuts", sub: "saved about $118 in labor", when: "Tuesday" },
   ];
 
   const rules: Rule[] = [
     // Hours & pay
-    { id: "ot", group: "Hours & pay", name: "Overtime cap", plain: "Nobody gets offered a shift that would push them past the cap. Hard stop, not a warning after payroll.", on: true, value: "40 hrs/week", options: ["38 hrs/week", "40 hrs/week", "45 hrs/week"], lastUsed: "Kept Sam off Friday close (would've hit 44)" },
-    { id: "maxasks", group: "Hours & pay", name: "Don't burn out the yes-people", plain: "Caps how many extra-shift asks any one person gets per week, so your most reliable people don't carry every gap.", on: true, value: "3 asks/week", options: ["2 asks/week", "3 asks/week", "No limit"], lastUsed: "Skipped Devon on Thursday, he'd hit 3" },
-    { id: "cuts", group: "Hours & pay", name: "Slow-night voluntary cuts", plain: "When a night books light, Tagout can offer voluntary cuts. First replies win, nobody gets forced off.", on: true, value: "Offer automatically", options: ["Offer automatically", "Only when I ask"], lastUsed: "Tuesday's rained-out patio, saved ~$118" },
+    { id: "ot", group: "Hours & pay", name: "Overtime cap", plain: "Nobody gets offered a shift that would push them past the cap. Hard stop, not a warning after payroll.", on: true, value: "40 hrs/week", options: ["38 hrs/week", "40 hrs/week", "45 hrs/week"], lastUsed: "Aug 29, 4:41 PM · blocked an offer to Sam O. (over 40 hrs)" },
+    { id: "maxasks", group: "Hours & pay", name: "Don't burn out the yes-people", plain: "Caps how many extra-shift asks any one person gets per week, so your most reliable people don't carry every gap.", on: true, value: "3 asks/week", options: ["2 asks/week", "3 asks/week", "No limit"], lastUsed: "Aug 28 · skipped Devon K. (3 asks this week)" },
+    { id: "cuts", group: "Hours & pay", name: "Slow-night voluntary cuts", plain: "When a night books light, Tagout can offer voluntary cuts. First replies win, nobody gets forced off.", on: true, value: "Offer automatically", options: ["Offer automatically", "Only when I ask"], lastUsed: "Aug 26 · 2 voluntary cuts accepted" },
+    { id: "minshift", group: "Hours & pay", name: "Minimum pickup length", plain: "Tagout never offers a pickup shorter than this. Nobody drives in for 90 minutes of work.", on: true, value: "3 hrs", options: ["2 hrs", "3 hrs", "4 hrs"], lastUsed: "Aug 25 · 2-hr gap not offered" },
+    { id: "maxdays", group: "Hours & pay", name: "Days in a row", plain: "Nobody gets offered a shift that would make too many days straight, even if they'd say yes.", on: true, value: "6 days max", options: ["5 days max", "6 days max", "Off"], lastUsed: "Aug 25 · held Rosa V. (6 days in a row)" },
     // Compliance
-    { id: "minor", group: "Compliance", name: "Minor curfew", plain: "Erin is 17. On school nights she's never offered anything past curfew. State rules, handled.", on: true, value: "Out by 10 PM", options: ["Out by 9 PM", "Out by 10 PM", "Out by 11 PM"], lastUsed: "Friday host shift ends 10 PM sharp" },
-    { id: "breaks", group: "Compliance", name: "Break reminders", plain: "Anyone past six hours without a 30-minute break gets flagged on their timecard before you approve it.", on: true, value: "30 min by hour 6", options: ["30 min by hour 5", "30 min by hour 6", "Off"], lastUsed: "Flagged Devon's 20-minute break today" },
-    { id: "keys", group: "Compliance", name: "Keyholders open & close", plain: "Opens and closes only go to people who can unlock the door: Sam and Rosa.", on: true, value: "2 keyholders", lastUsed: "Sunday open offered to Rosa first" },
-    { id: "clopen", group: "Compliance", name: "No accidental clopens", plain: "Closing then opening the next morning needs a real night's rest between. Tagout asks the person before it ever books one.", on: true, value: "10 hr gap", options: ["8 hr gap", "10 hr gap", "12 hr gap"], lastUsed: "Blocked Katie's Sat/Sun clopen, 3:22 PM" },
+    { id: "minor", group: "Compliance", name: "Minor curfew", plain: "Erin is 17. On school nights she's never offered anything past curfew. State rules, handled.", on: true, value: "Out by 10 PM", options: ["Out by 9 PM", "Out by 10 PM", "Out by 11 PM"], lastUsed: "Aug 29 · Erin C.'s shift capped at 10:00 PM" },
+    { id: "breaks", group: "Compliance", name: "Break reminders", plain: "Anyone past six hours without a 30-minute break gets flagged on their timecard before you approve it.", on: true, value: "30 min by hour 6", options: ["30 min by hour 5", "30 min by hour 6", "Off"], lastUsed: "Aug 30 · timecard flagged (20-min break over 6 hrs)" },
+    { id: "keys", group: "Compliance", name: "Keyholders open & close", plain: "Opens and closes only go to people who can unlock the door: Sam and Rosa.", on: true, value: "2 keyholders", lastUsed: "Aug 24 · open shift limited to keyholders" },
+    { id: "clopen", group: "Compliance", name: "No accidental clopens", plain: "Closing then opening the next morning needs a real night's rest between. Tagout asks the person before it ever books one.", on: true, value: "10 hr gap", options: ["8 hr gap", "10 hr gap", "12 hr gap"], lastUsed: "Aug 30, 3:22 PM · blocked a swap (Katie S., 9-hr turnaround)" },
+    { id: "barcert", group: "Compliance", name: "Certified behind the bar", plain: "Bartender shifts only get offered to people with an alcohol service certification on file.", on: true, value: "Cert required", lastUsed: "Standing · 2 staff hold alcohol certification" },
     // How Tagout asks
-    { id: "quiet", group: "How Tagout asks", name: "Quiet hours", plain: "No texts during quiet hours unless it's a same-morning emergency.", on: true, value: "9:30 PM to 7 AM", options: ["9 PM to 8 AM", "9:30 PM to 7 AM", "10 PM to 6 AM"], lastUsed: "Held Sunday asks until 7:01 AM" },
-    { id: "spacing", group: "How Tagout asks", name: "Time per person", plain: "How long each person gets to answer before Tagout moves down the list.", on: true, value: "15 min each", options: ["10 min each", "15 min each", "30 min each"], lastUsed: "Moved from Marisa to Sasha at the 15" },
-    { id: "escalate", group: "How Tagout asks", name: "When you get the dial list", plain: "Tagout always asks everyone eligible. This sets how early you also get names and numbers to dial yourself.", on: true, value: "1 hr before shift", options: ["2 hrs before shift", "1 hr before shift", "Only if the list runs dry"], lastUsed: "Sunday brunch: list handed over at 8:12 AM" },
-    { id: "fair", group: "How Tagout asks", name: "Fair first dibs", plain: "Extra shifts go to whoever asked for more hours first, then by who actually says yes. No favorites.", on: true, value: "Devon flagged: wants hours", lastUsed: "Devon got first ask on Tuesday pickup" },
+    { id: "quiet", group: "How Tagout asks", name: "Quiet hours", plain: "No texts during quiet hours unless it's a same-morning emergency.", on: true, value: "9:30 PM to 7 AM", options: ["9 PM to 8 AM", "9:30 PM to 7 AM", "10 PM to 6 AM"], lastUsed: "Aug 24 · 3 messages held until 7:00 AM" },
+    { id: "spacing", group: "How Tagout asks", name: "Time per person", plain: "How long each person gets to answer before Tagout moves down the list.", on: true, value: "15 min each", options: ["10 min each", "15 min each", "30 min each"], lastUsed: "Aug 30, 4:56 PM · advanced to next person at 15 min" },
+    { id: "escalate", group: "How Tagout asks", name: "When you get the dial list", plain: "Tagout always asks everyone eligible. This sets how early you also get names and numbers to dial yourself.", on: true, value: "1 hr before shift", options: ["2 hrs before shift", "1 hr before shift", "Only if the list runs dry"], lastUsed: "Aug 24, 8:12 AM · call list sent to GM" },
+    { id: "fair", group: "How Tagout asks", name: "Who gets asked first", plain: "The order Tagout works the list. People flagged as wanting hours always jump the line.", on: true, value: "Best yes-rate first", options: ["Fewest hours first", "Best yes-rate first", "Even rotation"], lastUsed: "Aug 26 · first ask to Devon K. (requested hours)" },
+    { id: "urgent", group: "How Tagout asks", name: "Last-minute mode", plain: "When a call-out lands this close to the shift, Tagout shortens the wait per person and warns you sooner.", on: true, value: "Inside 3 hrs", options: ["Inside 2 hrs", "Inside 3 hrs", "Inside 4 hrs"], lastUsed: "Aug 30, 6:04 AM · shortened waits (call-out inside window)" },
     // Approvals
-    { id: "swaps", group: "Approvals", name: "Swaps that pass every rule", plain: "When a swap clears hours, roles, and rest rules, Tagout can finish it alone or still bring it to you.", on: true, value: "Still ask me", options: ["Auto-approve", "Still ask me"], lastUsed: "Erin and Katie's Sunday swap came to you first" },
-    { id: "training", group: "Approvals", name: "New-hire training window", plain: "New hires don't get solo shifts until they've been on the floor long enough. Tagout pairs them with a trainer instead.", on: true, value: "First 2 weeks", options: ["First week", "First 2 weeks", "First month"], lastUsed: "Tyler will pair with Marisa once he's onboarded" },
+    { id: "swaps", group: "Approvals", name: "Swaps that pass every rule", plain: "When a swap clears hours, roles, and rest rules, Tagout can finish it alone or still bring it to you.", on: true, value: "Still ask me", options: ["Auto-approve", "Still ask me"], lastUsed: "Aug 29 · swap sent for approval" },
+    { id: "training", group: "Approvals", name: "New-hire training window", plain: "New hires don't get solo shifts until they've been on the floor long enough. Tagout pairs them with a trainer instead.", on: true, value: "First 2 weeks", options: ["First week", "First 2 weeks", "First month"], lastUsed: "Standing · applies to Tyler J. after onboarding" },
+    { id: "otexcept", group: "Approvals", name: "Overtime exceptions", plain: "If the only person left for a shift would go into overtime, Tagout can bring it to you instead of leaving the gap.", on: true, value: "Ask me first", options: ["Never allow", "Ask me first"], lastUsed: "Aug 9 · last exception request" },
+    { id: "dropreason", group: "Approvals", name: "Drops need a reason", plain: "When someone drops a shift, Tagout asks why and logs it to their file, so patterns show up early.", on: true, value: "Required", options: ["Required", "Optional"], lastUsed: "Aug 30, 4:41 PM · reason logged (Dana W.)" },
+    { id: "pickupboard", group: "Approvals", name: "Post drops to the pickup board", plain: "Dropped shifts also appear in the staff portal's pickup list while Tagout works the texts, so browsers can grab them too.", on: true, value: "On", options: ["On", "Off"], lastUsed: "Aug 30 · 1 open shift posted to the board" },
   ];
 
   const timeOff: TimeOff[] = [
     { id: "t1", staffId: "sasha", range: "Sep 12–14", reason: "Sister's wedding", state: "pending" },
     { id: "t2", staffId: "devon", range: "Sep 3", reason: "DMV appointment", state: "pending" },
-    { id: "t3", staffId: "rosa", range: "Aug 21", reason: "Doctor", state: "approved" },
+    { id: "t3", staffId: "rosa", range: "Sep 8", reason: "Doctor", state: "approved" },
   ];
 
   const events: HouseEvent[] = [

@@ -39,7 +39,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-cream">
       {/* sidebar (desktop) */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[220px] flex-col p-4 lg:flex">
-        <div className="flex h-full flex-col rounded-[28px] bg-ink p-4">
+        <div className="flex h-full flex-col rounded-[28px] bg-pine p-4">
           <Link href="/portal" className="flex items-center gap-2.5 px-2 pt-1">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green">
               <BubbleMark size={18} className="text-white" />
@@ -84,7 +84,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             onClick={logout}
             className="mt-3 rounded-2xl px-3.5 py-2.5 text-left text-[13.5px] font-bold text-paper/50 transition-colors hover:bg-paper/8 hover:text-paper"
           >
-            Log out · resets demo
+            Log out
           </button>
         </div>
       </aside>
@@ -132,7 +132,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               )}
             </button>
             <div className="flex items-center gap-2.5 rounded-full bg-white py-1.5 pl-1.5 pr-4 shadow-pop">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink font-display text-[13px] font-extrabold text-paper">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-dark font-display text-[13px] font-extrabold text-paper">
                 J
               </span>
               <div className="leading-tight">
@@ -185,7 +185,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <Link
               href="/portal/inbox"
               onClick={() => setNotifOpen(false)}
-              className="mt-1 block rounded-2xl bg-ink py-2.5 text-center text-[13px] font-extrabold text-paper"
+              className="mt-1 block rounded-2xl bg-green-dark py-2.5 text-center text-[13px] font-extrabold text-paper"
             >
               Open the full inbox →
             </Link>
@@ -200,7 +200,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       <nav
         aria-label="Portal mobile"
         style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
-        className="fixed inset-x-3 z-40 flex justify-between rounded-[24px] bg-ink px-2 py-2 lg:hidden"
+        className="fixed inset-x-3 z-40 flex justify-between rounded-[24px] bg-pine px-2 py-2 lg:hidden"
       >
         {NAV.slice(0, 5).map((n) => {
           const active = n.href === "/portal" ? pathname === "/portal" : pathname.startsWith(n.href);
@@ -242,7 +242,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end bg-ink/40 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-50 flex items-end bg-pine/40 backdrop-blur-sm lg:hidden"
             onClick={() => setMoreOpen(false)}
           >
             <motion.div
@@ -254,7 +254,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               className="w-full rounded-t-[28px] bg-white p-5"
               style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
             >
-              <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-ink/15" />
+              <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-pine/15" />
               <div className="grid grid-cols-2 gap-3">
                 {NAV.slice(5).map((n) => (
                   <Link
@@ -272,7 +272,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 onClick={logout}
                 className="mt-3 w-full rounded-2xl border-2 border-ink/10 py-3 text-[13.5px] font-extrabold text-ink/55"
               >
-                Log out · resets the demo
+                Log out
               </button>
             </motion.div>
           </motion.div>

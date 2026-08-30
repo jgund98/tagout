@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePortal, shiftHours, uid, needsYouCount } from "@/lib/portal/store";
-import { Avatar, AvatarStack, Chip, StatTile, LiveDot, GreenBtn } from "@/components/portal/ui";
+import { Avatar, AvatarStack, Burst, Chip, StatTile, LiveDot, GreenBtn } from "@/components/portal/ui";
 import type { FeedEvent } from "@/lib/portal/data";
 
 const KIND_META: Record<FeedEvent["kind"], { chip: string; tone: "mint" | "lav" | "butter" | "blush" }> = {
@@ -28,6 +28,11 @@ export default function TonightPage() {
   const { state, dispatch } = usePortal();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("all");
   const [note, setNote] = useState("");
+  const [burst, setBurst] = useState(false);
+  const celebrate = () => {
+    setBurst(true);
+    setTimeout(() => setBurst(false), 950);
+  };
 
   const staffOf = (id: string | null) => state.staff.find((s) => s.id === id) ?? null;
 
@@ -38,7 +43,10 @@ export default function TonightPage() {
   );
   const onClock = state.punches.filter((p) => p.outAt === null);
   const liveRun = state.runs.find((r) => r.state === "live");
-  const laborTonight = tonight.reduce((sum, s) => sum + shiftHours(s) * 16, 0); // demo: blended $16/hr
+  const laborTonight = tonight.reduce((sum, s) => {
+    const person = state.staff.find((p) => p.id === s.staffId);
+    return sum + shiftHours(s) * (person?.rate ?? 14);
+  }, 0);
 
   const feed = state.feed.filter((f) => (filter === "all" ? true : f.kind === filter));
 
@@ -49,19 +57,20 @@ export default function TonightPage() {
 
   return (
     <div className="mx-auto max-w-6xl">
+      <Burst show={burst} />
       {needs > 0 && (
         <Link
           href="/portal/coverage"
-          className="mb-5 flex items-center gap-3 rounded-3xl bg-ink p-4 shadow-pop transition-transform hover:scale-[1.005]"
+          className="mb-5 flex items-center gap-3 rounded-3xl border-2 border-coral/25 bg-white p-4 shadow-pop transition-transform hover:scale-[1.005]"
         >
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-coral font-display text-[16px] font-extrabold text-white">
             {needs}
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block text-[14.5px] font-extrabold leading-snug text-paper">
+            <span className="block text-[14.5px] font-extrabold leading-snug text-ink">
               {needs === 1 ? "One thing needs" : `${needs} things need`} your call
             </span>
-            <span className="block text-[12.5px] font-semibold text-paper/50">
+            <span className="block text-[12.5px] font-semibold text-ink/50">
               approvals, timecards, time off · everything else is handled
             </span>
           </span>
@@ -83,7 +92,7 @@ export default function TonightPage() {
         {liveRun ? (
           <Link
             href="/portal/coverage"
-            className="flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-[14px] font-extrabold text-paper transition-all hover:shadow-lift"
+            className="flex items-center gap-2 rounded-full bg-pine px-5 py-3 text-[14px] font-extrabold text-paper transition-all hover:shadow-lift"
           >
             <LiveDot /> 1 cover in motion →
           </Link>
@@ -112,7 +121,7 @@ export default function TonightPage() {
                 key={f.key}
                 onClick={() => setFilter(f.key)}
                 className={`rounded-full px-3.5 py-1.5 text-[12.5px] font-extrabold transition-colors ${
-                  filter === f.key ? "bg-ink text-paper" : "bg-white text-ink/55 shadow-pop hover:text-ink"
+                  filter === f.key ? "bg-green-dark text-white" : "bg-white text-ink/55 shadow-pop hover:text-ink"
                 }`}
               >
                 {f.label}
@@ -134,6 +143,7 @@ export default function TonightPage() {
                   )}
                   <motion.article
                     layout
+                    whileHover={{ y: -2 }}
                     initial={{ opacity: 0, y: -14, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0 }}
@@ -169,7 +179,7 @@ export default function TonightPage() {
         <div className="space-y-5">
           {/* live cover card */}
           {liveRun && (
-            <section className="rounded-3xl bg-ink p-5">
+            <section className="rounded-3xl bg-pine p-5">
               <p className="flex items-center gap-2 text-[11.5px] font-extrabold uppercase tracking-wide text-green">
                 <LiveDot /> Happening right now
               </p>
@@ -177,31 +187,35 @@ export default function TonightPage() {
                 {liveRun.title}
               </h3>
               <p className="mt-1 text-[13px] font-semibold text-paper/55">{liveRun.sub}</p>
-              <div className="mt-3.5 space-y-2">
-                {liveRun.steps.map((s, i) => (
-                  <div key={i} className="flex items-start gap-2.5">
-                    <span
-                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
-                        s.state === "done"
-                          ? "bg-green/20 text-green"
-                          : s.state === "live"
-                            ? "bg-green text-ink"
-                            : "bg-paper/10 text-paper/40"
-                      }`}
-                    >
-                      {s.state === "done" ? "✓" : i + 1}
-                    </span>
-                    <p className={`text-[13px] font-semibold leading-snug ${s.state === "todo" ? "text-paper/40" : "text-paper/85"}`}>
-                      {s.label}
-                      {s.detail && <span className="block text-[11.5px] font-medium text-paper/45">{s.detail}</span>}
-                    </p>
+              {(() => {
+                const live = liveRun.steps.find((s) => s.state === "live");
+                const lastDone = [...liveRun.steps].reverse().find((s) => s.state === "done");
+                return (
+                  <div className="mt-4">
+                    {live && (
+                      <p className="flex items-start gap-2 text-[14.5px] font-extrabold leading-snug text-paper">
+                        <LiveDot className="mt-1.5" />
+                        <span>
+                          {live.label}
+                          {live.detail && (
+                            <span className="block text-[12px] font-medium text-paper/50">{live.detail}</span>
+                          )}
+                        </span>
+                      </p>
+                    )}
+                    {lastDone && (
+                      <p className="mt-2.5 text-[12.5px] font-semibold text-paper/45">
+                        Last update: {lastDone.detail ?? lastDone.label}
+                      </p>
+                    )}
                   </div>
-                ))}
-              </div>
+                );
+              })()}
               {liveRun.outcome?.includes("needs your approval") && (
                 <GreenBtn
                   className="mt-4 w-full"
                   onClick={() => {
+                    celebrate();
                     dispatch({ type: "APPROVE_LIVE_COVER" });
                     dispatch({
                       type: "FEED_PUSH",

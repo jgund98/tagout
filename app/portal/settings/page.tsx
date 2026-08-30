@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { usePortal, endDemoSession } from "@/lib/portal/store";
-import { Chip, PageTitle, DemoNote, GhostBtn } from "@/components/portal/ui";
+import { Chip, PageTitle, GhostBtn } from "@/components/portal/ui";
 
 const INTEGRATIONS = [
   { name: "SMS provider", what: "Real texting: covers, invites, sign-in codes", state: "Setup needed", key: true },
@@ -26,8 +26,8 @@ export default function SettingsPage() {
           <dl className="mt-3 space-y-2.5 text-[14px]">
             {[
               ["Name", state.houseName],
-              ["Timezone", "Eastern (Palm Beach, FL)"],
-              ["Service hours", "11 AM – 12 AM · brunch Sundays"],
+              ["Timezone", "Eastern Time (ET)"],
+              ["Service hours", "11:00 AM – 12:00 AM"],
               ["Tagout's number", "(561) 555-8248"],
               ["GM cell", "(561) 324-9522"],
             ].map(([k, v]) => (
@@ -37,11 +37,11 @@ export default function SettingsPage() {
               </div>
             ))}
           </dl>
-          <DemoNote>Editing house details unlocks with real accounts; in demo mode they reset on logout anyway.</DemoNote>
+
         </section>
 
         {/* plan & billing */}
-        <section className="rounded-3xl bg-ink p-5">
+        <section className="rounded-3xl bg-pine p-5">
           <h2 className="font-display text-[18px] font-extrabold text-paper">Plan &amp; billing</h2>
           <p className="mt-2 font-display text-[30px] font-extrabold text-green">
             $348<span className="text-[15px] text-paper/50"> / month</span>
@@ -97,7 +97,7 @@ export default function SettingsPage() {
               </p>
               <a
                 href="mailto:hello@trytagout.com?subject=Adding%20a%20second%20location"
-                className="mt-3 inline-block rounded-full bg-ink px-4 py-2 text-[12.5px] font-extrabold text-paper"
+                className="mt-3 inline-block rounded-full bg-green-dark px-4 py-2 text-[12.5px] font-extrabold text-paper"
               >
                 Email us, we&apos;ll set it up →
               </a>
@@ -119,26 +119,18 @@ export default function SettingsPage() {
               </div>
             ))}
           </div>
-          <DemoNote>
-            Everything in this demo runs without them; the moment keys land, the same flows go live for real.
-          </DemoNote>
+
         </section>
       </div>
 
-      <div className="mt-6 flex items-center justify-between rounded-3xl bg-blush/40 p-5">
-        <div>
-          <p className="font-display text-[15px] font-extrabold text-ink">Demo mode</p>
-          <p className="text-[13px] font-semibold text-ink/55">
-            Logging out wipes every change and reseeds the restaurant, fresh for the next walkthrough.
-          </p>
-        </div>
+      <div className="mt-6 flex justify-end">
         <GhostBtn
           onClick={() => {
             endDemoSession();
             router.push("/login");
           }}
         >
-          Log out & reset
+          Log out
         </GhostBtn>
       </div>
     </div>

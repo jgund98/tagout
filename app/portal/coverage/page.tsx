@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePortal, uid } from "@/lib/portal/store";
-import { Avatar, Chip, LiveDot, GreenBtn, GhostBtn, PageTitle, TagBubble, ThemBubble, DemoNote } from "@/components/portal/ui";
+import { Avatar, Burst, Chip, LiveDot, GreenBtn, GhostBtn, PageTitle, TagBubble, ThemBubble } from "@/components/portal/ui";
 import type { CoverageRun } from "@/lib/portal/data";
 
 const MODES = [
@@ -16,6 +16,7 @@ const MODES = [
 export default function CoveragePage() {
   const { state, dispatch } = usePortal();
   const [openRun, setOpenRun] = useState<string | null>("r-live");
+  const [burst, setBurst] = useState(false);
   const staffOf = (id?: string) => state.staff.find((s) => s.id === id) ?? null;
 
   const liveRun = state.runs.find((r) => r.state === "live");
@@ -26,6 +27,8 @@ export default function CoveragePage() {
     (needsApproval ? 1 : 0) + pendingCards + pendingTimeOff;
 
   const approve = () => {
+    setBurst(true);
+    setTimeout(() => setBurst(false), 950);
     dispatch({ type: "APPROVE_LIVE_COVER" });
     dispatch({
       type: "FEED_PUSH",
@@ -35,6 +38,7 @@ export default function CoveragePage() {
 
   return (
     <div className="mx-auto max-w-5xl">
+      <Burst show={burst} />
       <PageTitle
         title="Coverage"
         sub="Every dropped shift, who Tagout asked, what they said, and where you come in."
@@ -78,7 +82,7 @@ export default function CoveragePage() {
       )}
 
       {/* NEEDS YOU: the catch-up queue */}
-      <section className="rounded-[28px] bg-ink p-5 sm:p-6">
+      <section className="rounded-[28px] bg-pine p-5 sm:p-6">
         <div className="flex items-center justify-between">
           <h2 className="flex items-center gap-2.5 font-display text-[19px] font-extrabold text-paper">
             Needs you
@@ -136,7 +140,7 @@ export default function CoveragePage() {
       <section className="mt-6 rounded-[28px] bg-white p-5 shadow-pop sm:p-6">
         <h2 className="font-display text-[18px] font-extrabold text-ink">How much should Tagout handle?</h2>
         <p className="mt-1 text-[13px] font-medium text-ink/50">
-          Your call, changeable any time. Most houses start in the middle and go hands-off within a month.
+          Change it any time. It applies from the next text on.
         </p>
         <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
           {MODES.map((m) => {
@@ -235,7 +239,7 @@ function RunCard({
               {/* steps */}
               <div>
                 <p className="mb-2.5 text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">
-                  What Tagout did
+                  Timeline
                 </p>
                 <div className="space-y-2.5">
                   {run.steps.map((s, i) => (
@@ -246,7 +250,7 @@ function RunCard({
                             ? "bg-mint text-green-dark"
                             : s.state === "live"
                               ? "bg-green text-ink"
-                              : "bg-ink/8 text-ink/35"
+                              : "bg-pine/8 text-ink/35"
                         }`}
                       >
                         {s.state === "done" ? "✓" : i + 1}
@@ -259,7 +263,7 @@ function RunCard({
                   ))}
                 </div>
                 {run.outcome && (
-                  <p className="mt-3 w-fit rounded-full bg-ink px-3.5 py-1.5 text-[11.5px] font-bold text-paper">
+                  <p className="mt-3 w-fit rounded-full bg-pine px-3.5 py-1.5 text-[11.5px] font-bold text-paper">
                     {run.outcome}
                   </p>
                 )}
@@ -267,7 +271,7 @@ function RunCard({
               {/* thread */}
               <div className="rounded-2xl bg-[#f1f3f2] p-3.5">
                 <p className="mb-2.5 text-center text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink/35">
-                  The actual texts
+                  Messages
                 </p>
                 <div className="space-y-2">
                   {run.thread.map((b, i) =>

@@ -81,7 +81,7 @@ export default function RulesPage() {
                               key={o}
                               onClick={() => !active && setValue(r, o)}
                               className={`rounded-full px-3.5 py-2 text-[13px] font-extrabold transition-colors ${
-                                active ? "bg-ink text-paper" : "bg-cream text-ink/55 hover:text-ink"
+                                active ? "bg-green-dark text-white" : "bg-cream text-ink/55 hover:text-ink"
                               }`}
                             >
                               {o}
@@ -100,7 +100,7 @@ export default function RulesPage() {
 
                   {r.on && (
                     <p className="mt-3 flex items-center gap-1.5 rounded-2xl rounded-bl-md bg-cream px-3.5 py-2 text-[12.5px] font-semibold text-ink/55">
-                      <span className="text-green-deep">✓</span> Last time it mattered: {r.lastUsed}
+                      <span className="text-green-deep">✓</span> Last applied · {r.lastUsed}
                     </p>
                   )}
                 </div>

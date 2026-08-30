@@ -2,21 +2,19 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { usePortal, shiftHours, toMins, uid } from "@/lib/portal/store";
-import { Avatar, Chip, GreenBtn, GhostBtn, PageTitle, LiveDot } from "@/components/portal/ui";
+import { useEffect, useRef } from "react";
+import { usePortal, shiftHours, toMins, uid, to24h, from24h } from "@/lib/portal/store";
+import { Avatar, Burst, Chip, GreenBtn, GhostBtn, PageTitle, LiveDot } from "@/components/portal/ui";
 import { DAYS, type Role, type Shift, type Staff } from "@/lib/portal/data";
 
 const ROLE_TONES: Record<Role, string> = {
   Server: "bg-mint text-green-dark",
   Bartender: "bg-lav text-violet-mid",
   Host: "bg-blush text-coral",
-  "Line cook": "bg-butter text-[#9a6a00]",
-  Prep: "bg-butter text-[#9a6a00]",
+  "Line cook": "bg-amber/90 text-ink",
+  Prep: "bg-amber/90 text-ink",
   Busser: "bg-lav text-violet-mid",
 };
-
-const TIMES = ["8:00 AM", "10:00 AM", "11:00 AM", "2:00 PM", "4:00 PM", "5:00 PM"];
-const ENDS = ["2:00 PM", "4:00 PM", "5:00 PM", "10:00 PM", "11:00 PM", "12:00 AM"];
 
 type Editing = { staffId: string; day: number; shift?: Shift };
 
@@ -24,6 +22,7 @@ export default function SchedulePage() {
   const { state, dispatch } = usePortal();
   const [editing, setEditing] = useState<Editing | null>(null);
   const [toast, setToast] = useState("");
+  const [burst, setBurst] = useState(false);
 
   const active = state.staff.filter((s) => s.status === "active" || s.status === "pending");
   const shiftsFor = (staffId: string, day: number) =>
@@ -56,7 +55,27 @@ export default function SchedulePage() {
 
   const draftCount = state.shifts.filter((s) => s.state === "draft").length;
 
+  // the board is live: anything that changes it while you're looking says so
+  const shiftsKey = JSON.stringify(state.shifts);
+  const firstRender = useRef(true);
+  const lastKey = useRef(shiftsKey);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      lastKey.current = shiftsKey;
+      return;
+    }
+    if (shiftsKey !== lastKey.current) {
+      lastKey.current = shiftsKey;
+      setToast("Board updated live");
+      const t = setTimeout(() => setToast(""), 2600);
+      return () => clearTimeout(t);
+    }
+  }, [shiftsKey]);
+
   const publish = () => {
+    setBurst(true);
+    setTimeout(() => setBurst(false), 950);
     dispatch({ type: "PUBLISH_WEEK" });
     dispatch({
       type: "FEED_PUSH",
@@ -75,11 +94,15 @@ export default function SchedulePage() {
 
   return (
     <div className="mx-auto max-w-7xl">
+      <Burst show={burst} />
       <PageTitle
         title="Schedule"
-        sub="Build it in minutes. Tagout keeps it whole after you publish."
+        sub="Week of Aug 25 – 31"
         right={
           <div className="flex items-center gap-2">
+            <span className="mr-1 flex items-center gap-1.5 text-[12.5px] font-extrabold text-green-deep">
+              <LiveDot /> Live board
+            </span>
             <GreenBtn onClick={publish} disabled={state.weekPublished && draftCount === 0}>
               {state.weekPublished && draftCount === 0 ? "Published ✓" : `Publish week${draftCount ? ` (${draftCount} new)` : ""}`}
             </GreenBtn>
@@ -91,7 +114,7 @@ export default function SchedulePage() {
       {warnings.length > 0 && (
         <div className="mb-4 space-y-2">
           {warnings.map((w, i) => (
-            <div key={i} className="flex items-center gap-2.5 rounded-2xl bg-butter/60 px-4 py-2.5">
+            <div key={i} className="flex items-center gap-2.5 rounded-2xl border-2 border-amber/60 bg-white px-4 py-2.5">
               <span aria-hidden>⚠️</span>
               <p className="text-[13px] font-bold text-ink">{w}</p>
             </div>
@@ -106,6 +129,7 @@ export default function SchedulePage() {
           shiftsFor={shiftsFor}
           onEdit={(e) => setEditing(e)}
           events={state.events}
+          staff={state.staff}
         />
       </div>
 
@@ -114,7 +138,7 @@ export default function SchedulePage() {
         <table className="w-full min-w-[880px] border-collapse">
           <thead>
             <tr>
-              <th className="w-[180px] px-3 py-2.5 text-left text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">
+              <th className="sticky left-0 z-10 w-[180px] bg-white px-3 py-2.5 text-left text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">
                 Crew
               </th>
               {DAYS.map((d, i) => (
@@ -137,7 +161,7 @@ export default function SchedulePage() {
               const h = hoursOf(p.id);
               return (
                 <tr key={p.id} className="border-t border-ink/5">
-                  <td className="px-3 py-2">
+                  <td className="sticky left-0 z-10 bg-white px-3 py-2">
                     <div className="flex items-center gap-2.5">
                       <Avatar person={p} size={34} />
                       <div className="leading-tight">
@@ -151,7 +175,7 @@ export default function SchedulePage() {
                   {DAYS.map((_, day) => {
                     const cell = shiftsFor(p.id, day);
                     return (
-                      <td key={day} className="px-1.5 py-2 align-top">
+                      <td key={day} className={`px-1.5 py-2 align-top ${day === 4 ? "bg-mint/25" : ""}`}>
                         {cell.length === 0 ? (
                           <button
                             aria-label={`Add shift for ${p.first} on ${DAYS[day]}`}
@@ -190,6 +214,27 @@ export default function SchedulePage() {
               );
             })}
           </tbody>
+          <tfoot>
+            <tr className="border-t-2 border-ink/8">
+              <td className="sticky left-0 z-10 bg-white px-3 py-2.5 text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">
+                Day totals
+              </td>
+              {DAYS.map((_, day) => {
+                const dayShifts = state.shifts.filter((s) => s.day === day && s.state !== "open");
+                const hrs = dayShifts.reduce((h, s) => h + shiftHours(s), 0);
+                const cost = dayShifts.reduce((c, s) => {
+                  const person = state.staff.find((p) => p.id === s.staffId);
+                  return c + shiftHours(s) * (person?.rate ?? 14);
+                }, 0);
+                return (
+                  <td key={day} className={`px-1.5 py-2.5 ${day === 4 ? "bg-mint/25" : ""}`}>
+                    <p className="text-[12px] font-extrabold text-ink">{Math.round(hrs)} hrs</p>
+                    <p className="text-[11px] font-bold text-ink/40">${Math.round(cost).toLocaleString()}</p>
+                  </td>
+                );
+              })}
+            </tr>
+          </tfoot>
         </table>
       </div>
 
@@ -215,7 +260,16 @@ export default function SchedulePage() {
               dispatch({ type: "SHIFT_DELETE", id });
               dispatch({
                 type: "FEED_PUSH",
-                event: { id: uid("f"), kind: "cover", who: editing.staffId, text: `You opened up a ${DAYS[editing.day]} shift`, sub: "Tagout will start finding coverage when you publish", when: "Just now" },
+                event: { id: uid("f"), kind: "cover", who: editing.staffId, text: `You removed a ${DAYS[editing.day]} shift`, sub: "nobody gets asked, the night just runs lighter", when: "Just now" },
+              });
+              setEditing(null);
+            }}
+            onDropCover={(id) => {
+              const shift = state.shifts.find((s) => s.id === id);
+              if (shift) dispatch({ type: "SHIFT_UPSERT", shift: { ...shift, state: "open", staffId: shift.staffId } });
+              dispatch({
+                type: "FEED_PUSH",
+                event: { id: uid("f"), kind: "cover", who: editing.staffId, text: `Coverage started for a ${DAYS[editing.day]} shift`, sub: "Tagout is ranking the eligible list now", when: "Just now" },
               });
               setEditing(null);
             }}
@@ -230,7 +284,7 @@ export default function SchedulePage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 whitespace-nowrap rounded-full bg-ink px-5 py-3 text-[13.5px] font-bold text-paper shadow-lift lg:bottom-8"
+            className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 whitespace-nowrap rounded-full bg-pine px-5 py-3 text-[13.5px] font-bold text-paper shadow-lift lg:bottom-8"
           >
             {toast} ✓
           </motion.p>
@@ -245,29 +299,44 @@ function MobileDayView({
   shiftsFor,
   onEdit,
   events,
+  staff,
 }: {
   active: Staff[];
   shiftsFor: (staffId: string, day: number) => Shift[];
   onEdit: (e: Editing) => void;
   events: { id: string; day: number; label: string; note: string }[];
+  staff: Staff[];
 }) {
   const [day, setDay] = useState(4); // tonight
+  const all = active.flatMap((p) => DAYS.map((_, i) => shiftsFor(p.id, i).map(() => i)).flat());
+  const counts = DAYS.map((_, i) => all.filter((d) => d === i).length);
+  const dayShifts = active.flatMap((p) => shiftsFor(p.id, day));
+  const dayHrs = dayShifts.reduce((h, s) => h + shiftHours(s), 0);
+  const dayCost = dayShifts.reduce((c, s) => {
+    const person = staff.find((p) => p.id === s.staffId);
+    return c + shiftHours(s) * (person?.rate ?? 14);
+  }, 0);
+  const summary = `${dayShifts.length} on · ${Math.round(dayHrs)} hrs · ${Math.round(dayCost).toLocaleString()} scheduled`;
   return (
     <div>
       <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-        {DAYS.map((d, i) => (
-          <button
-            key={d}
-            onClick={() => setDay(i)}
-            className={`shrink-0 rounded-full px-4 py-2 text-[13.5px] font-extrabold transition-colors ${
-              day === i ? "bg-ink text-paper" : "bg-white text-ink/50 shadow-pop"
-            }`}
-          >
-            {d}
-            {i === 4 && <span className="ml-1 text-green">•</span>}
-          </button>
-        ))}
+        {DAYS.map((d, i) => {
+          const n = counts[i];
+          return (
+            <button
+              key={d}
+              onClick={() => setDay(i)}
+              className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[13.5px] font-extrabold transition-colors ${
+                day === i ? "bg-green-dark text-white" : "bg-white text-ink/50 shadow-pop"
+              }`}
+            >
+              {d}
+              <span className={`text-[11px] font-bold ${day === i ? "text-white/60" : "text-ink/30"}`}>{n}</span>
+            </button>
+          );
+        })}
       </div>
+      <p className="mt-2.5 text-[13px] font-bold text-ink/45">{summary}</p>
       {events.filter((e) => e.day === day).map((e) => (
         <p key={e.id} className="mt-3 rounded-2xl rounded-bl-md bg-lav/60 px-4 py-2.5 text-[13px] font-bold text-violet-mid">
           📌 {e.label} · {e.note}
@@ -320,20 +389,24 @@ function ShiftEditor({
   onClose,
   onSave,
   onDelete,
+  onDropCover,
 }: {
   editing: Editing;
   staff: Staff[];
   onClose: () => void;
   onSave: (s: Shift) => void;
   onDelete: (id: string) => void;
+  onDropCover: (id: string) => void;
 }) {
   const person = staff.find((s) => s.id === editing.staffId)!;
+  const [dropping, setDropping] = useState(false);
   const [start, setStart] = useState(editing.shift?.start ?? "5:00 PM");
   const [end, setEnd] = useState(editing.shift?.end ?? "11:00 PM");
   const [role, setRole] = useState<Role>(editing.shift?.role ?? person.role);
   const [section, setSection] = useState(editing.shift?.section ?? "");
+  const [shiftNote, setShiftNote] = useState(editing.shift?.note ?? "");
 
-  const bad = toMins(end) !== 0 && toMins(end) <= toMins(start) && end !== "12:00 AM";
+  const bad = toMins(end) !== 0 && toMins(end) <= toMins(start);
 
   return (
     <motion.div
@@ -367,15 +440,23 @@ function ShiftEditor({
         <div className="mt-5 grid grid-cols-2 gap-3">
           <label className="block">
             <span className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">Starts</span>
-            <select value={start} onChange={(e) => setStart(e.target.value)} className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green">
-              {TIMES.map((t) => <option key={t}>{t}</option>)}
-            </select>
+            <input
+              type="time"
+              step={900}
+              value={to24h(start)}
+              onChange={(e) => e.target.value && setStart(from24h(e.target.value))}
+              className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green"
+            />
           </label>
           <label className="block">
             <span className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">Ends</span>
-            <select value={end} onChange={(e) => setEnd(e.target.value)} className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green">
-              {ENDS.map((t) => <option key={t}>{t}</option>)}
-            </select>
+            <input
+              type="time"
+              step={900}
+              value={to24h(end)}
+              onChange={(e) => e.target.value && setEnd(from24h(e.target.value))}
+              className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green"
+            />
           </label>
           <label className="block">
             <span className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">Working as</span>
@@ -391,6 +472,15 @@ function ShiftEditor({
             </select>
           </label>
         </div>
+        <label className="mt-3 block">
+          <span className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">Note (optional)</span>
+          <input
+            value={shiftNote}
+            onChange={(e) => setShiftNote(e.target.value)}
+            placeholder="training with Marisa, big party at 7…"
+            className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green"
+          />
+        </label>
         {bad && <p className="mt-2 text-[12.5px] font-bold text-coral">That shift ends before it starts.</p>}
         <div className="mt-5 flex items-center gap-2">
           <GreenBtn
@@ -405,6 +495,7 @@ function ShiftEditor({
                 end,
                 role,
                 section: section || undefined,
+                note: shiftNote.trim() || undefined,
                 state: "draft",
               })
             }
@@ -413,16 +504,35 @@ function ShiftEditor({
           </GreenBtn>
           {editing.shift && (
             <button
-              onClick={() => onDelete(editing.shift!.id)}
+              onClick={() => setDropping(true)}
               className="rounded-full border-2 border-blush px-4 py-2.5 text-[13.5px] font-extrabold text-coral transition-colors hover:bg-blush/40"
             >
-              Drop shift
+              Drop…
             </button>
           )}
           <button onClick={onClose} className="px-2 text-[13.5px] font-bold text-ink/45 hover:text-ink">
             Cancel
           </button>
         </div>
+        {dropping && (
+          <div className="mt-4 rounded-2xl bg-cream p-4">
+            <p className="text-[13.5px] font-extrabold text-ink">Drop this shift, then what?</p>
+            <div className="mt-2.5 grid gap-2">
+              <button
+                onClick={() => onDropCover(editing.shift!.id)}
+                className="rounded-xl bg-green px-4 py-2.5 text-left text-[13px] font-extrabold text-ink hover:bg-green-deep hover:text-white"
+              >
+                Find coverage → Tagout starts texting the eligible list
+              </button>
+              <button
+                onClick={() => onDelete(editing.shift!.id)}
+                className="rounded-xl border-2 border-ink/12 bg-white px-4 py-2.5 text-left text-[13px] font-extrabold text-ink/70 hover:border-ink"
+              >
+                Just remove it → the night runs one lighter
+              </button>
+            </div>
+          </div>
+        )}
         <p className="mt-3 text-[11.5px] font-semibold text-ink/40">
           Changes go out as drafts. Nobody gets texted until you hit Publish.
         </p>
