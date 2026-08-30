@@ -28,9 +28,8 @@ export default function StaffPage() {
                 Your schedule lives where your thumbs&nbsp;<span className="text-green-deep">do.</span>
               </h1>
               <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-soft md:text-xl">
-                Ask for your week. Drop a shift. Grab extra hours. All in plain
-                English, all from your texts. There&apos;s a full portal too, for when
-                you want the whole picture. Nobody makes you live in&nbsp;it.
+                Ask for your week. Drop a shift. Grab hours. All by text. The full
+                portal is there when you want it; nobody makes you live in&nbsp;it.
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-4">
                 <Link
@@ -123,7 +122,7 @@ export default function StaffPage() {
           <Reveal>
             <div className="relative">
               <img
-                src="/photos/server-tray.jpg"
+                src="/photos/server-tray.webp"
                 alt="Server carrying a tray of drinks across a patio"
                 loading="lazy"
                 className="aspect-square w-full max-w-md rounded-[32px] object-cover object-[45%_20%] shadow-lift"

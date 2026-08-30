@@ -48,7 +48,7 @@ export default function LoginPage() {
           </div>
           <div className="ml-auto w-fit max-w-xs rounded-3xl rounded-br-md bg-green p-5 shadow-lift">
             <p className="text-[15.5px] font-bold leading-relaxed text-white">
-              Nothing needs you. But it&apos;s all in the feed if you want the story. 🤝
+              Nothing needs you. It&apos;s all in the feed if you want the story.
             </p>
           </div>
           <p className="mt-8 max-w-md font-display text-3xl font-extrabold leading-tight text-paper/90">

@@ -1,8 +1,8 @@
 const EVENTS = [
-  { t: "6:04 AM", e: "Line cook texts in sick", tone: "coral" },
+  { t: "6:04 AM", e: "Line cook calls out", tone: "coral" },
   { t: "6:41 AM", e: "Luis confirms prep. GM still asleep", tone: "green" },
   { t: "11:40 AM", e: "40-top books Thursday: +1 server suggested", tone: "violet" },
-  { t: "2:15 PM", e: "Patio rained out: two voluntary early-outs", tone: "amber" },
+  { t: "2:15 PM", e: "Patio rained out: two voluntary cuts", tone: "amber" },
   { t: "4:52 PM", e: "Dana drops Friday close", tone: "coral" },
   { t: "4:53 PM", e: "2 texts sent, zero group blasts", tone: "green" },
   { t: "4:59 PM", e: "Marisa: “omg yes 🙌”", tone: "green" },

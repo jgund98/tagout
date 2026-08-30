@@ -46,7 +46,7 @@ export default function DemoPage() {
 
           <figure className="relative mt-10 overflow-hidden rounded-3xl shadow-lift">
             <img
-              src="/photos/manager-tablet.jpg"
+              src="/photos/manager-tablet.webp"
               alt="Manager reviewing the week on a tablet over coffee"
               loading="lazy"
               className="aspect-[16/9] w-full object-cover object-[50%_42%]"

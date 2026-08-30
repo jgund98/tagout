@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Wordmark from "./Wordmark";
 import { site } from "@/lib/site";
 
-type NavChild = { label: string; href: string; desc?: string };
+type NavChild = { label: string; href: string; desc?: string; short?: string };
 type NavItem = { label: string; href: string; children?: readonly NavChild[] };
 
 export default function Header() {
@@ -149,48 +149,45 @@ export default function Header() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="lg:hidden max-h-[calc(100vh-64px)] overflow-y-auto overflow-x-hidden border-t border-ink/8 bg-paper"
+            className="lg:hidden overflow-hidden border-t border-ink/8 bg-paper"
             aria-label="Mobile"
           >
-            <div className="space-y-1 px-4 py-4">
-              {nav.map((item) =>
-                item.children ? (
-                  <div key={item.label} className="pb-1">
-                    <p className="px-4 pb-1 pt-2 text-[12px] font-extrabold uppercase tracking-wider text-ink/40">
+            {/* compact one-screen menu: chip grids, no inner scrolling */}
+            <div className="px-4 pb-5 pt-4">
+              {nav
+                .filter((item) => item.children)
+                .map((item) => (
+                  <div key={item.label} className="mb-4">
+                    <p className="mb-2 px-1 text-[11.5px] font-extrabold uppercase tracking-wider text-ink/40">
                       {item.label}
                     </p>
-                    {item.children.map((c) => (
-                      <Link
-                        key={c.href}
-                        href={c.href}
-                        className="block rounded-xl px-4 py-2.5 text-[17px] font-bold text-ink hover:bg-ink/5"
-                      >
-                        {c.label}
-                      </Link>
-                    ))}
+                    <div className={`grid gap-2 ${item.children!.length > 3 ? "grid-cols-2" : "grid-cols-3"}`}>
+                      {item.children!.map((c) => (
+                        <Link
+                          key={c.href}
+                          href={c.href}
+                          className="rounded-2xl border border-ink/10 bg-white px-3 py-3 text-center text-[15px] font-bold text-ink"
+                        >
+                          {c.short ?? c.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                ) : (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="block rounded-xl px-4 py-2.5 text-[17px] font-bold text-ink hover:bg-ink/5"
-                  >
-                    {item.label}
-                  </Link>
-                )
-              )}
-              <Link
-                href={site.login.href}
-                className="block rounded-xl px-4 py-2.5 text-[17px] font-bold text-ink hover:bg-ink/5"
-              >
-                {site.login.label}
-              </Link>
-              <Link
-                href={site.cta.href}
-                className="mt-2 block rounded-xl bg-green px-4 py-3.5 text-center text-lg font-extrabold text-ink"
-              >
-                {site.cta.label} →
-              </Link>
+                ))}
+              <div className="grid grid-cols-2 gap-2 border-t border-ink/8 pt-4">
+                <Link
+                  href={site.login.href}
+                  className="rounded-2xl border-2 border-ink/15 py-3.5 text-center text-[16px] font-extrabold text-ink"
+                >
+                  {site.login.label}
+                </Link>
+                <Link
+                  href={site.cta.href}
+                  className="rounded-2xl bg-green py-3.5 text-center text-[16px] font-extrabold text-ink"
+                >
+                  {site.cta.label} →
+                </Link>
+              </div>
             </div>
           </motion.nav>
         )}

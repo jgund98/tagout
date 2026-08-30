@@ -69,8 +69,8 @@ export default function CoverTheater() {
 
   return (
     <div ref={rootRef} className="grid gap-8 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-12">
-      {/* progress rail */}
-      <div className="flex flex-col">
+      {/* progress rail (desktop) */}
+      <div className="hidden flex-col lg:flex">
         <ol className="relative space-y-1">
           {STEPS.map((s, i) => {
             const isDone = step > i;
@@ -128,6 +128,29 @@ export default function CoverTheater() {
               "radial-gradient(90% 70% at 50% 38%, rgba(14,207,127,0.14), transparent 70%)",
           }}
         />
+        {/* mobile narrator: keeps the story attached to the stage */}
+        <div className="relative z-10 mb-4 flex items-center gap-2.5 lg:hidden">
+          <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-1 text-[11.5px] font-extrabold tabular-nums text-paper">
+            {Math.min(active + 1, STEPS.length)}/{STEPS.length}
+          </span>
+          <motion.p
+            key={active}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex-1 text-[13.5px] font-bold leading-snug text-paper"
+          >
+            {STEPS[Math.min(active, STEPS.length - 1)].label}
+          </motion.p>
+          <button
+            onClick={replay}
+            aria-label="Replay the scene"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-paper"
+          >
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 1.5v3h-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
         <AnimatePresence mode="wait">
           {/* STEP 0 — the drop */}
           {active === 0 && (

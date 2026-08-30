@@ -28,9 +28,8 @@ export default function GmsPage() {
                 Get your Friday nights&nbsp;<span className="text-green-deep">back.</span>
               </h1>
               <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-soft md:text-xl">
-                You didn&apos;t take this job to be a switchboard operator. Tagout works
-                the coverage problem for you and reports back in one line, so your
-                phone becomes a place where good news&nbsp;arrives.
+                You didn&apos;t take this job to run a phone tree. Tagout works the coverage
+                problem and reports back in one&nbsp;line.
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-4">
                 <Link
@@ -77,10 +76,10 @@ export default function GmsPage() {
                 </p>
                 <ul className="mt-6 flex-1 space-y-4">
                   {[
-                    "6:15 AM: wake up to a sick text, start dialing",
+                    "6:15 AM: wake up to a call-out, start dialing",
                     "10:00 AM: post the shift, blast the group chat",
                     "2:00 PM: chase the two “maybes” from the chat",
-                    "4:45 PM: give up, work the section yourself",
+                    "4:45 PM: give up, take a section yourself",
                     "11:30 PM: build tomorrow's fix from the office",
                   ].map((t) => (
                     <li key={t} className="flex items-start gap-3 text-[15.5px] font-semibold text-paper/70">

@@ -143,7 +143,7 @@ export default function VsPage() {
                 </Link>
               </div>
               <img
-                src="/photos/server-table.jpg"
+                src="/photos/server-table.webp"
                 alt="Server taking a payment at a table of business diners"
                 loading="lazy"
                 className="aspect-[4/3] w-full rounded-3xl object-cover"

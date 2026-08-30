@@ -40,17 +40,18 @@ export default function Home() {
 function Hero() {
   return (
     <section className="relative overflow-hidden bg-paper pt-16 md:pt-[72px]">
-      <div className="relative mx-auto flex min-h-[calc(100svh-64px)] w-full max-w-7xl flex-col justify-center gap-7 px-4 py-8 sm:px-6 md:min-h-[calc(100svh-72px)] lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:grid-rows-[auto_auto] lg:items-center lg:gap-x-10 lg:gap-y-0 lg:px-8 lg:py-6">
+      <div className="relative mx-auto flex min-h-[calc(100svh-64px)] w-full max-w-7xl flex-col gap-5 px-4 pb-8 pt-5 sm:px-6 md:min-h-[calc(100svh-72px)] lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:grid-rows-[auto_auto] lg:items-center lg:justify-center lg:gap-x-10 lg:gap-y-0 lg:px-8 lg:py-6">
         {/* headline first, everywhere */}
         <div className="lg:self-end lg:[grid-area:1/1/2/2]">
           <Reveal>
-            <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green text-[11px] text-white">⚡</span>
-              For restaurants: single spots to 200-location groups
+            <p className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-ink/10 bg-white px-4 py-2 text-[13px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)] sm:text-[13.5px]">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green text-[11px] text-white">⚡</span>
+              <span className="sm:hidden">Built for restaurants</span>
+              <span className="hidden sm:inline">For restaurants: single spots to 200-location groups</span>
             </p>
           </Reveal>
           <Reveal delay={0.08}>
-            <h1 className="mt-5 font-display text-[40px] font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl xl:text-7xl">
+            <h1 className="mt-4 font-display text-[40px] font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl lg:mt-5 xl:text-7xl">
               Scheduling that{" "}
               <span className="relative inline-block text-green-deep">
                 texts&nbsp;back.
@@ -65,6 +66,23 @@ function Hero() {
                 </svg>
               </span>
             </h1>
+          </Reveal>
+          {/* mobile-only CTAs: above the fold, before the phone */}
+          <Reveal delay={0.16}>
+            <div className="mt-5 flex items-center gap-3 lg:hidden">
+              <Link
+                href="/demo"
+                className="rounded-full bg-green px-6 py-3.5 text-[16px] font-extrabold text-ink"
+              >
+                Get a demo →
+              </Link>
+              <a
+                href="#watch"
+                className="rounded-full border-2 border-ink/15 px-5 py-3.5 text-[16px] font-extrabold text-ink"
+              >
+                Watch it work
+              </a>
+            </div>
           </Reveal>
         </div>
 
@@ -300,9 +318,8 @@ function ManagerPillars() {
               Build the week in minutes, not&nbsp;Sunday nights.
             </h3>
             <p className="mt-4 text-lg leading-relaxed text-ink-soft">
-              Start from last week, from a template, or from scratch. Tagout flags
-              conflicts, balances hours, and publishes to everyone by text, with a
-              simple link for the ones who want to see the whole week.
+              Start from last week or a template. Conflicts get flagged while you build,
+              not after you publish. One tap sends the week to every phone in the building.
             </p>
             <ul className="mt-6 space-y-3">
               {[
@@ -321,7 +338,7 @@ function ManagerPillars() {
 
         {/* Row 2 — approvals */}
         <div className="mt-20 grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <Reveal className="lg:order-2">
+          <Reveal className="hidden md:block lg:order-2">
             <ApprovalsMock />
           </Reveal>
           <Reveal delay={0.1} className="lg:order-1">
@@ -329,9 +346,8 @@ function ManagerPillars() {
               Swaps and covers arrive pre-solved.
             </h3>
             <p className="mt-4 text-lg leading-relaxed text-ink-soft">
-              By the time a request reaches you, Tagout has already checked hours, roles,
-              and availability, and usually found the replacement. Your job shrinks to
-              a single tap: approve.
+              By the time a request reaches you, the hours, the roles, and usually the
+              replacement are already handled. Your job shrinks to one tap: approve.
             </p>
             <ul className="mt-6 space-y-3">
               {[
@@ -358,9 +374,8 @@ function ManagerPillars() {
               Overtime surprises, retired.
             </h3>
             <p className="mt-4 text-lg leading-relaxed text-ink-soft">
-              Tagout does the math before every offer: weekly hours, role rates, your labor
-              targets. The shift never even gets offered to someone it would push over.
-              Your P&amp;L finds out nothing happened, which is the point.
+              Tagout runs the math before every offer. A shift is never offered to someone
+              it would push into overtime, so payroll just comes in clean.
             </p>
             <ul className="mt-6 space-y-3">
               {[
@@ -390,7 +405,7 @@ function StaffSection() {
         <Reveal>
           <div className="relative">
             <img
-              src="/photos/server-text.jpg"
+              src="/photos/server-text.webp"
               alt="A server smiling at a text message on her phone between shifts"
               className="aspect-[4/5] w-full max-w-md rounded-[32px] object-cover object-[38%_50%] shadow-lift"
               loading="lazy"
@@ -412,10 +427,9 @@ function StaffSection() {
             Zero training. It&apos;s just&nbsp;texting.
           </h2>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
-            Swaps, pickups, availability, confirmations: your team can handle all of it
-            by reply. There&apos;s still a full staff portal (the week at a glance, open
-            shifts, time-off), but it&apos;s a choice, not homework. The 19-year-old host
-            and the 30-year industry vet both just&nbsp;text.
+            Swaps, pickups, availability: all handled by reply. The full staff portal is
+            there when they want it, but it&apos;s a choice, not homework. The 19-year-old
+            host and the 30-year vet both just&nbsp;text.
           </p>
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             {[
@@ -482,15 +496,14 @@ function MeetTag() {
             The quiet operator on every&nbsp;shift.
           </h2>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/65">
-            Tagout isn&apos;t a chatbot bolted onto a calendar. It&apos;s a coverage engine that
-            works the way your sharpest manager does. It just never sleeps, and it
-            never forgets who wants more&nbsp;hours.
+            Not a chatbot bolted onto a calendar. A coverage engine that works the way
+            your sharpest manager does, and never&nbsp;sleeps.
           </p>
         </Reveal>
 
-        <Stagger className="mt-14 grid gap-5 sm:grid-cols-2" gap={0.1}>
+        <Stagger className="no-scrollbar mt-14 flex snap-x snap-mandatory gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible" gap={0.1}>
           {cards.map((c) => (
-            <Item key={c.title} className={c.mobile ? "" : "hidden sm:block"}>
+            <Item key={c.title} className="min-w-[84%] snap-center sm:min-w-0">
               <div className="group h-full rounded-3xl border border-white/10 bg-white/[0.06] p-6 backdrop-blur transition-colors hover:bg-white/[0.1] sm:p-8">
                 <span
                   className={`inline-block rounded-full px-3.5 py-1.5 text-[12.5px] font-extrabold ${
@@ -529,8 +542,8 @@ function EdgeCases() {
     {
       time: "6:04 AM",
       tone: "bg-blush text-coral",
-      title: "The sick call before sunrise",
-      body: "Sam texts in sick at 6:04. By 6:41, Luis has confirmed for prep. Your first notification arrives with your coffee, not your alarm.",
+      title: "The 6 AM call-out",
+      body: "Sam calls out at 6:04. By 6:41, Luis has confirmed for prep. Your first notification arrives with your coffee, not your alarm.",
       sms: "“Covered: Luis takes 8–2. Told Sam to feel better.”",
       mobile: true,
     },
@@ -546,7 +559,7 @@ function EdgeCases() {
       time: "2:15 PM",
       tone: "bg-butter text-[#9a6a00]",
       title: "The rained-out patio",
-      body: "The forecast flips. Instead of eating labor on an empty patio, Tagout offers voluntary early-outs. First replies win.",
+      body: "The forecast flips. Instead of eating labor on an empty patio, Tagout offers voluntary cuts. First replies win.",
       sms: "“Rain tonight. Anyone want the evening off? Two spots.”",
       mobile: true,
     },
@@ -569,9 +582,9 @@ function EdgeCases() {
     {
       time: "Before publish",
       tone: "bg-mint text-green-dark",
-      title: "The surprise double",
-      body: "A swap would put Priya on an 11am to 11pm double. Tagout asks her first, so nobody finds a 12-hour day on the board.",
-      sms: "“This swap makes Saturday a double for you. Still good?”",
+      title: "The accidental clopen",
+      body: "A swap would have Priya closing Saturday and opening Sunday brunch. Tagout catches the clopen and asks her first, so nobody finds it on the published schedule.",
+      sms: "“Heads up: that swap means close Sat, open Sun at 9. Still good?”",
       mobile: false,
     },
   ];
@@ -590,9 +603,9 @@ function EdgeCases() {
             trust the system with the&nbsp;keys.
           </p>
         </Reveal>
-        <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" gap={0.08}>
+        <Stagger className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible lg:grid-cols-3" gap={0.08}>
           {cases.map((c) => (
-            <Item key={c.title} className={c.mobile ? "" : "hidden md:block"}>
+            <Item key={c.title} className="min-w-[84%] snap-center sm:min-w-0">
               <div className="flex h-full flex-col rounded-3xl bg-white p-6 shadow-pop transition-shadow hover:shadow-lift sm:p-7">
                 <span className={`w-fit rounded-full px-3 py-1 text-[11.5px] font-extrabold uppercase tracking-wide ${c.tone}`}>
                   {c.time}
@@ -629,19 +642,19 @@ function PhotoBand() {
         >
           {[
             {
-              src: "/photos/dining-room.jpg",
+              src: "/photos/dining-room.webp",
               alt: "Server setting tables in a warm dining room before service",
               cap: "Friday, fully staffed",
               pos: "50% 45%",
             },
             {
-              src: "/photos/counter-service.jpg",
+              src: "/photos/counter-service.webp",
               alt: "Coffee shop employee working the register",
               cap: "Counter covered, line moving",
               pos: "92% 50%",
             },
             {
-              src: "/photos/server-burgers.jpg",
+              src: "/photos/server-burgers.webp",
               alt: "Server delivering plates of burgers and fries on a patio",
               cap: "Nobody working a double they didn't ask for",
               pos: "62% 45%",
@@ -711,10 +724,10 @@ function GroupsSection() {
             <Reveal delay={0.1}>
               <GroupDashMock />
             </Reveal>
-            <Reveal delay={0.18}>
+            <Reveal delay={0.18} className="hidden md:block">
               <figure className="relative overflow-hidden rounded-3xl shadow-lift">
                 <img
-                  src="/photos/groups-floor.jpg"
+                  src="/photos/groups-floor.webp"
                   alt="Server moving through a busy modern dining room mid-shift"
                   loading="lazy"
                   className="aspect-[16/9] w-full object-cover"
