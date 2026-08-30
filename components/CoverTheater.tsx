@@ -44,25 +44,44 @@ export default function CoverTheater() {
   const reduced = useReducedMotion();
   const [step, setStep] = useState(-1);
   const [runId, setRunId] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [slow, setSlow] = useState(false); // phones get ~50% more reading time
+
+  useEffect(() => {
+    setSlow(window.matchMedia("(max-width: 1023px)").matches);
+  }, []);
 
   useEffect(() => {
     if (reduced) {
       setStep(4);
       return;
     }
-    if (!inView) return;
+    if (!inView || paused) return;
     if (step === -1) {
       const t = setTimeout(() => setStep(0), 400);
       return () => clearTimeout(t);
     }
     if (step >= 4) return;
-    const t = setTimeout(() => setStep((s) => s + 1), DURATIONS[step]);
+    const t = setTimeout(() => setStep((s) => s + 1), DURATIONS[step] * (slow ? 1.5 : 1));
     return () => clearTimeout(t);
-  }, [inView, step, reduced, runId]);
+  }, [inView, step, reduced, runId, paused, slow]);
 
   const replay = () => {
+    setPaused(false);
     setStep(0);
     setRunId((r) => r + 1);
+  };
+  // manual navigation takes the wheel: autoplay stops until play is pressed
+  const goTo = (i: number) => {
+    setPaused(true);
+    setStep(i);
+  };
+  const togglePlay = () => {
+    if (step >= STEPS.length - 1) {
+      replay();
+      return;
+    }
+    setPaused((p) => !p);
   };
 
   const active = Math.max(step, 0);
@@ -78,7 +97,7 @@ export default function CoverTheater() {
             return (
               <li key={s.id} className="relative">
                 <button
-                  onClick={() => setStep(i)}
+                  onClick={() => goTo(i)}
                   className={`group flex w-full items-start gap-3.5 rounded-2xl px-4 py-3.5 text-left transition-colors ${
                     isActive ? "bg-white shadow-pop" : "hover:bg-white/60"
                   }`}
@@ -128,26 +147,53 @@ export default function CoverTheater() {
               "radial-gradient(90% 70% at 50% 38%, rgba(14,207,127,0.14), transparent 70%)",
           }}
         />
-        {/* mobile narrator: keeps the story attached to the stage */}
-        <div className="relative z-10 mb-4 flex items-center gap-2.5 lg:hidden">
-          <span className="shrink-0 rounded-full bg-white/15 px-2.5 py-1 text-[11.5px] font-extrabold tabular-nums text-paper">
+        {/* mobile narrator + controls: read at your own pace */}
+        <div className="relative z-10 mb-4 flex items-center gap-2 lg:hidden">
+          <button
+            onClick={() => goTo(Math.max(0, active - 1))}
+            disabled={active === 0}
+            aria-label="Previous step"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-paper disabled:opacity-30"
+          >
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <path d="M10 3 5 8l5 5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <span className="shrink-0 rounded-full bg-white/15 px-2 py-1 text-[11.5px] font-extrabold tabular-nums text-paper">
             {Math.min(active + 1, STEPS.length)}/{STEPS.length}
           </span>
           <motion.p
             key={active}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex-1 text-[13.5px] font-bold leading-snug text-paper"
+            className="flex-1 text-[13px] font-bold leading-snug text-paper"
           >
             {STEPS[Math.min(active, STEPS.length - 1)].label}
           </motion.p>
           <button
-            onClick={replay}
-            aria-label="Replay the scene"
+            onClick={togglePlay}
+            aria-label={paused ? "Play" : "Pause"}
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-paper"
           >
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
-              <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 1.5v3h-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            {paused || step >= STEPS.length - 1 ? (
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+                <path d="M4 2.5v11l9-5.5-9-5.5Z" />
+              </svg>
+            ) : (
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+                <rect x="3" y="2.5" width="3.6" height="11" rx="1" />
+                <rect x="9.4" y="2.5" width="3.6" height="11" rx="1" />
+              </svg>
+            )}
+          </button>
+          <button
+            onClick={() => goTo(Math.min(STEPS.length - 1, active + 1))}
+            disabled={active === STEPS.length - 1}
+            aria-label="Next step"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-paper disabled:opacity-30"
+          >
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <path d="m6 3 5 5-5 5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>

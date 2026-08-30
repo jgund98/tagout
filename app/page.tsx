@@ -5,6 +5,7 @@ import { PhoneShell, HeroThread } from "@/components/Phone";
 import { BubbleMark } from "@/components/Wordmark";
 import CoverTheater from "@/components/CoverTheater";
 import Marquee from "@/components/Marquee";
+import BRoll from "@/components/BRoll";
 import CTABand from "@/components/CTABand";
 import {
   ScheduleMock,
@@ -47,8 +48,8 @@ function Hero() {
           <Reveal>
             <p className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-ink/10 bg-white px-4 py-2 text-[13px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)] sm:text-[13.5px]">
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green text-[11px] text-white">⚡</span>
-              <span className="sm:hidden">Built for restaurants</span>
-              <span className="hidden sm:inline">For restaurants: single spots to 200-location groups</span>
+              <span className="sm:hidden">For restaurants &amp; retail</span>
+              <span className="hidden sm:inline">For restaurants &amp; retail: single spots to 200-location groups</span>
             </p>
           </Reveal>
           <Reveal delay={0.08}>
@@ -250,7 +251,7 @@ function OldWay() {
                     { n: "Call Sam", s: "voicemail" },
                     { n: "Call Alexis", s: "“maybe”" },
                     { n: "Call Jordan", s: "left VM" },
-                    { n: "Text Mia", s: "seen 6:40" },
+                    { n: "Text Sasha", s: "seen 6:40" },
                   ].map((r) => (
                     <li key={r.n} className="flex items-center justify-between border-b border-dashed border-ink/12 pb-2.5">
                       <span className="text-[15.5px] font-bold text-ink/70 line-through decoration-coral decoration-2">
@@ -664,30 +665,44 @@ function PhotoBand() {
               alt: "Server setting tables in a warm dining room before service",
               cap: "Friday, fully staffed",
               pos: "50% 45%",
+              video: "",
+              poster: "",
             },
             {
-              src: "/photos/counter-service.webp",
-              alt: "Coffee shop employee working the register",
-              cap: "Counter covered, line moving",
-              pos: "92% 50%",
+              video: "/video/pass.mp4",
+              poster: "/video/pass-poster.webp",
+              alt: "",
+              src: "",
+              cap: "The pass, keeping pace",
+              pos: "",
             },
             {
               src: "/photos/server-burgers.webp",
               alt: "Server delivering plates of burgers and fries on a patio",
               cap: "Nobody working a double they didn't ask for",
               pos: "62% 45%",
+              video: "",
+              poster: "",
             },
           ].map((p) => (
-            <Item key={p.src} className="min-w-[78%] snap-center sm:min-w-0">
+            <Item key={p.cap} className="min-w-[78%] snap-center sm:min-w-0">
               <figure className="group overflow-hidden rounded-[28px] shadow-pop">
                 <div className="overflow-hidden">
-                  <img
-                    src={p.src}
-                    alt={p.alt}
-                    loading="lazy"
-                    style={{ objectPosition: p.pos }}
-                    className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                  />
+                  {p.video ? (
+                    <BRoll
+                      src={p.video}
+                      poster={p.poster!}
+                      className="aspect-[4/5] w-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={p.src}
+                      alt={p.alt}
+                      loading="lazy"
+                      style={{ objectPosition: p.pos }}
+                      className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                    />
+                  )}
                 </div>
                 <figcaption className="bg-white px-5 py-4 font-display text-[15.5px] font-extrabold text-ink">
                   {p.cap}
@@ -748,10 +763,9 @@ function GroupsSection() {
             </Reveal>
             <Reveal delay={0.18} className="hidden md:block">
               <figure className="relative overflow-hidden rounded-3xl shadow-lift">
-                <img
-                  src="/photos/groups-floor.webp"
-                  alt="Server moving through a busy modern dining room mid-shift"
-                  loading="lazy"
+                <BRoll
+                  src="/video/service.mp4"
+                  poster="/video/service-poster.webp"
                   className="aspect-[16/9] w-full object-cover"
                 />
                 <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 to-transparent px-6 pb-5 pt-14 font-display text-[15.5px] font-extrabold text-paper">

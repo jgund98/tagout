@@ -55,9 +55,10 @@ export default function PricingPage() {
               unlimited texting. Growing? Add a section: 15 more seats for $99.
               Your bill changes when the house grows, never when someone&nbsp;quits.
             </p>
-            <p className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full bg-mint px-5 py-2.5 text-[14.5px] font-extrabold text-green-dark">
-              <span className="h-2 w-2 rounded-full bg-green" />
-              {site.pricing.pilotNote}
+            <p className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full bg-mint px-4 py-2.5 text-[13.5px] font-extrabold text-green-dark sm:px-5 sm:text-[14.5px]">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-green" />
+              <span className="sm:hidden">30-day pilot. Don&apos;t stay? Fee comes back.</span>
+              <span className="hidden sm:inline">{site.pricing.pilotNote}</span>
             </p>
           </Reveal>
         </div>

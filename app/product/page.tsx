@@ -81,7 +81,7 @@ export default function ProductPage() {
       {/* capability grid */}
       <section className="bg-paper pb-6">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" gap={0.08}>
+          <Stagger className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible lg:grid-cols-3" gap={0.08}>
             {[
               { h: "Schedule builder", b: "Drag-fast weekly grid with pre-built rotation formats, copy-forward, and conflict checks as you type.", c: "bg-mint text-green-dark" },
               { h: "AI shift coverage", b: "Drops and no-shows handled by an AI that texts the right people in a human voice.", c: "bg-lav text-violet-mid" },
@@ -90,7 +90,7 @@ export default function ProductPage() {
               { h: "Approvals in one tap", b: "Requests arrive pre-checked against hours, roles, and your house rules.", c: "bg-lav text-violet-mid" },
               { h: "Group dashboard", b: "Coverage, open shifts, and OT exposure across every location, live.", c: "bg-mint text-green-dark" },
             ].map((f) => (
-              <Item key={f.h}>
+              <Item key={f.h} className="min-w-[84%] snap-center sm:min-w-0">
                 <div className="h-full rounded-3xl bg-white p-6 shadow-pop transition-shadow hover:shadow-lift sm:p-7">
                   <span className={`inline-block rounded-full px-3 py-1 text-[11.5px] font-extrabold uppercase tracking-wide ${f.c}`}>
                     Included

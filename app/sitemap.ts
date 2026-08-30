@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/for/gms",
     "/for/staff",
     "/for/groups",
+    "/for/stores",
     "/demo",
   ];
   return routes.map((path) => ({

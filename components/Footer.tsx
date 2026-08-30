@@ -18,6 +18,7 @@ const cols: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "General managers", href: "/for/gms" },
       { label: "Servers & staff", href: "/for/staff" },
       { label: "Restaurant groups", href: "/for/groups" },
+      { label: "Retail & stores", href: "/for/stores" },
     ],
   },
   {

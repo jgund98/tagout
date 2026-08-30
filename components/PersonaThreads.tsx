@@ -77,3 +77,40 @@ export function StaffThread() {
     />
   );
 }
+
+/** The store manager's side: keyholders, openers, the Saturday scramble. */
+export function StoreThread() {
+  return (
+    <ScriptedThread
+      loop
+      script={[
+        {
+          beat: { kind: "them", text: <>Jess called out. need a keyholder to open tomorrow</> },
+          wait: 2000,
+        },
+        { beat: { kind: "typing", align: "left" }, wait: 1500 },
+        {
+          beat: {
+            kind: "tag",
+            text: (
+              <>
+                Off tomorrow morning and under 40: Tyler (28 hrs) and Dana (31).
+                Both are keyholders. Text Tyler first?
+              </>
+            ),
+          },
+          wait: 2800,
+        },
+        { beat: { kind: "them", text: <>yes</> }, wait: 1400 },
+        {
+          beat: {
+            kind: "tag",
+            text: <>On it. If neither answers by 9, you get their numbers to&nbsp;dial.</>,
+          },
+          wait: 2200,
+        },
+        { beat: { kind: "pill", text: "8:41 PM: Tyler's opening. Confirmed" }, wait: 4500 },
+      ]}
+    />
+  );
+}

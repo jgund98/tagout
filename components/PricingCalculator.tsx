@@ -40,18 +40,39 @@ export default function PricingCalculator() {
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.12em] text-green-dark">
             Size it to your house
           </p>
-          <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-ink">
+          <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
             How many people are on your&nbsp;schedule?
           </h2>
 
-          <div className="mt-8">
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-              <p className="font-display text-6xl font-extrabold tabular-nums tracking-tight text-ink">
-                {atMax ? `${MAX_SEATS}+` : seats}
-              </p>
-              <p className="text-[14px] font-bold text-ink/45 sm:text-right">
-                seats · servers, cooks, hosts, managers, everyone
-              </p>
+          <div className="mt-6 sm:mt-8">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="font-display text-5xl font-extrabold tabular-nums tracking-tight text-ink sm:text-6xl">
+                  {atMax ? `${MAX_SEATS}+` : seats}
+                </p>
+                <p className="mt-0.5 text-[12.5px] font-bold text-ink/45 sm:text-[14px]">
+                  seats on the schedule
+                </p>
+              </div>
+              <div className="text-right">
+                {atMax ? (
+                  <p className="font-display text-5xl font-extrabold tracking-tight text-green-deep sm:text-6xl">
+                    Custom
+                  </p>
+                ) : (
+                  <AnimatedDollars
+                    value={monthly}
+                    className="font-display text-5xl font-extrabold tabular-nums tracking-tight text-green-deep sm:text-6xl"
+                  />
+                )}
+                <p className="mt-0.5 text-[12.5px] font-bold text-ink/45 sm:text-[14px]">
+                  {atMax
+                    ? "volume rates, talk to us"
+                    : sections === 0
+                      ? "a month. the house covers it"
+                      : `a month · the house + ${sections} section${sections > 1 ? "s" : ""}`}
+                </p>
+              </div>
             </div>
             <input
               type="range"
@@ -71,7 +92,7 @@ export default function PricingCalculator() {
           </div>
 
           {/* the house + sections */}
-          <div className="mt-6">
+          <div className="mt-6 hidden sm:block">
             <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">
               How your price is built
             </p>
@@ -96,39 +117,15 @@ export default function PricingCalculator() {
             </p>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:mt-6">
             <div className="rounded-2xl bg-mint p-4">
               <p className="text-[12px] font-extrabold uppercase tracking-wide text-green-dark/70">
-                Your monthly
-              </p>
-              {atMax ? (
-                <p className="mt-1 font-display text-3xl font-extrabold text-green-dark">
-                  Custom
-                </p>
-              ) : (
-                <AnimatedDollars
-                  value={monthly}
-                  className="mt-1 font-display text-3xl font-extrabold tabular-nums text-green-dark"
-                />
-              )}
-              <p className="text-[12px] font-semibold text-green-dark/70">
-                {atMax
-                  ? "volume rates for a house this size"
-                  : sections === 0
-                    ? "the house covers it"
-                    : `the house + ${sections} section${sections > 1 ? "s" : ""}`}
-              </p>
-            </div>
-            <div className="rounded-2xl bg-cream p-4">
-              <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">
                 Works out to
               </p>
-              <p className="mt-1 font-display text-3xl font-extrabold tabular-nums text-ink">
-                {atMax
-                  ? "under $8"
-                  : `$${perSeat.toFixed(perSeat < 10 ? 2 : 1).replace(/\.0$/, "")}`}
+              <p className="mt-1 font-display text-3xl font-extrabold tabular-nums text-green-dark">
+                {atMax ? "under $8" : `$${Math.round(perSeat)}`}
               </p>
-              <p className="text-[12px] font-semibold text-ink/45">
+              <p className="text-[12px] font-semibold text-green-dark/70">
                 {atMax
                   ? "a seat, before volume rates even apply"
                   : "a seat, and it drops as you grow"}

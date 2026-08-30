@@ -32,6 +32,7 @@ export const site = {
         { label: "General managers", short: "GMs", href: "/for/gms", desc: "Get your Friday nights back" },
         { label: "Servers & staff", short: "Staff", href: "/for/staff", desc: "The schedule that lives in your texts" },
         { label: "Restaurant groups", short: "Groups", href: "/for/groups", desc: "Roll out in waves, not weekends" },
+        { label: "Retail & stores", short: "Stores", href: "/for/stores", desc: "Same coverage, different counter" },
       ],
     },
     { label: "Pricing", href: "/pricing" },
@@ -46,6 +47,7 @@ export const site = {
     "Fast casual",
     "Coffee & cafés",
     "Bars & nightlife",
+    "Retail & shops",
     "Multi-unit groups",
   ],
 
@@ -56,7 +58,7 @@ export const site = {
     baseSeats: 25,
     sectionPrice: 99,
     sectionSeats: 15,
-    launchFee: 299,
+    launchFee: 249,
     pilotNote:
       "Start with a 30-day pilot in one location. If you don't stay, the launch fee comes back.",
     included: [
