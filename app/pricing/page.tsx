@@ -7,9 +7,9 @@ import FaqJsonLd from "@/components/FaqJsonLd";
 import PricingCalculator from "@/components/PricingCalculator";
 
 export const metadata: Metadata = {
-  title: "Pricing: $21 a seat, everything on",
+  title: "Pricing: one price covers the house",
   description:
-    "One rate: $21 per seat per month, with the AI agent, both portals, and unlimited texting included. White-glove launch, month to month, custom plans for groups.",
+    "$249 a month covers the house, up to 25 seats, with the AI agent, both portals, and unlimited texting included. Growing? Add a section: +15 seats for $99. Turnover never touches the bill.",
 };
 
 const FAQS = [
@@ -31,12 +31,16 @@ const FAQS = [
   },
   {
     q: "What if my roster swings with the season?",
-    a: "Billing follows the schedule. Patio season adds seats; January takes them away. You never pay for someone who isn't working.",
+    a: "Add a section for patio season, drop it in January. Nothing else on the bill moves, and nobody gets deactivated to save money.",
+  },
+  {
+    q: "What if I sit right at the edge of a section?",
+    a: "Bands are judged on your month's average active roster, not your busiest week, and we flag it with you before anything changes. No surprise line items, ever.",
   },
 ];
 
 export default function PricingPage() {
-  const { seatPrice, launchFee, custom } = site.pricing;
+  const { sectionPrice, launchFee, custom } = site.pricing;
   return (
     <>
       <section className="relative overflow-hidden bg-paper pt-16 md:pt-[72px]">
@@ -44,12 +48,12 @@ export default function PricingPage() {
         <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-14 text-center sm:px-6 md:pt-20 lg:px-8">
           <Reveal>
             <h1 className="mx-auto max-w-3xl font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl md:text-7xl">
-              $21 a seat. <span className="text-green-deep">Everything&nbsp;on.</span>
+              $249 covers <span className="text-green-deep">the&nbsp;house.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft md:text-xl">
-              Everyone on your schedule is a seat, and everything is in the rate: the AI
-              agent, both portals, unlimited texting. No modules, no add-ons,
-              no math you need a rep to explain. Past 20 seats, volume discounts kick in on their own.
+              The base covers up to 25 seats with the AI agent, both portals, and
+              unlimited texting. Growing? Add a section: 15 more seats for $99.
+              Your bill changes when the house grows, never when someone&nbsp;quits.
             </p>
             <p className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full bg-mint px-5 py-2.5 text-[14.5px] font-extrabold text-green-dark">
               <span className="h-2 w-2 rounded-full bg-green" />
@@ -70,19 +74,23 @@ export default function PricingPage() {
       {/* how the money works */}
       <section className="bg-cream py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Stagger className="grid gap-5 md:grid-cols-3" gap={0.1}>
+          <Stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" gap={0.1}>
             {[
               {
                 h: "What counts as a seat?",
-                b: `Anyone active on the schedule that month: servers, cooks, hosts, bartenders, managers. Seasonal crew rolls off automatically when they're off the schedule. Managers are seats too, never a separate "admin fee."`,
+                b: `Anyone active on the schedule that month: servers, cooks, hosts, bartenders, managers. Managers are seats too, never a separate "admin fee."`,
+              },
+              {
+                h: "What's a section?",
+                b: `Fifteen more seats for $${sectionPrice}, named after the thing you already hand your servers. One flat add, no per-head math. Most houses never need more than two.`,
+              },
+              {
+                h: "Turnover-proof billing",
+                b: `Staff churn is this industry's oldest tax, so we built the one invoice it can't touch. Hire, quit, and rehire all summer: you pay for the size of the house, not the drama of the roster.`,
               },
               {
                 h: "Why the launch fee?",
-                b: `Because launch is work and we do all of it: your schedules and staff imported, house rules configured, every employee onboarded by text, and a human watching your first week. $${launchFee}, once per location.`,
-              },
-              {
-                h: "Why per seat, not per module?",
-                b: `Legacy platforms sell scheduling, then messaging, then forecasting, and the invoice grows a line at a time. Ours grows only when your team does, starting at $${seatPrice} a head with automatic volume discounts past 20 seats. Your accountant will get it in one glance.`,
+                b: `Because launch is work and we do all of it: schedules imported, house rules set, every employee onboarded by text, a human watching your first week. $${launchFee}, once per location.`,
               },
             ].map((c) => (
               <Item key={c.h}>

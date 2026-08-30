@@ -163,7 +163,7 @@ export default function GmsPage() {
           </Reveal>
           <Stagger className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4" gap={0.1}>
             {[
-              { n: "1", t: "“It's $21 a seat with everything included.”" },
+              { n: "1", t: "“It's $249 a month for the whole house, all-in.”" },
               { n: "2", t: "“It blocks overtime before the offer goes out.”" },
               { n: "3", t: "“The crew doesn't need training. It's texting.”" },
               { n: "4", t: "“There's a 30-day pilot. If it flops, we walk.”" },

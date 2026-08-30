@@ -21,7 +21,7 @@ export const site = {
       children: [
         { label: "Overview", short: "Overview", href: "/product", desc: "The whole platform, front to back" },
         { label: "Watch it cover a shift", short: "Watch it work", href: "/product#watch", desc: "The coverage engine, in motion" },
-        { label: "Pricing", short: "Pricing", href: "/pricing", desc: "$21 a seat, everything on" },
+        { label: "Pricing", short: "Pricing", href: "/pricing", desc: "One price covers the house" },
         { label: "Compare", short: "Compare", href: "/vs-hotschedules", desc: "The honest side-by-side" },
       ],
     },
@@ -50,15 +50,13 @@ export const site = {
   ],
 
   pricing: {
-    seatPrice: 21,
-    seatMinimum: 12,
+    // "The house": one base price covers a full roster.
+    // Growing? "Add a section": +15 seats, like the ones you hand your servers.
+    base: 249,
+    baseSeats: 25,
+    sectionPrice: 99,
+    sectionSeats: 15,
     launchFee: 299,
-    // volume tiers: first 20 seats at $21, next 15 at $18, everything past 35 at $15
-    seatTiers: [
-      { upTo: 20, price: 21 },
-      { upTo: 35, price: 18 },
-      { upTo: Infinity, price: 15 },
-    ],
     pilotNote:
       "Start with a 30-day pilot in one location. If you don't stay, the launch fee comes back.",
     included: [

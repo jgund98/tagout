@@ -61,9 +61,9 @@ const orgJsonLd = {
       url: site.url,
       offers: {
         "@type": "Offer",
-        price: String(site.pricing.seatPrice),
+        price: String(site.pricing.base),
         priceCurrency: "USD",
-        description: `$${site.pricing.seatPrice} per seat per month with volume discounts; ${site.pricing.seatMinimum}-seat minimum.`,
+        description: `$${site.pricing.base} per month covers up to ${site.pricing.baseSeats} seats; +$${site.pricing.sectionPrice} per additional section of ${site.pricing.sectionSeats} seats.`,
       },
       publisher: { "@id": `${site.url}/#org` },
     },

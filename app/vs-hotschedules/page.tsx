@@ -16,7 +16,7 @@ const rows: { k: string; hs: string; tg: string }[] = [
   { k: "Overtime control", hs: "Reports and alerts", tg: "Blocked before the offer goes out" },
   { k: "Staff onboarding", hs: "Download, register, learn", tg: "Reply YES to one text" },
   { k: "Manager experience", hs: "Deep, dense, trained-into", tg: "Clean web app, learned in an afternoon" },
-  { k: "Pricing shape", hs: "Modules and add-ons", tg: "$21 a seat, everything included" },
+  { k: "Pricing shape", hs: "Modules and add-ons", tg: "One house price, sections as you grow" },
   { k: "Built", hs: "1999, grown by acquisition", tg: "2026, built around AI + SMS from day one" },
 ];
 

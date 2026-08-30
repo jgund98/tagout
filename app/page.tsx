@@ -115,7 +115,7 @@ function Hero() {
           </Reveal>
           <Reveal delay={0.32}>
             <ul className="mt-7 flex flex-wrap gap-x-7 gap-y-2 text-[14.5px] font-semibold text-ink-soft">
-              {["$21 a seat, everything on", "Live in one shift", "Free import from your old scheduler"].map((t) => (
+              {["One price covers the house", "Live in one shift", "Free import from your old scheduler"].map((t) => (
                 <li key={t} className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-mint text-[11px] font-black text-green-dark">✓</span>
                   {t}
@@ -774,7 +774,7 @@ function CompareTeaser() {
     { k: "Open shift coverage", them: "Blast + hope + call list", us: "Tagout finds, asks, confirms" },
     { k: "Overtime protection", them: "Report after the damage", us: "Blocked before the offer" },
     { k: "Staff onboarding", them: "Downloads, logins, training", us: "One text: “reply YES”" },
-    { k: "Pricing", them: "Modules, add-ons, tiers", us: "$21 a seat, everything on" },
+    { k: "Pricing", them: "Modules, add-ons, tiers", us: "One house price, everything on" },
   ];
   return (
     <section className="bg-paper py-20 md:py-28">

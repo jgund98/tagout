@@ -17,29 +17,17 @@ function AnimatedDollars({ value, className }: { value: number; className: strin
   return <motion.p className={className}>{text}</motion.p>;
 }
 
-const { seatMinimum, launchFee, seatTiers } = site.pricing;
+const { base, baseSeats, sectionPrice, sectionSeats, launchFee } = site.pricing;
 
-function priceFor(seats: number) {
-  let remaining = seats;
-  let floor = 0;
-  let total = 0;
-  for (const tier of seatTiers) {
-    const span = Math.min(remaining, tier.upTo - floor);
-    if (span <= 0) break;
-    total += span * tier.price;
-    remaining -= span;
-    floor = tier.upTo;
-  }
-  return total;
+function sectionsFor(seats: number) {
+  return Math.max(0, Math.ceil((seats - baseSeats) / sectionSeats));
 }
 
 export default function PricingCalculator() {
-  const [seats, setSeats] = useState(18);
-  const billable = Math.max(seats, seatMinimum);
-  const monthly = priceFor(billable);
-  const blended = monthly / billable;
-  const perDay = monthly / 30;
-  const activeTier = billable > 35 ? 2 : billable > 20 ? 1 : 0;
+  const [seats, setSeats] = useState(32);
+  const sections = sectionsFor(seats);
+  const monthly = base + sections * sectionPrice;
+  const perSeat = monthly / seats;
 
   return (
     <div className="overflow-hidden rounded-[32px] bg-white shadow-lift">
@@ -47,7 +35,7 @@ export default function PricingCalculator() {
         {/* the dial */}
         <div className="p-7 sm:p-10">
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.12em] text-green-dark">
-            Size it to your crew
+            Size it to your house
           </p>
           <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-ink">
             How many people are on your&nbsp;schedule?
@@ -64,44 +52,45 @@ export default function PricingCalculator() {
             </div>
             <input
               type="range"
-              min={seatMinimum}
-              max={60}
+              min={8}
+              max={70}
               value={seats}
               onChange={(e) => setSeats(parseInt(e.target.value, 10))}
               aria-label="Number of people on your schedule"
               className="mt-4 h-2.5 w-full cursor-pointer appearance-none rounded-full bg-ink/8 accent-[#0ecf7f]"
             />
             <div className="mt-2 flex justify-between text-[12px] font-bold text-ink/35">
-              <span>café · {seatMinimum}</span>
-              <span>fast casual</span>
+              <span>café</span>
+              <span>the house · {baseSeats}</span>
               <span>full service</span>
-              <span>60</span>
+              <span>70</span>
             </div>
           </div>
 
-          {/* volume tiers */}
+          {/* the house + sections */}
           <div className="mt-6">
             <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">
-              Volume pricing, applied automatically
+              How your price is built
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
-              {[
-                { label: `Seats 1–20 · $${seatTiers[0].price}` },
-                { label: `21–35 · $${seatTiers[1].price}` },
-                { label: `36+ · $${seatTiers[2].price}` },
-              ].map((t, i) => (
+              <span className="rounded-full bg-green px-3.5 py-1.5 text-[13px] font-extrabold text-ink">
+                The house · {baseSeats} seats · ${base}
+              </span>
+              {[1, 2, 3].map((n) => (
                 <span
-                  key={t.label}
+                  key={n}
                   className={`rounded-full px-3.5 py-1.5 text-[13px] font-extrabold transition-colors ${
-                    i <= activeTier
-                      ? "bg-mint text-green-dark"
-                      : "bg-ink/5 text-ink/40"
+                    sections >= n ? "bg-mint text-green-dark" : "bg-ink/5 text-ink/35"
                   }`}
                 >
-                  {t.label}
+                  + Section · {sectionSeats} seats · ${sectionPrice}
                 </span>
               ))}
             </div>
+            <p className="mt-2.5 text-[13px] font-semibold text-ink/45">
+              A section, like the ones you hand your servers. Most houses never need
+              more than&nbsp;two.
+            </p>
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -114,20 +103,20 @@ export default function PricingCalculator() {
                 className="mt-1 font-display text-3xl font-extrabold tabular-nums text-green-dark"
               />
               <p className="text-[12px] font-semibold text-green-dark/70">
-                {billable > 20
-                  ? `blended $${blended.toFixed(2).replace(/\.00$/, "")} a seat`
-                  : `$${seatTiers[0].price} × ${billable} seats`}
+                {sections === 0
+                  ? "the house covers it"
+                  : `the house + ${sections} section${sections > 1 ? "s" : ""}`}
               </p>
             </div>
             <div className="rounded-2xl bg-cream p-4">
               <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">
-                Per day
+                Works out to
               </p>
               <p className="mt-1 font-display text-3xl font-extrabold tabular-nums text-ink">
-                ${perDay.toFixed(0)}
+                ${perSeat.toFixed(perSeat < 10 ? 2 : 1).replace(/\.0$/, "")}
               </p>
               <p className="text-[12px] font-semibold text-ink/45">
-                about one comped entrée
+                a seat, and it drops as you grow
               </p>
             </div>
             <div className="rounded-2xl bg-cream p-4">
@@ -144,20 +133,20 @@ export default function PricingCalculator() {
           </div>
 
           <p className="mt-5 text-[13px] font-medium text-ink/45">
-            {seatMinimum}-seat minimum. A seat is anyone active on the schedule that
-            month; managers included, never billed extra. Multiple locations unlock
-            deeper volume rates.
+            Turnover-proof: hire, quit, and rehire all summer, the bill only moves when
+            the house adds a section. Multi-location groups unlock custom rates.
           </p>
         </div>
 
         {/* what's in it */}
         <div className="relative flex flex-col overflow-hidden bg-ink p-7 sm:p-10">
           <BubbleMark
-        check={false}
-        size={220} className="pointer-events-none absolute -right-14 -bottom-14 rotate-12 text-paper/[0.05]"
+            check={false}
+            size={220}
+            className="pointer-events-none absolute -right-14 -bottom-14 rotate-12 text-paper/[0.05]"
           />
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.12em] text-green">
-            Every seat gets everything
+            The house comes fully loaded
           </p>
           <ul className="mt-5 flex-1 space-y-3">
             {site.pricing.included.map((f) => (
@@ -171,7 +160,7 @@ export default function PricingCalculator() {
           </ul>
           <Link
             href="/demo"
-            className="mt-8 rounded-full bg-green py-4 text-center text-[16px] font-extrabold text-ink transition-all hover:shadow-lift"
+            className="relative mt-8 rounded-full bg-green py-4 text-center text-[16px] font-extrabold text-ink transition-all hover:shadow-lift"
           >
             Price mine in a demo →
           </Link>
