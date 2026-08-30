@@ -30,7 +30,10 @@ export default function PricingCalculator() {
   const atMax = seats >= MAX_SEATS; // past here, the ladder hands off to custom rates
   const sections = sectionsFor(seats);
   const monthly = base + sections * sectionPrice;
-  const perSeat = monthly / seats;
+  // Divide by the seats the price COVERS, not the slider position — per-seat
+  // then only ever falls as the house grows instead of spiking at band edges.
+  const coveredSeats = baseSeats + sections * sectionSeats;
+  const perSeat = monthly / coveredSeats;
 
   return (
     <div className="overflow-hidden rounded-[32px] bg-white shadow-lift">
@@ -128,7 +131,7 @@ export default function PricingCalculator() {
               <p className="text-[12px] font-semibold text-green-dark/70">
                 {atMax
                   ? "a seat, before volume rates even apply"
-                  : "a seat, and it drops as you grow"}
+                  : `a seat across the ${coveredSeats} seats yours covers`}
               </p>
             </div>
             <div className="rounded-2xl bg-cream p-4">

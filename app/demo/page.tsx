@@ -14,23 +14,35 @@ export default function DemoPage() {
       <div className="pointer-events-none absolute -top-32 right-[-8%] h-[480px] w-[480px] rounded-full bg-mint blur-[110px]" />
       <div className="pointer-events-none absolute bottom-0 left-[-10%] h-[380px] w-[380px] rounded-full bg-lav blur-[110px] opacity-80" />
 
-      <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-12 sm:px-6 md:pb-28 md:pt-16 lg:grid-cols-[1fr_1fr] lg:gap-16 lg:px-8">
+      {/* Mobile order is conversion-first: headline, then the form itself, then the
+          pitch. Grid auto-placement gives desktop the classic two-column layout. */}
+      <div className="relative mx-auto grid max-w-7xl gap-8 px-4 pb-20 pt-10 sm:px-6 md:pb-28 md:pt-16 lg:grid-cols-2 lg:gap-x-16 lg:gap-y-10 lg:px-8">
         <Reveal>
           <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
             <span className="h-2 w-2 rounded-full bg-green tg-pulse" />
             A 20-minute live demo with a real person
           </p>
-          <h1 className="mt-6 font-display text-[38px] font-extrabold leading-[1.02] tracking-[-0.03em] text-ink sm:text-6xl sm:leading-[0.98]">
+          <h1 className="mt-5 font-display text-[38px] font-extrabold leading-[1.02] tracking-[-0.03em] text-ink sm:mt-6 sm:text-6xl sm:leading-[0.98]">
             Watch&nbsp;Tagout cover&nbsp;a&nbsp;shift.{" "}
             <span className="text-green-deep">Yours.</span>
           </h1>
-          <p className="mt-6 max-w-lg text-lg leading-relaxed text-ink-soft">
+          <p className="mt-4 max-w-lg text-[16.5px] leading-relaxed text-ink-soft sm:hidden">
+            Bring a week of your real schedule. We drop a shift on purpose, you watch
+            Tagout put it back together.
+          </p>
+          <p className="mt-6 hidden max-w-lg text-lg leading-relaxed text-ink-soft sm:block">
             No slides, no canned pitch. Bring a week of your real schedule and we&apos;ll import
             it live, drop a shift on purpose, and let you watch Tagout put it back
             together.
           </p>
+        </Reveal>
 
-          <ul className="mt-9 space-y-5">
+        <Reveal delay={0.12} className="lg:row-span-2">
+          <DemoForm />
+        </Reveal>
+
+        <Reveal>
+          <ul className="space-y-5">
             {[
               { h: "Minute 0–5", b: "Your schedule, imported while we talk." },
               { h: "Minute 5–15", b: "A dropped shift, covered end-to-end in front of you." },
@@ -45,7 +57,7 @@ export default function DemoPage() {
             ))}
           </ul>
 
-          <div className="mt-10 rounded-3xl bg-cream p-6">
+          <div className="mt-8 rounded-3xl bg-cream p-6 sm:mt-10">
             <p className="font-display text-[16px] font-extrabold text-ink">
               Rolling out a group?
             </p>
@@ -54,10 +66,6 @@ export default function DemoPage() {
               pilot plan shaped for ops leadership.
             </p>
           </div>
-        </Reveal>
-
-        <Reveal delay={0.12}>
-          <DemoForm />
         </Reveal>
       </div>
     </section>

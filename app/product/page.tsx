@@ -25,7 +25,7 @@ const FAQS = [
   },
   {
     q: "Does Tagout ever text the whole roster?",
-    a: "No. That's the group-blast problem we exist to kill. Tagout ranks candidates by availability, hours, role, and real yes-history, then asks a few people in order. If nobody answers, it escalates early, with names and numbers ready to dial.",
+    a: "No. That's the group-blast problem we exist to kill. Tagout ranks everyone eligible by availability, hours, role, and real yes-history, then asks them one at a time, in order, until the shift is covered. It warns you early if replies run slow, and only once the entire list has been asked do you get names and numbers to dial.",
   },
   {
     q: "Can managers override Tagout?",

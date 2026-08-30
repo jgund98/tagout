@@ -144,13 +144,14 @@ type Beat =
   | { kind: "tag"; text: ReactNode }
   | { kind: "them"; text: ReactNode }
   | { kind: "typing"; align: "left" | "right" }
+  | { kind: "action"; text: string }
   | { kind: "pill"; text: string };
 
 type Script = { beat: Beat; wait: number }[];
 
 /** Three different, hyper-real scenarios — the hero phone rotates through them. */
 const SCRIPTS: Script[] = [
-  // 1 — the Friday cover
+  // 1 — coverage, the signature scene (staff side)
   [
     {
       beat: {
@@ -172,36 +173,73 @@ const SCRIPTS: Script[] = [
     },
     { beat: { kind: "pill", text: "Covered in 7 min. No app was opened" }, wait: 4200 },
   ],
-  // 2 — the manager, on the fly, mid-shift
+  // 2 — the manager's command line + live orchestration across the roster
   [
     {
       beat: { kind: "them", text: <>down a busser tonight. who&apos;s off right now?</> },
-      wait: 2000,
+      wait: 1900,
     },
-    { beat: { kind: "typing", align: "left" }, wait: 1500 },
+    { beat: { kind: "typing", align: "left" }, wait: 1300 },
     {
       beat: {
         kind: "tag",
         text: (
           <>
             Off tonight and under 40: Devon (26 hrs), Alex (31), Sam (33). Devon&apos;s
-            covered last-minute twice this month. Text him first?
+            covered last-minute twice this month. Want me to work the list?
           </>
         ),
       },
-      wait: 2800,
+      wait: 2600,
     },
-    { beat: { kind: "them", text: <>yes go</> }, wait: 1400 },
+    { beat: { kind: "them", text: <>yes go</> }, wait: 1300 },
+    { beat: { kind: "action", text: "texting Devon… then Alex if he passes" }, wait: 2000 },
     {
       beat: {
         kind: "tag",
-        text: <>On it. If nobody bites in 15 minutes, you get their numbers to&nbsp;dial.</>,
+        text: <>Devon&apos;s in, there by 6:45. Board updated, and Alex got a &ldquo;never mind, thanks!&rdquo;</>,
+      },
+      wait: 2000,
+    },
+    { beat: { kind: "pill", text: "You sent 2 texts. Tagout handled the rest" }, wait: 4200 },
+  ],
+  // 3 — the data brain: it reads the board before you ask twice
+  [
+    {
+      beat: { kind: "them", text: <>how are we looking for tomorrow? we have that 45-top at 7</> },
+      wait: 2000,
+    },
+    { beat: { kind: "action", text: "reading Friday's board + party notes" }, wait: 1700 },
+    {
+      beat: {
+        kind: "tag",
+        text: (
+          <>
+            You&apos;re at 6 servers, two short of how you usually run a party that
+            size. Jake and Sasha are free and under 40. Add both?
+          </>
+        ),
+      },
+      wait: 2700,
+    },
+    { beat: { kind: "them", text: <>do it</> }, wait: 1300 },
+    {
+      beat: {
+        kind: "tag",
+        text: (
+          <>
+            Asking both now. The full Friday board&apos;s bigger than a text:{" "}
+            <span className="font-semibold text-[#0b84fe] underline decoration-[#0b84fe]/40">
+              trytagout.com/b/fri
+            </span>
+          </>
+        ),
       },
       wait: 2200,
     },
-    { beat: { kind: "pill", text: "6:12 PM: Devon's in. There by 6:45" }, wait: 4200 },
+    { beat: { kind: "pill", text: "Both confirmed by 3:15. Friday's whole" }, wait: 4200 },
   ],
-  // 3 — the 6 AM call-out
+  // 4 — the 6 AM call-out (nobody woke the GM)
   [
     {
       beat: {
@@ -223,24 +261,24 @@ const SCRIPTS: Script[] = [
     },
     { beat: { kind: "pill", text: "Covered 6:41 AM, GM still asleep" }, wait: 4200 },
   ],
-  // 4 — staff-initiated swap
+  // 5 — memory + warmth: the swap that remembers why
   [
     {
       beat: { kind: "them", text: <>can I swap my Saturday? it&apos;s my mom&apos;s birthday 🎂</> },
-      wait: 2000,
+      wait: 1900,
     },
-    { beat: { kind: "typing", align: "left" }, wait: 1600 },
+    { beat: { kind: "action", text: "checking who can cover Saturday close" }, wait: 1600 },
     {
       beat: {
         kind: "tag",
         text: (
           <>
-            On it. Katie&apos;s free and under hours. She&apos;ll take Saturday if you cover
-            her Sunday brunch. Deal?
+            Happy early birthday to your mom 🎉 Katie&apos;s free and under hours.
+            She&apos;ll take Saturday if you cover her Sunday brunch. Deal?
           </>
         ),
       },
-      wait: 2400,
+      wait: 2500,
     },
     { beat: { kind: "them", text: <>deal 🙌 tell her thank you</> }, wait: 1400 },
     { beat: { kind: "pill", text: "Swap solved. Your manager tapped Approve once" }, wait: 4200 },
@@ -313,6 +351,16 @@ function ThreadPlayer({
             <Typing key={`typing-${i}`} align={b.align} />
           ) : b.kind === "pill" ? (
             <SystemPill key={`pill-${i}`}>{b.text}</SystemPill>
+          ) : b.kind === "action" ? (
+            <motion.p
+              key={`action-${i}`}
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center text-[10.5px] font-semibold italic text-ink/35"
+            >
+              {b.text}
+            </motion.p>
           ) : (
             <Bubble key={`b-${i}`} from={b.kind}>
               {b.text}

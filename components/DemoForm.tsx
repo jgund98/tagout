@@ -147,7 +147,10 @@ export default function DemoForm() {
               <span className="mb-1.5 block text-[13px] font-extrabold uppercase tracking-wide text-ink/45">
                 Current scheduler
               </span>
-              <select name="current" className={inputCls} defaultValue="HotSchedules">
+              <select name="current" className={inputCls} defaultValue="" required>
+                <option value="" disabled>
+                  Pick one…
+                </option>
                 {CURRENT.map((c) => (
                   <option key={c}>{c}</option>
                 ))}

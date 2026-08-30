@@ -4,7 +4,6 @@ import { Reveal, Stagger, Item } from "@/components/Reveal";
 import { PhoneShell, HeroThread } from "@/components/Phone";
 import { BubbleMark } from "@/components/Wordmark";
 import CoverTheater from "@/components/CoverTheater";
-import Marquee from "@/components/Marquee";
 import BRoll from "@/components/BRoll";
 import CTABand from "@/components/CTABand";
 import {
@@ -21,7 +20,6 @@ export default function Home() {
     <>
       <Hero />
       <SegmentStrip />
-      <TickerBand />
       <OldWay />
       <Theater />
       <ManagerPillars />
@@ -31,7 +29,6 @@ export default function Home() {
       <PhotoBand />
       <GroupsSection />
       <CompareTeaser />
-      <SwitchSteps />
       <CTABand />
     </>
   );
@@ -116,7 +113,7 @@ function Hero() {
           </Reveal>
           <Reveal delay={0.32}>
             <ul className="mt-7 flex flex-wrap gap-x-7 gap-y-2 text-[14.5px] font-semibold text-ink-soft">
-              {["One price covers the house", "Live in one shift", "Free import from your old scheduler"].map((t) => (
+              {["One price covers the house", "Live in one shift", "We move you off your old scheduler"].map((t) => (
                 <li key={t} className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-mint text-[11px] font-black text-green-dark">✓</span>
                   {t}
@@ -156,42 +153,24 @@ function SegmentStrip() {
   return (
     <section className="border-y border-ink/6 bg-cream">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2">
-          <p className="mr-3 text-[13.5px] font-bold uppercase tracking-wider text-ink/40">
+        <p className="text-center leading-[2.1]">
+          <span className="mr-4 align-middle font-display text-[12px] font-extrabold uppercase tracking-[0.18em] text-green-deep">
             Built for
-          </p>
-          {site.segments.map((s) => (
-            <span
-              key={s}
-              className="rounded-full border border-ink/10 bg-white px-4 py-1.5 text-[13.5px] font-bold text-ink-soft"
-            >
-              {s}
+          </span>
+          {site.segments.map((s, i) => (
+            <span key={s} className="align-middle">
+              {i > 0 && (
+                <span className="mx-3 inline-block h-1.5 w-1.5 rounded-full bg-green align-middle sm:mx-3.5" />
+              )}
+              <span className="whitespace-nowrap font-display text-[15.5px] font-extrabold tracking-tight text-ink sm:text-[17px]">
+                {s}
+              </span>
             </span>
           ))}
-        </div>
-        <p className="mt-3.5 text-center text-[15px] font-bold text-ink">
+        </p>
+        <p className="mt-2.5 text-center text-[14.5px] font-semibold text-ink-soft">
           Runs on the phones your crew already carries. If they can text, they&apos;re&nbsp;trained.
         </p>
-      </div>
-    </section>
-  );
-}
-
-/* ================= TICKER ================= */
-
-function TickerBand() {
-  return (
-    <section className="bg-cream py-10 md:py-14">
-      <Reveal>
-        <p className="mx-auto max-w-7xl px-4 text-center font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-ink/40 sm:px-6">
-          A Friday with Tagout on shift
-        </p>
-        <p className="mx-auto mt-3 max-w-2xl px-4 text-center text-lg font-bold text-ink sm:px-6">
-          An entire coverage scramble, handled, and the manager never left the&nbsp;pass.
-        </p>
-      </Reveal>
-      <div className="mt-6">
-        <Marquee />
       </div>
     </section>
   );
@@ -318,8 +297,9 @@ function ManagerPillars() {
           </h2>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-soft">
             The portal is fast. The thread is faster: text &ldquo;Marisa called out
-            tonight&rdquo; and a ranked list comes back, ready to work. If nobody
-            answers, you get names and numbers to dial, never a&nbsp;mystery.
+            tonight&rdquo; and a ranked list comes back, ready to work. Tagout asks the
+            whole eligible list before it ever hands the problem back, and when an ask
+            outgrows a text, the reply comes with a link straight into the&nbsp;portal.
           </p>
         </Reveal>
 
@@ -448,12 +428,12 @@ function StaffSection() {
           </p>
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             {[
-              { k: "“Drop my Tuesday”", v: "Tagout starts finding coverage" },
-              { k: "“Swap with Devon”", v: "Checked & sent for approval" },
-              { k: "“What do I work this week?”", v: "Week texted back instantly" },
-              { k: "“Can't do mornings anymore”", v: "Availability updated" },
+              { k: "“Drop my Tuesday”", v: "Tagout starts finding coverage", mob: true },
+              { k: "“Swap with Devon”", v: "Checked & sent for approval", mob: false },
+              { k: "“What do I work this week?”", v: "Week texted back instantly", mob: true },
+              { k: "“Can't do mornings anymore”", v: "Availability updated", mob: false },
             ].map((r) => (
-              <div key={r.k} className="rounded-2xl bg-white p-4 shadow-pop">
+              <div key={r.k} className={(r.mob ? "" : "hidden sm:block ") + "rounded-2xl bg-white p-4 shadow-pop"}>
                 <p className="font-display text-[15.5px] font-extrabold text-ink">{r.k}</p>
                 <p className="mt-1 text-[13.5px] font-semibold text-green-dark">→ {r.v}</p>
               </div>
@@ -493,7 +473,7 @@ function MeetTag() {
     {
       title: "Escalates early, not at 4:55",
       mobile: false,
-      body: "If nobody answers, Tagout tells you while there's still time to act: what it tried, who's left, and their numbers ready to dial.",
+      body: "Slow day for replies? Tagout warns you while there's still time to act, keeps working the list, and only hands you numbers to dial once every eligible person has been asked.",
       chip: "Heads-up at 1:15 PM",
       tone: "amber",
     },
@@ -542,13 +522,6 @@ function MeetTag() {
           ))}
         </Stagger>
 
-        <Reveal delay={0.15}>
-          <p className="mt-12 flex flex-wrap items-center gap-3 text-[15px] font-semibold text-white/55">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green font-display text-[13px] font-extrabold text-ink">T</span>
-            Texts get read: industry research puts SMS open rates near 98%, most within minutes.
-            That&apos;s the channel your coverage should live on.
-          </p>
-        </Reveal>
       </div>
     </section>
   );
@@ -661,28 +634,28 @@ function PhotoBand() {
         >
           {[
             {
-              src: "/photos/dining-room.webp",
-              alt: "Server setting tables in a warm dining room before service",
+              video: "/video/floor.mp4",
+              poster: "/video/floor-poster.webp",
               cap: "Friday, fully staffed",
-              pos: "50% 45%",
-              video: "",
-              poster: "",
-            },
-            {
-              video: "/video/pass.mp4",
-              poster: "/video/pass-poster.webp",
-              alt: "",
               src: "",
-              cap: "The pass, keeping pace",
+              alt: "",
               pos: "",
             },
             {
+              video: "/video/plating.mp4",
+              poster: "/video/plating-poster.webp",
+              cap: "The pass, keeping pace",
+              src: "",
+              alt: "",
+              pos: "",
+            },
+            {
+              video: "",
+              poster: "",
               src: "/photos/server-burgers.webp",
               alt: "Server delivering plates of burgers and fries on a patio",
               cap: "Nobody working a double they didn't ask for",
               pos: "62% 45%",
-              video: "",
-              poster: "",
             },
           ].map((p) => (
             <Item key={p.cap} className="min-w-[78%] snap-center sm:min-w-0">
@@ -691,7 +664,7 @@ function PhotoBand() {
                   {p.video ? (
                     <BRoll
                       src={p.video}
-                      poster={p.poster!}
+                      poster={p.poster}
                       className="aspect-[4/5] w-full object-cover"
                     />
                   ) : (
@@ -763,9 +736,11 @@ function GroupsSection() {
             </Reveal>
             <Reveal delay={0.18} className="hidden md:block">
               <figure className="relative overflow-hidden rounded-3xl shadow-lift">
-                <BRoll
-                  src="/video/service.mp4"
-                  poster="/video/service-poster.webp"
+                <img
+                  src="/photos/dining-room.webp"
+                  alt="Warm dining room set and ready for service"
+                  loading="lazy"
+                  style={{ objectPosition: "50% 60%" }}
                   className="aspect-[16/9] w-full object-cover"
                 />
                 <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 to-transparent px-6 pb-5 pt-14 font-display text-[15.5px] font-extrabold text-paper">
@@ -850,50 +825,6 @@ function CompareTeaser() {
             </table>
           </div>
         </Reveal>
-      </div>
-    </section>
-  );
-}
-
-/* ================= SWITCH STEPS ================= */
-
-function SwitchSteps() {
-  const steps = [
-    {
-      n: "01",
-      h: "We import everything",
-      b: "Schedules, staff, roles, availability, all pulled in from HotSchedules, 7shifts, or your spreadsheet. You don't rebuild a thing.",
-    },
-    {
-      n: "02",
-      h: "Your team replies YES",
-      b: "Staff onboarding is literally one text message. No downloads, no account setup, no training meeting.",
-    },
-    {
-      n: "03",
-      h: "Tagout takes the pager",
-      b: "Run one week side by side if you like. Most managers stop opening the old app before the trial ends.",
-    },
-  ];
-  return (
-    <section className="bg-cream py-20 md:py-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Reveal>
-          <h2 className="max-w-2xl font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-ink sm:text-5xl">
-            Switch in a week, not a&nbsp;quarter.
-          </h2>
-        </Reveal>
-        <Stagger className="no-scrollbar mt-12 flex snap-x snap-proximity overscroll-x-contain gap-4 overflow-x-auto md:grid md:grid-cols-3 md:gap-5 md:overflow-visible" gap={0.12}>
-          {steps.map((s) => (
-            <Item key={s.n} className="min-w-[82%] snap-center md:min-w-0">
-              <div className="h-full rounded-3xl bg-white p-7 shadow-pop">
-                <p className="font-display text-5xl font-extrabold tracking-tight text-green">{s.n}</p>
-                <h3 className="mt-4 font-display text-[21px] font-extrabold text-ink">{s.h}</h3>
-                <p className="mt-2.5 text-[15px] leading-relaxed text-ink-soft">{s.b}</p>
-              </div>
-            </Item>
-          ))}
-        </Stagger>
       </div>
     </section>
   );

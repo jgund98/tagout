@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import Wordmark from "./Wordmark";
+import Wordmark, { BubbleMark } from "./Wordmark";
 import { site } from "@/lib/site";
 
 type NavChild = { label: string; href: string; desc?: string; short?: string };
@@ -152,13 +152,30 @@ export default function Header() {
             className="lg:hidden overflow-hidden border-t border-ink/8 bg-paper"
             aria-label="Mobile"
           >
-            {/* compact one-screen menu: chip grids, no inner scrolling */}
-            <div className="px-4 pb-5 pt-4">
+            {/* compact one-screen menu: tinted group cards, no inner scrolling */}
+            <div className="relative overflow-hidden px-4 pb-5 pt-3">
+              <BubbleMark
+                check={false}
+                size={170}
+                className="pointer-events-none absolute -right-10 -top-8 rotate-12 text-ink/[0.04]"
+              />
               {nav
                 .filter((item) => item.children)
-                .map((item) => (
-                  <div key={item.label} className="mb-4">
-                    <p className="mb-2 px-1 text-[11.5px] font-extrabold uppercase tracking-wider text-ink/40">
+                .map((item, gi) => (
+                  <motion.div
+                    key={item.label}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.05 + gi * 0.07, ease: "easeOut" }}
+                    className={`relative mb-2.5 rounded-[24px] p-3.5 ${
+                      gi === 0 ? "bg-mint/55" : "bg-lav/45"
+                    }`}
+                  >
+                    <p
+                      className={`mb-2 px-1 text-[11px] font-extrabold uppercase tracking-[0.14em] ${
+                        gi === 0 ? "text-green-dark/70" : "text-violet-mid"
+                      }`}
+                    >
                       {item.label}
                     </p>
                     <div className={`grid gap-2 ${item.children!.length > 3 ? "grid-cols-2" : "grid-cols-3"}`}>
@@ -166,28 +183,33 @@ export default function Header() {
                         <Link
                           key={c.href}
                           href={c.href}
-                          className="rounded-2xl border border-ink/10 bg-white px-3 py-3 text-center text-[15px] font-bold text-ink"
+                          className="rounded-2xl bg-white px-3 py-3 text-center text-[15px] font-extrabold text-ink shadow-[0_1px_3px_rgb(15_21_18/0.07)] active:scale-[0.97] transition-transform"
                         >
                           {c.short ?? c.label}
                         </Link>
                       ))}
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              <div className="grid grid-cols-2 gap-2 border-t border-ink/8 pt-4">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.19, ease: "easeOut" }}
+                className="mt-3 grid grid-cols-2 gap-2 border-t border-ink/8 pt-3.5"
+              >
                 <Link
                   href={site.login.href}
-                  className="rounded-2xl border-2 border-ink/15 py-3.5 text-center text-[16px] font-extrabold text-ink"
+                  className="rounded-full border-2 border-ink/15 py-3.5 text-center text-[16px] font-extrabold text-ink"
                 >
                   {site.login.label}
                 </Link>
                 <Link
                   href={site.cta.href}
-                  className="rounded-2xl bg-green py-3.5 text-center text-[16px] font-extrabold text-ink"
+                  className="rounded-full bg-green py-3.5 text-center text-[16px] font-extrabold text-ink"
                 >
                   {site.cta.label} →
                 </Link>
-              </div>
+              </motion.div>
             </div>
           </motion.nav>
         )}

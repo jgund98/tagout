@@ -52,7 +52,7 @@ export function StaffThread() {
             text: (
               <>
                 This week: Tue 5–11, Thu 5–11, Sat 11–5. Want the week in your
-                calendar? Tap: tagout.app/w/marisa
+                calendar? Tap: trytagout.com/w/marisa
               </>
             ),
           },
@@ -94,8 +94,8 @@ export function StoreThread() {
             kind: "tag",
             text: (
               <>
-                Off tomorrow morning and under 40: Tyler (28 hrs) and Dana (31).
-                Both are keyholders. Text Tyler first?
+                4 keyholders are off tomorrow and under 40: Tyler (28 hrs), Dana
+                (31), Erin (33), Matt (35). Work the list in that order?
               </>
             ),
           },
@@ -105,7 +105,12 @@ export function StoreThread() {
         {
           beat: {
             kind: "tag",
-            text: <>On it. If neither answers by 9, you get their numbers to&nbsp;dial.</>,
+            text: (
+              <>
+                On it. I&apos;ll keep asking until it&apos;s covered. Only if the whole
+                list passes do you get numbers to&nbsp;dial.
+              </>
+            ),
           },
           wait: 2200,
         },
