@@ -84,7 +84,7 @@ export default function SchedulePage() {
         kind: "rule",
         who: null,
         text: "Week published. Everyone just got their schedule by text",
-        sub: "no app downloads, no 'check the portal'",
+        sub: "sent to everyone on this week",
         when: "Just now",
       },
     });
@@ -308,6 +308,9 @@ function MobileDayView({
   staff: Staff[];
 }) {
   const [day, setDay] = useState(4); // tonight
+  const [mode, setMode] = useState<"day" | "person">("day");
+  const [personId, setPersonId] = useState(active[0]?.id ?? "");
+  const person = active.find((p) => p.id === personId) ?? active[0];
   const all = active.flatMap((p) => DAYS.map((_, i) => shiftsFor(p.id, i).map(() => i)).flat());
   const counts = DAYS.map((_, i) => all.filter((d) => d === i).length);
   const dayShifts = active.flatMap((p) => shiftsFor(p.id, day));
@@ -316,10 +319,75 @@ function MobileDayView({
     const person = staff.find((p) => p.id === s.staffId);
     return c + shiftHours(s) * (person?.rate ?? 14);
   }, 0);
-  const summary = `${dayShifts.length} on · ${Math.round(dayHrs)} hrs · ${Math.round(dayCost).toLocaleString()} scheduled`;
+  const summary = `${dayShifts.length} on · ${Math.round(dayHrs)} hrs · $${Math.round(dayCost).toLocaleString()} scheduled`;
+  if (mode === "person") {
+    return (
+      <div>
+        <ModeToggle mode={mode} setMode={setMode} />
+        <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
+          {active.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setPersonId(p.id)}
+              className={`flex shrink-0 items-center gap-2 rounded-full py-1.5 pl-1.5 pr-4 transition-colors ${
+                person?.id === p.id ? "bg-green-dark text-white" : "bg-white text-ink shadow-pop"
+              }`}
+            >
+              <Avatar person={p} size={28} />
+              <span className="text-[13px] font-extrabold">{p.first}</span>
+            </button>
+          ))}
+        </div>
+        {person && (
+          <div className="mt-3 space-y-2">
+            {DAYS.map((d, i) => {
+              const cell = shiftsFor(person.id, i);
+              return cell.length === 0 ? (
+                <button
+                  key={d}
+                  onClick={() => onEdit({ staffId: person.id, day: i })}
+                  className="flex w-full items-center justify-between rounded-2xl border-2 border-dashed border-ink/8 px-4 py-3 text-left"
+                >
+                  <span className="text-[13.5px] font-bold text-ink/35">{d} · off</span>
+                  <span className="text-[16px] font-extrabold text-green">+</span>
+                </button>
+              ) : (
+                cell.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => onEdit({ staffId: person.id, day: i, shift: s })}
+                    className="flex w-full items-center justify-between rounded-2xl bg-white px-4 py-3 text-left shadow-pop active:scale-[0.99]"
+                  >
+                    <span>
+                      <span className="block text-[14px] font-extrabold text-ink">
+                        {d} · {s.start}–{s.end}
+                      </span>
+                      <span className="block text-[12px] font-semibold text-ink/45">
+                        {s.section ?? s.role}
+                        {s.state === "draft" && " · draft"}
+                        {s.note ? ` · ${s.note}` : ""}
+                      </span>
+                    </span>
+                    <span className={`rounded-lg rounded-bl-[4px] px-2.5 py-1 text-[11px] font-extrabold ${ROLE_TONES[s.role]}`}>
+                      {s.role}
+                    </span>
+                  </button>
+                ))
+              );
+            })}
+            <p className="text-right text-[12.5px] font-bold text-ink/40">
+              {person.first}: {Math.round(DAYS.flatMap((_, i) => shiftsFor(person.id, i)).reduce((h, s) => h + shiftHours(s), 0))} hrs this week
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      <ModeToggle mode={mode} setMode={setMode} />
+      <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
         {DAYS.map((d, i) => {
           const n = counts[i];
           return (
@@ -383,6 +451,24 @@ function MobileDayView({
   );
 }
 
+function ModeToggle({ mode, setMode }: { mode: "day" | "person"; setMode: (m: "day" | "person") => void }) {
+  return (
+    <div className="flex w-fit rounded-full bg-white p-1 shadow-pop">
+      {(["day", "person"] as const).map((k) => (
+        <button
+          key={k}
+          onClick={() => setMode(k)}
+          className={`rounded-full px-4 py-1.5 text-[12.5px] font-extrabold transition-colors ${
+            mode === k ? "bg-green-dark text-white" : "text-ink/45"
+          }`}
+        >
+          {k === "day" ? "By day" : "By person"}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function ShiftEditor({
   editing,
   staff,
@@ -437,7 +523,32 @@ function ShiftEditor({
             </p>
           </div>
         </div>
-        <div className="mt-5 grid grid-cols-2 gap-3">
+        <div className="mt-4 flex flex-wrap gap-1.5">
+          {[
+            ["Open", "8:00 AM", "2:00 PM"],
+            ["Lunch", "11:00 AM", "5:00 PM"],
+            ["Dinner", "5:00 PM", "11:00 PM"],
+            ["Close", "4:00 PM", "12:00 AM"],
+          ].map(([label, s, e]) => {
+            const active = start === s && end === e;
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => {
+                  setStart(s);
+                  setEnd(e);
+                }}
+                className={`rounded-full px-3.5 py-1.5 text-[12.5px] font-extrabold transition-colors ${
+                  active ? "bg-green-dark text-white" : "bg-cream text-ink/55 hover:text-ink"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-3">
           <label className="block">
             <span className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">Starts</span>
             <input

@@ -59,6 +59,43 @@ export function fmtClock(mins: number): string {
   return `${hh}:${String(m).padStart(2, "0")} ${ap}`;
 }
 
+/**
+ * Flexibility score, 0 to 99: how likely this person is to actually take a
+ * shift when asked. Built only from tracked behavior, and the breakdown is
+ * shown to the GM in full, so the ranking is oversight, not a black box.
+ */
+export function flexScore(s: import("./data").Staff): number {
+  if (s.status !== "active" || (s.picks90 === 0 && s.yesRate === 0)) return 0;
+  let score = 45 * s.yesRate + Math.min(30, s.picks90 * 3) - s.drops90 * 5;
+  if (s.availNote === "Anytime") score += 18;
+  else if (s.availNote === "Wants more hours") score += 18;
+  else score += 6;
+  return Math.max(5, Math.min(99, Math.round(score)));
+}
+
+export function flexParts(s: import("./data").Staff): { label: string; delta: string; good: boolean }[] {
+  const parts: { label: string; delta: string; good: boolean }[] = [];
+  parts.push({
+    label: `Says yes ${Math.round(s.yesRate * 10)} of 10 asks`,
+    delta: `+${Math.round(45 * s.yesRate)}`,
+    good: s.yesRate >= 0.6,
+  });
+  parts.push({
+    label: `${s.picks90} pickups in 90 days`,
+    delta: `+${Math.min(30, s.picks90 * 3)}`,
+    good: s.picks90 > 0,
+  });
+  if (s.drops90 > 0)
+    parts.push({ label: `${s.drops90} drops in 90 days`, delta: `-${s.drops90 * 5}`, good: false });
+  const open = s.availNote === "Anytime" || s.availNote === "Wants more hours";
+  parts.push({
+    label: open ? `Availability: ${s.availNote.toLowerCase()}` : `Availability: ${s.availNote.toLowerCase()}`,
+    delta: open ? "+18" : "+6",
+    good: open,
+  });
+  return parts;
+}
+
 /** Everything currently waiting on the GM, counted once, shown everywhere. */
 export function needsYouCount(state: PortalState): number {
   const approval = state.runs.some((r) => r.state === "live" && r.outcome?.includes("needs your approval")) ? 1 : 0;
@@ -312,7 +349,7 @@ function buildTimeline(): Cue[] {
         d({ type: "RUN_STEP", runId: "r-live", stepIndex: 2, state: "done", detail: "Marisa passed (dentist)" });
         d({ type: "RUN_STEP", runId: "r-live", stepIndex: 3, state: "live", detail: "texting Sasha now · 30 hrs, free tonight" });
         d({ type: "RUN_BUBBLE", runId: "r-live", bubble: { from: "tag", text: "All good, feel better! (Now texting Sasha…)" } });
-        d(F({ kind: "cover", who: "sasha", text: "Tagout moved to Sasha, 2nd of 6 on the list", sub: "one at a time, never a group blast", when: "Just now" }));
+        d(F({ kind: "cover", who: "sasha", text: "Tagout moved to Sasha, 2nd of 6 on the list", sub: "asked in order, one at a time", when: "Just now" }));
       },
     },
     {

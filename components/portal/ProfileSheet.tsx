@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { usePortal, uid } from "@/lib/portal/store";
+import { usePortal, uid, flexScore, flexParts } from "@/lib/portal/store";
 import { Avatar, Chip, GreenBtn } from "./ui";
 import type { Role, Staff } from "@/lib/portal/data";
 
@@ -72,7 +72,13 @@ export default function ProfileSheet({ person, onClose }: { person: Staff; onClo
         </div>
 
         {/* what Tagout has learned */}
-        <div className="mt-5 grid grid-cols-3 gap-2">
+        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="rounded-2xl bg-mint/70 p-3 text-center">
+            <p className="text-[11px] font-extrabold uppercase tracking-wide text-green-dark/70">Flexibility</p>
+            <p className="mt-0.5 font-display text-[18px] font-extrabold text-ink">
+              {flexScore(p) > 0 ? flexScore(p) : "new"}
+            </p>
+          </div>
           {[
             ["Says yes", p.yesRate > 0 ? `${Math.round(p.yesRate * 10)} of 10` : "new"],
             ["Pickups", String(p.picks90)],
@@ -85,6 +91,24 @@ export default function ProfileSheet({ person, onClose }: { person: Staff; onClo
           ))}
         </div>
         <p className="mt-1.5 text-right text-[11px] font-bold text-ink/35">Last 90 days</p>
+        {flexScore(p) > 0 && (
+          <div className="mt-3 rounded-2xl bg-cream p-3.5">
+            <p className="text-[11px] font-extrabold uppercase tracking-wide text-ink/40">
+              How the flexibility score adds up
+            </p>
+            <ul className="mt-2 space-y-1">
+              {flexParts(p).map((part) => (
+                <li key={part.label} className="flex items-baseline justify-between gap-3 text-[13px] font-semibold">
+                  <span className="text-ink/65">{part.label}</span>
+                  <span className={`font-extrabold ${part.good ? "text-green-deep" : "text-coral"}`}>{part.delta}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-[11.5px] font-semibold text-ink/40">
+              Updates as they reply. Sets the ask order when the rule is on.
+            </p>
+          </div>
+        )}
         {p.drops90 >= 3 && (
           <p className="mt-2 rounded-2xl rounded-bl-md bg-blush/50 px-3.5 py-2 text-[12.5px] font-bold text-ink">
             Pattern: {p.drops90} drops in 90 days, three of them Fridays. Kept private, worth a conversation.

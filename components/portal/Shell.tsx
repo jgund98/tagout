@@ -193,8 +193,17 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
 
-      {/* content */}
-      <main className="px-4 pb-28 pt-6 sm:px-6 lg:pb-10 lg:pl-[244px] lg:pr-8">{children}</main>
+      {/* content: each screen slides in like an app */}
+      <main className="px-4 pb-28 pt-6 sm:px-6 lg:pb-10 lg:pl-[244px] lg:pr-8">
+        <motion.div
+          key={pathname}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+        >
+          {children}
+        </motion.div>
+      </main>
 
       {/* mobile bottom nav */}
       <nav
@@ -209,13 +218,20 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               key={n.href}
               href={n.href}
               className={`relative flex flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 text-[11px] font-extrabold ${
-                active ? "bg-green text-ink" : "text-paper/60"
+                active ? "text-ink" : "text-paper/60"
               }`}
             >
-              <span className="text-[16px]" aria-hidden>{n.icon}</span>
-              {n.label}
+              {active && (
+                <motion.span
+                  layoutId="tab-pill"
+                  transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                  className="absolute inset-0 rounded-2xl bg-green"
+                />
+              )}
+              <span className="relative text-[16px]" aria-hidden>{n.icon}</span>
+              <span className="relative">{n.label}</span>
               {n.href === "/portal/coverage" && needs > 0 && (
-                <span className="absolute -top-1 right-1 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-white">
+                <span className="absolute -top-1 right-1 z-10 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-white">
                   {needs}
                 </span>
               )}

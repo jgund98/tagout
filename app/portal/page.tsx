@@ -108,7 +108,7 @@ export default function TonightPage() {
         <StatTile label="Coverage" value={liveRun ? "1 gap" : "100%"} sub={liveRun ? "Tagout's working it" : "every shift confirmed"} tone="mint" live={!!liveRun} />
         <StatTile label="On the clock" value={onClock.length} sub="live time clock" tone="white" live />
         <StatTile label="Labor tonight" value={"$" + Math.round(laborTonight).toLocaleString()} sub="as scheduled" tone="butter" />
-        <StatTile label="90-day covers" value={state.stats.covers90d} sub={`median ${state.stats.medianCoverMins} min to yes`} tone="lav" />
+        <StatTile label="Tomorrow" value="Ready" sub="45-top at 7 · staffed +2" tone="lav" />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">

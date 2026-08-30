@@ -208,9 +208,9 @@ export function makeSeed(): PortalState {
       when: "Started 4:41 PM",
       steps: [
         { label: "Dana dropped Friday close", detail: "4:41 PM · reason: sitter fell through", state: "done" },
-        { label: "Ranked everyone eligible", detail: "6 can work it · sorted by hours, availability, real yes-rate", state: "done" },
+        { label: "Ranked everyone eligible", detail: "6 can work it · sorted by hours, availability, yes-rate", state: "done" },
         { label: "Texting Marisa", detail: "she's 1st: 31 hrs, says yes 9 times out of 10", state: "live" },
-        { label: "Then Sasha, then Jake", detail: "one at a time, never a group blast", state: "todo" },
+        { label: "Then Sasha, then Jake", detail: "asked in order, one at a time", state: "todo" },
         { label: "You approve, board updates", state: "todo" },
       ],
       thread: [
@@ -302,7 +302,7 @@ export function makeSeed(): PortalState {
     { id: "quiet", group: "How Tagout asks", name: "Quiet hours", plain: "No texts during quiet hours unless it's a same-morning emergency.", on: true, value: "9:30 PM to 7 AM", options: ["9 PM to 8 AM", "9:30 PM to 7 AM", "10 PM to 6 AM"], lastUsed: "Aug 24 · 3 messages held until 7:00 AM" },
     { id: "spacing", group: "How Tagout asks", name: "Time per person", plain: "How long each person gets to answer before Tagout moves down the list.", on: true, value: "15 min each", options: ["10 min each", "15 min each", "30 min each"], lastUsed: "Aug 30, 4:56 PM · advanced to next person at 15 min" },
     { id: "escalate", group: "How Tagout asks", name: "When you get the dial list", plain: "Tagout always asks everyone eligible. This sets how early you also get names and numbers to dial yourself.", on: true, value: "1 hr before shift", options: ["2 hrs before shift", "1 hr before shift", "Only if the list runs dry"], lastUsed: "Aug 24, 8:12 AM · call list sent to GM" },
-    { id: "fair", group: "How Tagout asks", name: "Who gets asked first", plain: "The order Tagout works the list. People flagged as wanting hours always jump the line.", on: true, value: "Best yes-rate first", options: ["Fewest hours first", "Best yes-rate first", "Even rotation"], lastUsed: "Aug 26 · first ask to Devon K. (requested hours)" },
+    { id: "fair", group: "How Tagout asks", name: "Who gets asked first", plain: "The order Tagout works the list. People flagged as wanting hours always jump the line.", on: true, value: "Best yes-rate first", options: ["Most flexible first", "Fewest hours first", "Best yes-rate first", "Even rotation"], lastUsed: "Aug 26 · first ask to Devon K. (requested hours)" },
     { id: "urgent", group: "How Tagout asks", name: "Last-minute mode", plain: "When a call-out lands this close to the shift, Tagout shortens the wait per person and warns you sooner.", on: true, value: "Inside 3 hrs", options: ["Inside 2 hrs", "Inside 3 hrs", "Inside 4 hrs"], lastUsed: "Aug 30, 6:04 AM · shortened waits (call-out inside window)" },
     // Approvals
     { id: "swaps", group: "Approvals", name: "Swaps that pass every rule", plain: "When a swap clears hours, roles, and rest rules, Tagout can finish it alone or still bring it to you.", on: true, value: "Still ask me", options: ["Auto-approve", "Still ask me"], lastUsed: "Aug 29 · swap sent for approval" },

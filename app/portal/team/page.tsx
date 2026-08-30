@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { usePortal, uid } from "@/lib/portal/store";
+import { usePortal, uid, flexScore } from "@/lib/portal/store";
 import { Avatar, Chip, GreenBtn, GhostBtn, PageTitle, TagBubble } from "@/components/portal/ui";
 import ProfileSheet from "@/components/portal/ProfileSheet";
 import type { Role, Staff } from "@/lib/portal/data";
@@ -11,6 +11,10 @@ export default function TeamPage() {
   const { state, dispatch } = usePortal();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
+  const [sort, setSort] = useState<"name" | "flex">("flex");
+  const sorted = [...state.staff].sort((a, b) =>
+    sort === "flex" ? flexScore(b) - flexScore(a) : a.name.localeCompare(b.name)
+  );
   const profile = state.staff.find((s) => s.id === profileId) ?? null;
   const staffOf = (id: string) => state.staff.find((s) => s.id === id);
 
@@ -22,7 +26,24 @@ export default function TeamPage() {
       <PageTitle
         title="Team"
         sub="Everyone on your roster, how their week looks, and who's still onboarding."
-        right={<GreenBtn onClick={() => setInviteOpen(true)}>+ Add team member</GreenBtn>}
+        right={
+          <div className="flex items-center gap-2">
+            <div className="flex rounded-full bg-white p-1 shadow-pop">
+              {(["flex", "name"] as const).map((k) => (
+                <button
+                  key={k}
+                  onClick={() => setSort(k)}
+                  className={`rounded-full px-3.5 py-1.5 text-[12.5px] font-extrabold transition-colors ${
+                    sort === k ? "bg-green-dark text-white" : "text-ink/45"
+                  }`}
+                >
+                  {k === "flex" ? "Most flexible" : "A to Z"}
+                </button>
+              ))}
+            </div>
+            <GreenBtn onClick={() => setInviteOpen(true)}>+ Add team member</GreenBtn>
+          </div>
+        }
       />
 
       {/* time off requests: decisions first */}
@@ -39,8 +60,8 @@ export default function TeamPage() {
 
       {/* roster */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {state.staff.map((p) => (
-          <StaffCard key={p.id} p={p} dispatch={dispatch} onOpen={() => setProfileId(p.id)} />
+        {sorted.map((p, i) => (
+          <StaffCard key={p.id} p={p} rank={sort === "flex" ? i + 1 : 0} dispatch={dispatch} onOpen={() => setProfileId(p.id)} />
         ))}
       </div>
 
@@ -64,14 +85,17 @@ export default function TeamPage() {
 
 function StaffCard({
   p,
+  rank,
   dispatch,
   onOpen,
 }: {
   p: Staff;
+  rank: number;
   dispatch: ReturnType<typeof usePortal>["dispatch"];
   onOpen: () => void;
 }) {
   const pct = Math.min(100, (p.hoursWeek / 40) * 100);
+  const score = flexScore(p);
   return (
     <motion.div
       layout
@@ -89,6 +113,11 @@ function StaffCard({
             {p.role} · {p.phone}
           </p>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {score > 0 && (
+              <Chip tone={score >= 70 ? "mint" : score >= 45 ? "lav" : "white"}>
+                {rank > 0 && rank <= 3 ? `#${rank} · ` : ""}Flexibility {score}
+              </Chip>
+            )}
             {p.status === "invited" && <Chip tone="butter">Invite sent</Chip>}
             {p.status === "pending" && <Chip tone="lav">Onboarding</Chip>}
             {p.keyholder && <Chip tone="mint">🔑 Keyholder</Chip>}

@@ -99,7 +99,7 @@ export default function CoveragePage() {
                 <Avatar person={staffOf("sasha")} size={36} />
                 <div className="min-w-0">
                   <p className="text-[14px] font-bold leading-snug text-paper">Sasha said yes to Dana&apos;s Friday close</p>
-                  <p className="text-[12px] font-semibold text-paper/50">one tap and everyone gets confirmed</p>
+                  <p className="text-[12px] font-semibold text-paper/50">approve and everyone gets confirmed</p>
                 </div>
               </div>
               <GreenBtn className="mt-3 w-full sm:mt-0 sm:w-auto sm:shrink-0" onClick={approve}>
