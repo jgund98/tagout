@@ -27,7 +27,7 @@ export default function VsPage() {
         <div className="pointer-events-none absolute -top-24 right-[-8%] h-[420px] w-[420px] rounded-full bg-mint blur-[100px]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-12 pt-14 sm:px-6 md:pb-16 md:pt-20 lg:px-8">
           <Reveal>
-            <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
+            <p className="inline-flex items-center gap-2 rounded-2xl rounded-bl-[6px] bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_2px_12px_rgb(15_21_18/0.08)]">
               The respectful teardown
             </p>
             <h1 className="mt-6 max-w-5xl font-display text-[40px] font-extrabold leading-[1.02] tracking-[-0.03em] text-ink sm:text-5xl md:text-6xl">

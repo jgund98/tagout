@@ -17,38 +17,38 @@ export default function StoresPage() {
       {/* hero */}
       <section className="relative overflow-hidden bg-paper pt-16 md:pt-[72px]">
         <div className="pointer-events-none absolute -top-40 right-[-10%] h-[520px] w-[520px] rounded-full bg-mint blur-[100px]" />
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-10 sm:px-6 md:pb-24 md:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
-          <div className="order-2 lg:order-1">
+        <div className="relative mx-auto grid max-w-7xl gap-7 px-4 pb-14 pt-7 sm:gap-10 sm:px-6 sm:pb-16 sm:pt-10 md:pb-24 md:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
+          <div>
             <Reveal>
-              <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
+              <p className="inline-flex items-center gap-2 rounded-2xl rounded-bl-[6px] bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_2px_12px_rgb(15_21_18/0.08)]">
                 For retail, shops & every shift-run floor
               </p>
-              <h1 className="mt-6 font-display text-[42px] font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl md:text-7xl">
+              <h1 className="mt-5 font-display text-[38px] font-extrabold leading-[1.0] tracking-[-0.03em] text-ink sm:mt-6 sm:text-6xl sm:leading-[0.98] md:text-7xl">
                 Stores drop shifts&nbsp;too. <span className="text-green-deep">Covered.</span>
               </h1>
-              <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-soft md:text-xl">
+              <p className="mt-4 max-w-xl text-[16.5px] leading-relaxed text-ink-soft sm:mt-7 sm:text-lg md:text-xl">
                 Tagout was built on restaurant Fridays, and a boutique Saturday breaks
                 the exact same way: a call-out, a dead group chat, a manager stuck on
                 the register. Same fix. The schedule texts&nbsp;back.
               </p>
-              <div className="mt-9 flex flex-wrap items-center gap-4">
+              <div className="mt-6 flex flex-wrap items-center gap-3 sm:mt-9 sm:gap-4">
                 <Link
                   href="/demo"
-                  className="group rounded-full bg-green px-7 py-4 text-lg font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white hover:shadow-lift"
+                  className="group rounded-full bg-green px-5 py-3.5 text-[16px] font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white hover:shadow-lift sm:px-7 sm:py-4 sm:text-lg"
                 >
                   Get a demo
                   <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
                 </Link>
                 <Link
                   href="/pricing"
-                  className="rounded-full border-2 border-ink/15 px-7 py-4 text-lg font-extrabold text-ink transition-colors hover:border-ink"
+                  className="rounded-full border-2 border-ink/15 px-5 py-3.5 text-[16px] font-extrabold text-ink transition-colors hover:border-ink sm:px-7 sm:py-4 sm:text-lg"
                 >
                   See pricing
                 </Link>
               </div>
             </Reveal>
           </div>
-          <div className="order-1 lg:order-2">
+          <div>
             <Reveal delay={0.1} y={40}>
               <div className="mx-auto w-fit">
                 <PhoneShell contact="Tagout" time="8:37">
@@ -131,7 +131,7 @@ export default function StoresPage() {
               ].map((s) => (
                 <span
                   key={s}
-                  className="rounded-full border border-ink/10 bg-white px-4 py-2 text-[14.5px] font-bold text-ink-soft"
+                  className="rounded-2xl rounded-bl-[6px] bg-white px-4 py-2 text-[14.5px] font-bold text-ink-soft shadow-[0_1px_6px_rgb(15_21_18/0.06)]"
                 >
                   {s}
                 </span>

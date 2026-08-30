@@ -4,7 +4,7 @@ import { site } from "@/lib/site";
 
 export default function CTABand({
   title = "Put Tagout on the schedule.",
-  sub = "See it cover a real shift in a 20-minute demo. If your GMs don't love it, don't switch.",
+  sub = "Watch it cover a real shift in 20 minutes, then pilot it for 30 days with your old scheduler still running. If you don't stay, we refund your launch fee.",
 }: {
   title?: string;
   sub?: string;

@@ -42,7 +42,7 @@ function Hero() {
         {/* headline first, everywhere */}
         <div className="lg:self-end lg:[grid-area:1/1/2/2]">
           <Reveal>
-            <p className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-ink/10 bg-white px-4 py-2 text-[13px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)] sm:text-[13.5px]">
+            <p className="inline-flex items-center gap-2 whitespace-nowrap rounded-2xl rounded-bl-[6px] bg-white px-4 py-2 text-[13px] font-bold text-ink shadow-[0_2px_12px_rgb(15_21_18/0.08)] sm:text-[13.5px]">
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green text-[11px] text-white">⚡</span>
               <span className="sm:hidden">For restaurants &amp; retail</span>
               <span className="hidden sm:inline">For restaurants &amp; retail: single spots to 200-location groups</span>
@@ -81,6 +81,9 @@ function Hero() {
                 Watch it work
               </a>
             </div>
+            <p className="mt-3 text-[13px] font-semibold text-ink/50 lg:hidden">
+              30-day pilot. Don&apos;t stay? We refund your launch fee.
+            </p>
           </Reveal>
         </div>
 
@@ -94,7 +97,8 @@ function Hero() {
             </p>
           </Reveal>
           <Reveal delay={0.24}>
-            <div className="mt-7 flex flex-wrap items-center gap-4">
+            {/* desktop-only: mobile already got its CTAs right under the H1 */}
+            <div className="mt-7 hidden flex-wrap items-center gap-4 lg:flex">
               <Link
                 href="/demo"
                 className="group rounded-full bg-green px-7 py-4 text-lg font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white hover:shadow-lift"
@@ -109,6 +113,9 @@ function Hero() {
                 Watch it work ↓
               </a>
             </div>
+            <p className="mt-3 hidden text-[13.5px] font-semibold text-ink/50 lg:block">
+              30-day pilot. Don&apos;t stay? We refund your launch fee.
+            </p>
           </Reveal>
           <Reveal delay={0.32}>
             <ul className="mt-7 flex flex-wrap gap-x-7 gap-y-2 text-[14.5px] font-semibold text-ink-soft">
@@ -203,7 +210,9 @@ function OldWay() {
           </h2>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-paper/60">
             Push notifications get swiped away. The group chat spirals. So the coverage
-            problem lands where it always lands: on the manager, mid-service, phone in&nbsp;hand.
+            problem lands where it always lands: on the manager, mid-service, phone
+            in&nbsp;hand. Add it up and covering shifts is a part-time job
+            nobody&nbsp;applied&nbsp;for.
           </p>
         </Reveal>
 
@@ -495,18 +504,56 @@ function MeetTag() {
       />
       <div className="pointer-events-none absolute -right-32 bottom-0 h-[420px] w-[420px] rounded-full bg-green/14 blur-[110px]" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Reveal>
-          <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green">
-            Meet Tag
-          </p>
-          <h2 className="mt-4 max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-white sm:text-5xl md:text-6xl">
-            The quiet operator on every&nbsp;shift.
-          </h2>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/65">
-            Not a chatbot bolted onto a calendar. A coverage engine that works the way
-            your sharpest manager does, and never&nbsp;sleeps.
-          </p>
-        </Reveal>
+        <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-16">
+          <Reveal>
+            <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green">
+              Meet Tagout
+            </p>
+            <h2 className="mt-4 max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-white sm:text-5xl md:text-6xl">
+              The quiet operator on every&nbsp;shift.
+            </h2>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/65">
+              Not a chatbot bolted onto a calendar. A coverage engine that works the way
+              your sharpest manager does, and never&nbsp;sleeps.
+            </p>
+          </Reveal>
+
+          {/* the staff file: Tagout, written up like one of the crew */}
+          <Reveal delay={0.12}>
+            <div className="max-w-sm -rotate-1 rounded-[28px] bg-paper p-6 shadow-lift lg:justify-self-end">
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green">
+                  <BubbleMark size={24} className="text-white" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-display text-[19px] font-extrabold leading-tight text-ink">Tagout</p>
+                  <p className="text-[12px] font-bold text-ink/45">Coverage · nights, weekends, holidays</p>
+                </div>
+                <span className="ml-auto flex shrink-0 items-center gap-1.5 rounded-lg rounded-bl-[4px] bg-mint px-2.5 py-1 text-[10.5px] font-extrabold uppercase tracking-wide text-green-dark">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green tg-pulse" />
+                  On shift
+                </span>
+              </div>
+              <ul className="mt-5 space-y-2.5 border-t border-ink/8 pt-4">
+                {[
+                  ["Call-outs", "Zero, ever"],
+                  ["Doubles", "Happily"],
+                  ["Response time", "About 40 seconds"],
+                  ["July 4th weekend", "Available"],
+                  ["Tips", "Politely declined"],
+                ].map(([k, v]) => (
+                  <li key={k} className="flex items-baseline justify-between gap-4 text-[14px]">
+                    <span className="font-semibold text-ink/45">{k}</span>
+                    <span className="text-right font-extrabold text-ink">{v}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 inline-block -rotate-2 rounded-lg rounded-bl-[4px] bg-green px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-wide text-ink">
+                Employee of the month, every month
+              </p>
+            </div>
+          </Reveal>
+        </div>
 
         <Stagger className="no-scrollbar mt-14 flex snap-x snap-proximity overscroll-x-contain gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible" gap={0.1}>
           {cards.map((c) => (
@@ -607,7 +654,7 @@ function EdgeCases() {
           {cases.map((c) => (
             <Item key={c.title} className="min-w-[84%] snap-center sm:min-w-0">
               <div className="flex h-full flex-col rounded-3xl bg-white p-6 shadow-pop transition-shadow hover:shadow-lift sm:p-7">
-                <span className={`w-fit rounded-full px-3 py-1 text-[11.5px] font-extrabold uppercase tracking-wide ${c.tone}`}>
+                <span className={`w-fit rounded-lg rounded-bl-[4px] px-3 py-1 text-[11.5px] font-extrabold uppercase tracking-wide ${c.tone}`}>
                   {c.time}
                 </span>
                 <h3 className="mt-3.5 font-display text-[20px] font-extrabold text-ink">{c.title}</h3>

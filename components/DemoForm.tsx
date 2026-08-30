@@ -177,6 +177,9 @@ export default function DemoForm() {
                 <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
               )}
             </button>
+            <p className="text-center text-[12.5px] font-semibold text-ink/45">
+              No contract. 30-day pilot. If you don&apos;t stay, we refund your launch&nbsp;fee.
+            </p>
             {error && (
               <p className="text-center text-[13px] font-bold text-coral">
                 That didn&apos;t go through. Try again, or email hello@trytagout.com.

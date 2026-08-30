@@ -23,7 +23,7 @@ const FAQS = [
   },
   {
     q: "What does the pilot look like?",
-    a: "Thirty days in one location, full product, our team does the launch. If your GM doesn't fight to keep it, walk away and the launch fee comes back.",
+    a: "Thirty days in one location, full product, our team does the launch. If your GM doesn't fight to keep it, walk away and we refund your $249 launch fee.",
   },
   {
     q: "Any contracts?",
@@ -51,13 +51,14 @@ export default function PricingPage() {
               $249 covers <span className="text-green-deep">the&nbsp;house.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft md:text-xl">
-              The base covers up to 25 seats with the AI agent, both portals, and
-              unlimited texting. Growing? Add a section: 15 more seats for $99.
-              Your bill changes when the house grows, never when someone&nbsp;quits.
+              That&apos;s not a platform fee, it&apos;s your first 25 seats, about
+              $10 apiece with Tagout&apos;s AI, both portals, and unlimited texting
+              built in. A section adds 15 more for $99 and pulls the average under
+              $8. The bill moves when the house grows, never when someone&nbsp;quits.
             </p>
-            <p className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full bg-mint px-4 py-2.5 text-[13.5px] font-extrabold text-green-dark sm:px-5 sm:text-[14.5px]">
+            <p className="mx-auto mt-5 inline-flex items-center gap-2 rounded-2xl rounded-bl-[6px] bg-mint px-4 py-2.5 text-[13.5px] font-extrabold text-green-dark sm:px-5 sm:text-[14.5px]">
               <span className="h-2 w-2 shrink-0 rounded-full bg-green" />
-              <span className="sm:hidden">30-day pilot. Don&apos;t stay? Fee comes back.</span>
+              <span className="sm:hidden">30-day pilot. Don&apos;t stay? $249 refunded.</span>
               <span className="hidden sm:inline">{site.pricing.pilotNote}</span>
             </p>
           </Reveal>
@@ -83,7 +84,7 @@ export default function PricingPage() {
               },
               {
                 h: "What's a section?",
-                b: `Fifteen more seats for $${sectionPrice}, named after the thing you already hand your servers. One flat add, no per-head math. Most houses never need more than two.`,
+                b: `Fifteen more seats for ${sectionPrice}, named after the thing you already hand your servers. One flat add that works out to $6.60 a seat, the cheapest seats in the house. Most never need more than two.`,
               },
               {
                 h: "Turnover-proof billing",

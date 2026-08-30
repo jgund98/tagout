@@ -47,7 +47,10 @@ export function PhoneShell({
             <BubbleMark size={20} className="text-paper" />
           </div>
           <p className="mt-1 text-[12px] font-semibold text-ink">{contact}</p>
-          <p className="text-[10px] text-ink/45">Text Message · SMS</p>
+          <p className="flex items-center gap-1 text-[10px] text-ink/45">
+            <span className="h-1.5 w-1.5 rounded-full bg-green tg-pulse" />
+            on shift 24/7 · SMS
+          </p>
         </div>
 
         <div

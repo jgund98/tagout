@@ -18,23 +18,23 @@ export default function StaffPage() {
       {/* hero */}
       <section className="relative overflow-hidden bg-paper pt-16 md:pt-[72px]">
         <div className="pointer-events-none absolute -top-40 left-[-10%] h-[520px] w-[520px] rounded-full bg-lav blur-[100px] opacity-90" />
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-10 sm:px-6 md:pb-24 md:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
-          <div className="order-2 lg:order-1">
+        <div className="relative mx-auto grid max-w-7xl gap-7 px-4 pb-14 pt-7 sm:gap-10 sm:px-6 sm:pb-16 sm:pt-10 md:pb-24 md:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
+          <div>
             <Reveal>
-              <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
+              <p className="inline-flex items-center gap-2 rounded-2xl rounded-bl-[6px] bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_2px_12px_rgb(15_21_18/0.08)]">
                 For servers, cooks, hosts & bartenders
               </p>
-              <h1 className="mt-6 font-display text-[42px] font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl md:text-7xl">
+              <h1 className="mt-5 font-display text-[38px] font-extrabold leading-[1.0] tracking-[-0.03em] text-ink sm:mt-6 sm:text-6xl sm:leading-[0.98] md:text-7xl">
                 Your schedule lives where your thumbs&nbsp;<span className="text-green-deep">do.</span>
               </h1>
-              <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-soft md:text-xl">
+              <p className="mt-4 max-w-xl text-[16.5px] leading-relaxed text-ink-soft sm:mt-7 sm:text-lg md:text-xl">
                 Ask for your week. Drop a shift. Grab hours. All by text. The full
                 portal is there when you want it; nobody makes you live in&nbsp;it.
               </p>
-              <div className="mt-9 flex flex-wrap items-center gap-4">
+              <div className="mt-6 flex flex-wrap items-center gap-3 sm:mt-9 sm:gap-4">
                 <Link
                   href="/demo"
-                  className="group rounded-full bg-green px-7 py-4 text-lg font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white hover:shadow-lift"
+                  className="group rounded-full bg-green px-5 py-3.5 text-[16px] font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white hover:shadow-lift sm:px-7 sm:py-4 sm:text-lg"
                 >
                   Show your manager
                   <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
@@ -45,7 +45,7 @@ export default function StaffPage() {
               </p>
             </Reveal>
           </div>
-          <div className="order-1 lg:order-2">
+          <div>
             <Reveal delay={0.1} y={40}>
               <div className="mx-auto w-fit">
                 <PhoneShell contact="Tagout" time="11:22">

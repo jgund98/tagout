@@ -49,7 +49,7 @@ export default function ProductPage() {
         <div className="pointer-events-none absolute -top-32 left-1/2 h-[460px] w-[720px] -translate-x-1/2 rounded-full bg-mint blur-[110px]" />
         <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-14 text-center sm:px-6 md:pb-20 md:pt-20 lg:px-8">
           <Reveal>
-            <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
+            <p className="inline-flex items-center gap-2 rounded-2xl rounded-bl-[6px] bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_2px_12px_rgb(15_21_18/0.08)]">
               The product, front to back
             </p>
             <h1 className="mx-auto mt-6 max-w-4xl font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl md:text-7xl">

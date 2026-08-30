@@ -60,7 +60,7 @@ export const site = {
     sectionSeats: 15,
     launchFee: 249,
     pilotNote:
-      "Start with a 30-day pilot in one location. If you don't stay, the launch fee comes back.",
+      "Run one location on a 30-day pilot, with your old scheduler still running the whole time. If you don't stay, we refund your $249 launch fee.",
     included: [
       "Tagout’s AI agent, covering shifts 24/7",
       "Unlimited scheduling-related texting",

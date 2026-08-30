@@ -27,7 +27,7 @@ const cols: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "Log in", href: "/login" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
-      { label: site.email, href: `mailto:${site.email}` },
+      { label: "Email us", href: `mailto:${site.email}` },
     ],
   },
 ];
@@ -46,7 +46,7 @@ export default function Footer() {
             <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-paper/60">
               {site.tagline}. Built for the people who actually run the floor.
             </p>
-            <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-paper/8 px-4 py-2 text-sm font-semibold text-paper/80">
+            <p className="mt-6 inline-flex items-center gap-2 rounded-2xl rounded-bl-[6px] bg-paper/8 px-4 py-2 text-sm font-semibold text-paper/80">
               <span className="h-2 w-2 rounded-full bg-green tg-pulse" />
               Tagout is on shift 24/7
             </p>

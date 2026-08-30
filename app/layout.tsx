@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileDock from "@/components/MobileDock";
+import StripGuard from "@/components/StripGuard";
 
 const gabarito = Gabarito({
   subsets: ["latin"],
@@ -84,6 +85,7 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <MobileDock />
+        <StripGuard />
         <Analytics />
       </body>
     </html>

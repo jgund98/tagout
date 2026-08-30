@@ -18,13 +18,12 @@ export default function DemoPage() {
           pitch. Grid auto-placement gives desktop the classic two-column layout. */}
       <div className="relative mx-auto grid max-w-7xl gap-8 px-4 pb-20 pt-10 sm:px-6 md:pb-28 md:pt-16 lg:grid-cols-2 lg:gap-x-16 lg:gap-y-10 lg:px-8">
         <Reveal>
-          <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
+          <p className="inline-flex items-center gap-2 rounded-2xl rounded-bl-[6px] bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_2px_12px_rgb(15_21_18/0.08)]">
             <span className="h-2 w-2 rounded-full bg-green tg-pulse" />
             A 20-minute live demo with a real person
           </p>
           <h1 className="mt-5 font-display text-[38px] font-extrabold leading-[1.02] tracking-[-0.03em] text-ink sm:mt-6 sm:text-6xl sm:leading-[0.98]">
-            Watch&nbsp;Tagout cover&nbsp;a&nbsp;shift.{" "}
-            <span className="text-green-deep">Yours.</span>
+            Watch&nbsp;Tagout cover <span className="text-green-deep">your&nbsp;shift.</span>
           </h1>
           <p className="mt-4 max-w-lg text-[16.5px] leading-relaxed text-ink-soft sm:hidden">
             Bring a week of your real schedule. We drop a shift on purpose, you watch
@@ -49,7 +48,7 @@ export default function DemoPage() {
               { h: "Minute 15–20", b: "Your bill vs ours, on a whiteboard, in the open." },
             ].map((s) => (
               <li key={s.h} className="flex flex-col gap-1.5 sm:flex-row sm:gap-4">
-                <span className="w-fit shrink-0 whitespace-nowrap rounded-full bg-mint px-3 py-1 text-[12px] font-extrabold uppercase tracking-wide text-green-dark sm:mt-1">
+                <span className="w-fit shrink-0 whitespace-nowrap rounded-lg rounded-bl-[4px] bg-mint px-3 py-1 text-[12px] font-extrabold uppercase tracking-wide text-green-dark sm:mt-1">
                   {s.h}
                 </span>
                 <p className="text-[15.5px] font-semibold leading-relaxed text-ink">{s.b}</p>
