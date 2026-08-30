@@ -58,7 +58,7 @@ export default function StaffPage() {
       </section>
 
       {/* fairness */}
-      <section className="bg-violet-deep py-20 md:py-28">
+      <section className="mx-2 rounded-[36px] bg-violet-deep py-20 sm:mx-4 md:rounded-[52px] md:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
             <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green">

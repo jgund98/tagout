@@ -10,10 +10,10 @@ export default function CTABand({
   sub?: string;
 }) {
   return (
-    <section className="relative mx-2 mb-2 overflow-hidden rounded-[36px] bg-green sm:mx-4 sm:mb-4 md:rounded-[52px]">
+    <section className="relative mx-2 mb-2 mt-2 overflow-hidden rounded-[36px] bg-green sm:mx-4 sm:mb-4 sm:mt-4 md:rounded-[52px]">
       {/* oversized watermark bubble */}
       <svg
-        className="pointer-events-none absolute -right-24 -top-32 h-[420px] w-[420px] text-white/12"
+        className="pointer-events-none absolute -bottom-28 -right-20 h-[420px] w-[420px] rotate-12 text-white/12"
         viewBox="0 0 48 48"
         fill="currentColor"
         aria-hidden

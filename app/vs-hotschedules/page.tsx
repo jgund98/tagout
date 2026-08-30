@@ -79,7 +79,7 @@ export default function VsPage() {
       </section>
 
       {/* the three reasons */}
-      <section className="bg-ink py-20 md:py-28">
+      <section className="mx-2 rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
             <h2 className="max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-paper sm:text-5xl">

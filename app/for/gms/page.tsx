@@ -62,7 +62,7 @@ export default function GmsPage() {
       </section>
 
       {/* before / after */}
-      <section className="bg-ink py-20 md:py-28">
+      <section className="mx-2 rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
             <h2 className="max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-paper sm:text-5xl">
@@ -151,7 +151,7 @@ export default function GmsPage() {
       </section>
 
       {/* pitch to the owner */}
-      <section className="bg-pine py-20 md:py-28">
+      <section className="mx-2 rounded-[36px] bg-pine py-20 sm:mx-4 md:rounded-[52px] md:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
             <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green">
