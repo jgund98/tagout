@@ -146,6 +146,7 @@ type Action =
   | { type: "FLOOR_BALANCE"; sections: string[] }
   | { type: "ROTATION_SET"; mode: import("./data").RotationMode }
   | { type: "STAFF_REMOVE"; id: string }
+  | { type: "SUGGEST_DISMISS"; id: string }
   | { type: "APPROVE_LIVE_COVER" };
 
 function reducer(state: PortalState, a: Action): PortalState {
@@ -291,6 +292,8 @@ function reducer(state: PortalState, a: Action): PortalState {
       return { ...state, rotation: a.mode };
     case "STAFF_REMOVE":
       return { ...state, staff: state.staff.filter((s) => s.id !== a.id) };
+    case "SUGGEST_DISMISS":
+      return { ...state, dismissed: [...state.dismissed, a.id] };
     case "APPROVE_LIVE_COVER": {
       // Sasha takes Dana's Friday close; the board updates in front of you.
       return {

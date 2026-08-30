@@ -16,6 +16,95 @@ const KIND_META: Record<FeedEvent["kind"], { chip: string; tone: "mint" | "lav" 
   rule: { chip: "House rule", tone: "lav" },
 };
 
+function Suggestions() {
+  const { state, dispatch } = usePortal();
+  const devon = state.staff.find((s) => s.id === "devon");
+  const dana = state.staff.find((s) => s.id === "dana");
+  const sam = state.staff.find((s) => s.id === "sam");
+  const sundayOpen = state.shifts.some((s) => s.state === "open" && s.day === 6);
+
+  type Sug = { id: string; icon: string; text: string; sub: string; action?: { label: string; run: () => void } };
+  const sugs: Sug[] = [];
+
+  if (devon && sundayOpen && devon.availNote === "Wants more hours")
+    sugs.push({
+      id: "devon-sunday",
+      icon: "⚡",
+      text: "Devon wants more hours and Sunday brunch is still open",
+      sub: `He's at ${devon.hoursWeek} hrs and says yes ${Math.round(devon.yesRate * 10)} of 10 asks`,
+      action: {
+        label: "Ask him first",
+        run: () =>
+          dispatch({
+            type: "FEED_PUSH",
+            event: { id: uid("f"), kind: "cover", who: "devon", text: "Devon moved to the front of Sunday's list", sub: "he gets the first ask when outreach starts Saturday", when: "Just now" },
+          }),
+      },
+    });
+
+  if (dana && dana.drops90 >= 3)
+    sugs.push({
+      id: "dana-pattern",
+      icon: "📉",
+      text: `Dana has dropped ${dana.drops90} shifts in 90 days, three of them Fridays`,
+      sub: "Kept off the group chat. A quick check-in usually turns this around",
+      action: {
+        label: "Remind me tomorrow",
+        run: () => dispatch({ type: "NOTE_ADD", text: "Check in with Dana about Fridays." }),
+      },
+    });
+
+  if (sam && sam.hoursWeek >= 38)
+    sugs.push({
+      id: "sam-ot",
+      icon: "🛡️",
+      text: `Sam is at ${sam.hoursWeek} hrs, so pickups would tip him into overtime`,
+      sub: "He's excluded from extra-shift asks for the rest of the week",
+    });
+
+  const visible = sugs.filter((s) => !state.dismissed.includes(s.id));
+  if (visible.length === 0) return null;
+
+  return (
+    <section className="rounded-3xl bg-white p-5 shadow-pop">
+      <h3 className="flex items-center gap-2 font-display text-[17px] font-extrabold text-ink">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green text-[12px]">✦</span>
+        Tagout suggests
+      </h3>
+      <div className="mt-3 space-y-2.5">
+        {visible.map((s) => (
+          <div key={s.id} className="rounded-2xl bg-cream/80 p-3.5">
+            <p className="text-[13.5px] font-bold leading-snug text-ink">
+              <span className="mr-1.5" aria-hidden>{s.icon}</span>
+              {s.text}
+            </p>
+            <p className="mt-1 text-[12px] font-semibold text-ink/50">{s.sub}</p>
+            <div className="mt-2.5 flex items-center gap-2">
+              {s.action && (
+                <button
+                  onClick={() => {
+                    s.action!.run();
+                    dispatch({ type: "SUGGEST_DISMISS", id: s.id });
+                  }}
+                  className="rounded-full bg-green-dark px-3.5 py-1.5 text-[12.5px] font-extrabold text-white"
+                >
+                  {s.action.label}
+                </button>
+              )}
+              <button
+                onClick={() => dispatch({ type: "SUGGEST_DISMISS", id: s.id })}
+                className="px-1 text-[12.5px] font-bold text-ink/40 hover:text-ink"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 const FILTERS = [
   { key: "all", label: "Everything" },
   { key: "cover", label: "Coverage" },
@@ -260,6 +349,9 @@ export default function TonightPage() {
               Open the week →
             </Link>
           </section>
+
+          {/* Tagout suggests: derived from the data, acted on in one tap */}
+          <Suggestions />
 
           {/* up next: the future, one glance */}
           <section className="rounded-3xl bg-white p-5 shadow-pop">

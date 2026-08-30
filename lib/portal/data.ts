@@ -116,6 +116,7 @@ export type PortalState = {
   events: HouseEvent[];
   notes: Note[];
   weekPublished: boolean;
+  dismissed: string[]; // suggestion ids the GM has handled
   stats: { coveredPct: number; repliesToday: number; laborWeek: number; covers90d: number; medianCoverMins: number };
 };
 
@@ -361,6 +362,7 @@ export function makeSeed(): PortalState {
     events,
     notes,
     weekPublished: true,
+    dismissed: [],
     stats: { coveredPct: 100, repliesToday: 14, laborWeek: 6240, covers90d: 47, medianCoverMins: 9 },
   };
 }
