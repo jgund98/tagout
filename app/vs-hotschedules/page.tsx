@@ -47,7 +47,21 @@ export default function VsPage() {
       <section className="bg-paper pb-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
-            <div className="overflow-x-auto rounded-3xl shadow-lift">
+            {/* mobile: stacked cards, one per row */}
+            <div className="space-y-3 md:hidden">
+              {rows.map((r) => (
+                <div key={r.k} className="rounded-2xl bg-white p-4 shadow-pop">
+                  <p className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">{r.k}</p>
+                  <p className="mt-1.5 text-[13.5px] font-medium text-ink/40">
+                    <span className="font-bold text-ink/50">HotSchedules:</span> {r.hs}
+                  </p>
+                  <p className="mt-1 text-[14.5px] font-bold text-green-dark">
+                    <span className="font-extrabold">Tagout:</span> {r.tg}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="hidden overflow-x-auto rounded-3xl shadow-lift md:block">
               <table className="w-full border-collapse md:min-w-[680px] bg-white text-left">
                 <thead>
                   <tr className="border-b border-ink/8">

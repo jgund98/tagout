@@ -222,7 +222,7 @@ function OldWay() {
         <Stagger className="mt-14 grid gap-6 md:grid-cols-3" gap={0.12}>
           <Item className="hidden md:block">
             <div className="flex h-full flex-col">
-              <LockscreenMock />
+              <LockscreenMock className="flex-1" />
               <p className="mt-5 text-[15.5px] font-semibold leading-snug text-paper/70">
                 <span className="font-display font-extrabold text-paper">The notification graveyard.</span>{" "}
                 “Open the app to view” is where open shifts go to die.
@@ -231,7 +231,7 @@ function OldWay() {
           </Item>
           <Item>
             <div className="flex h-full flex-col">
-              <GroupChatMock />
+              <GroupChatMock className="flex-1" />
               <p className="mt-5 text-[15.5px] font-semibold leading-snug text-paper/70">
                 <span className="font-display font-extrabold text-paper">The group-chat spiral.</span>{" "}
                 Twenty-three people, six replies, zero coverage.
@@ -240,11 +240,11 @@ function OldWay() {
           </Item>
           <Item className="hidden md:block">
             <div className="flex h-full flex-col">
-              <div className="rounded-[30px] bg-white p-6 shadow-lift">
+              <div className="flex flex-1 flex-col rounded-[30px] bg-white p-6 shadow-lift">
                 <p className="font-display text-[15px] font-extrabold uppercase tracking-wide text-ink/40">
                   Manager&apos;s notebook · Fri
                 </p>
-                <ul className="mt-4 space-y-3">
+                <ul className="mt-4 flex flex-1 flex-col justify-evenly gap-3">
                   {[
                     { n: "Call Kyle", s: "no answer" },
                     { n: "Call Sam", s: "voicemail" },
@@ -799,7 +799,17 @@ function CompareTeaser() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <div className="mt-10 overflow-x-auto rounded-3xl shadow-lift">
+          {/* mobile: stacked cards, one per row */}
+          <div className="mt-10 space-y-3 md:hidden">
+            {rows.map((r) => (
+              <div key={r.k} className="rounded-2xl bg-white p-4 shadow-pop">
+                <p className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">{r.k}</p>
+                <p className="mt-1.5 text-[13.5px] font-medium text-ink/40 line-through decoration-ink/25">{r.them}</p>
+                <p className="mt-1 text-[14.5px] font-bold text-green-dark">✓ {r.us}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 hidden overflow-x-auto rounded-3xl shadow-lift md:block">
             <table className="w-full border-collapse md:min-w-[640px] overflow-hidden rounded-3xl bg-white text-left">
               <thead>
                 <tr className="border-b border-ink/8">
