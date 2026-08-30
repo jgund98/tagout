@@ -18,7 +18,7 @@ export function GmThread() {
             kind: "tag",
             text: (
               <>
-                On it. Off tonight and under 40: Devon (26 hrs), Alex (31), Priya
+                On it. Off tonight and under 40: Devon (26 hrs), Alex (31), Katie
                 (34). Text them in that order?
               </>
             ),

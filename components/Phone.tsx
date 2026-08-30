@@ -235,7 +235,7 @@ const SCRIPTS: Script[] = [
         kind: "tag",
         text: (
           <>
-            On it. Priya&apos;s free and under hours. She&apos;ll take Saturday if you cover
+            On it. Katie&apos;s free and under hours. She&apos;ll take Saturday if you cover
             her Sunday brunch. Deal?
           </>
         ),

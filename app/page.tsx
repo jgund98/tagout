@@ -601,7 +601,7 @@ function EdgeCases() {
       time: "Before publish",
       tone: "bg-mint text-green-dark",
       title: "The accidental clopen",
-      body: "A swap would have Priya closing Saturday and opening Sunday brunch. Tagout catches the clopen and asks her first, so nobody finds it on the published schedule.",
+      body: "A swap would have Katie closing Saturday and opening Sunday brunch. Tagout catches the clopen and asks her first, so nobody finds it on the published schedule.",
       sms: "“Heads up: that swap means close Sat, open Sun at 9. Still good?”",
       mobile: false,
     },

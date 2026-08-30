@@ -42,7 +42,7 @@ export default function LoginPage() {
               While you were logged out
             </p>
             <p className="mt-2 text-[15.5px] font-medium leading-relaxed text-ink">
-              Tagout covered Sunday brunch (Priya said yes), lined up a swap for
+              Tagout covered Sunday brunch (Katie said yes), lined up a swap for
               Tuesday, and kept Jake out of overtime.
             </p>
           </div>

@@ -31,7 +31,7 @@ const ROSTER: Person[] = [
   { name: "Marisa T.", role: "Server", hours: 31, status: "pick", reason: "Free · says yes often", yes: "8 of 9 asks" },
   { name: "Devon K.", role: "Server", hours: 26, status: "backup", reason: "Free · newer on close", yes: "5 of 7 asks" },
   { name: "Jake R.", role: "Server", hours: 38.5, status: "skip-ot", reason: "Would hit overtime" },
-  { name: "Priya S.", role: "Server", hours: 29, status: "skip-off", reason: "Requested off" },
+  { name: "Katie S.", role: "Server", hours: 29, status: "skip-off", reason: "Requested off" },
 ];
 
 function initials(name: string) {

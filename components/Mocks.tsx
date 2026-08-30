@@ -37,7 +37,7 @@ const GRID: { name: string; cells: Cell[] }[] = [
     ],
   },
   {
-    name: "Priya S.",
+    name: "Katie S.",
     cells: [
       {},
       { label: "5–11", tone: "mint" },
@@ -155,7 +155,7 @@ export function ApprovalsMock({ className = "" }: { className?: string }) {
       state: "ready",
     },
     {
-      who: "Priya S.",
+      who: "Katie S.",
       what: "Drop Sunday brunch",
       note: "Tagout already has 3 candidates",
       state: "working",
@@ -208,7 +208,7 @@ export function GuardrailsMock({ className = "" }: { className?: string }) {
     { name: "Jake R.", hrs: 38.5, cap: 40, tone: "amber" },
     { name: "Marisa T.", hrs: 31, cap: 40, tone: "green" },
     { name: "Devon K.", hrs: 26, cap: 40, tone: "green" },
-    { name: "Priya S.", hrs: 29, cap: 40, tone: "green" },
+    { name: "Katie S.", hrs: 29, cap: 40, tone: "green" },
   ];
   return (
     <div className={`rounded-3xl bg-white p-5 shadow-lift sm:p-6 ${className}`}>
