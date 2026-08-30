@@ -80,7 +80,7 @@ export default function Footer() {
             © {new Date().getFullYear()} {site.legal.company} All rights reserved.
           </p>
           <p className="text-sm text-paper/45">
-            {site.domain} · Made for restaurants, not head offices.
+            {site.domain} · Made for restaurants and retail, not head offices.
           </p>
         </div>
       </div>

@@ -8,9 +8,9 @@ export const site = {
   wordmark: "tagout",
   domain: "trytagout.com",
   url: "https://trytagout.com",
-  tagline: "Restaurant scheduling that texts back",
+  tagline: "Scheduling that texts back",
   description:
-    "Tagout builds your schedule, then its AI fills every gap over text message, finding who's free, who's under overtime, and who actually says yes. Managers approve. Your team just replies.",
+    "Tagout builds your schedule, then its AI fills every gap over text message, finding who's free, who's under overtime, and who actually says yes. Built for restaurants first, and for retail and every shift-run floor.",
   email: "hello@trytagout.com",
   aiName: "Tagout",
 

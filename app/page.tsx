@@ -5,6 +5,7 @@ import { PhoneShell, HeroThread } from "@/components/Phone";
 import { BubbleMark } from "@/components/Wordmark";
 import CoverTheater from "@/components/CoverTheater";
 import CTABand from "@/components/CTABand";
+import CompareThread from "@/components/CompareThread";
 import {
   ScheduleMock,
   ApprovalsMock,
@@ -303,7 +304,7 @@ function Theater() {
 
 function ManagerPillars() {
   return (
-    <section id="managers" className="scroll-mt-24 bg-paper py-14 sm:py-20 md:py-28">
+    <section id="managers" className="scroll-mt-24 bg-mint/40 py-14 sm:py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-violet-mid">
@@ -314,9 +315,8 @@ function ManagerPillars() {
           </h2>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-soft">
             The portal is fast. The thread is faster: text &ldquo;Marisa called out
-            tonight&rdquo; and a ranked list comes back, ready to work. Tagout asks the
-            whole eligible list before it ever hands the problem back, and when an ask
-            outgrows a text, the reply comes with a link straight into the&nbsp;portal.
+            tonight&rdquo; and a ranked list comes back, ready to work. When an ask
+            outgrows a text, the reply links straight into the&nbsp;portal.
           </p>
         </Reveal>
 
@@ -412,7 +412,7 @@ function ManagerPillars() {
 
 function StaffSection() {
   return (
-    <section id="staff" className="scroll-mt-24 overflow-hidden bg-cream py-14 sm:py-20 md:py-28">
+    <section id="staff" className="scroll-mt-24 overflow-hidden bg-butter/30 py-14 sm:py-20 md:py-28">
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:px-8">
         <Reveal>
           <div className="relative">
@@ -636,7 +636,7 @@ function EdgeCases() {
     },
   ];
   return (
-    <section className="bg-cream py-14 sm:py-20 md:py-28">
+    <section className="bg-blush/25 py-14 sm:py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green-dark">
@@ -653,15 +653,25 @@ function EdgeCases() {
         <Stagger className="no-scrollbar mt-12 flex snap-x snap-proximity overscroll-x-contain gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible lg:grid-cols-3" gap={0.08}>
           {cases.map((c) => (
             <Item key={c.title} className="min-w-[84%] snap-center sm:min-w-0">
-              <div className="flex h-full flex-col rounded-3xl bg-white p-6 shadow-pop transition-shadow hover:shadow-lift sm:p-7">
-                <span className={`w-fit rounded-lg rounded-bl-[4px] px-3 py-1 text-[11.5px] font-extrabold uppercase tracking-wide ${c.tone}`}>
-                  {c.time}
-                </span>
-                <h3 className="mt-3.5 font-display text-[20px] font-extrabold text-ink">{c.title}</h3>
-                <p className="mt-2 flex-1 text-[14.5px] leading-relaxed text-ink-soft">{c.body}</p>
-                <p className="mt-4 rounded-2xl rounded-bl-md bg-cream px-4 py-3 text-[13.5px] font-semibold leading-snug text-ink">
-                  {c.sms}
-                </p>
+              <div className="flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-pop transition-shadow hover:shadow-lift">
+                {/* a slice of the phone screen: timestamp + the actual text */}
+                <div className="bg-[#f4f2ec] px-5 pb-5 pt-3.5">
+                  <p className="text-center text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink/35">
+                    {c.time}
+                  </p>
+                  <div className="mt-2.5 flex items-start gap-2">
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green">
+                      <BubbleMark size={14} className="text-white" />
+                    </div>
+                    <p className="rounded-[16px] rounded-bl-md bg-white px-3.5 py-2 text-[13.5px] leading-snug text-ink shadow-[0_1px_2px_rgb(15_21_18/0.08)]">
+                      {c.sms.replace(/[\u201c\u201d]/g, "")}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-1 flex-col p-5 sm:px-6">
+                  <h3 className="font-display text-[19px] font-extrabold text-ink">{c.title}</h3>
+                  <p className="mt-1.5 text-[14px] leading-relaxed text-ink-soft">{c.body}</p>
+                </div>
               </div>
             </Item>
           ))}
@@ -689,22 +699,22 @@ function PhotoBand() {
         >
           {[
             {
-              src: "/photos/dining-room.webp",
-              alt: "Server setting tables in a warm dining room before service",
+              src: "/photos/band-floor.webp",
+              alt: "Server carrying a tray of drinks through a busy, warmly lit dining room",
               cap: "Friday, fully staffed",
-              pos: "50% 45%",
+              pos: "50% 50%",
             },
             {
-              src: "/photos/counter-service.webp",
-              alt: "Coffee shop employee working the register",
+              src: "/photos/band-counter.webp",
+              alt: "Smiling barista handing a coffee across the counter to a customer",
               cap: "Counter covered, line moving",
-              pos: "92% 50%",
+              pos: "50% 50%",
             },
             {
-              src: "/photos/server-burgers.webp",
-              alt: "Server delivering plates of burgers and fries on a patio",
+              src: "/photos/band-happy.webp",
+              alt: "Waitress laughing with a guest at a bright, plant-filled café",
               cap: "Nobody working a double they didn't ask for",
-              pos: "62% 45%",
+              pos: "50% 50%",
             },
           ].map((p) => (
             <Item key={p.cap} className="min-w-[78%] snap-center sm:min-w-0">
@@ -838,31 +848,8 @@ function CompareTeaser() {
               </div>
             ))}
           </div>
-          <div className="mt-10 hidden overflow-x-auto rounded-3xl shadow-lift md:block">
-            <table className="w-full border-collapse md:min-w-[640px] overflow-hidden rounded-3xl bg-white text-left">
-              <thead>
-                <tr className="border-b border-ink/8">
-                  <th className="px-6 py-5 text-[13px] font-extrabold uppercase tracking-wide text-ink/40">
-                    What matters
-                  </th>
-                  <th className="px-6 py-5 text-[13px] font-extrabold uppercase tracking-wide text-ink/40">
-                    Legacy schedulers
-                  </th>
-                  <th className="bg-mint/70 px-6 py-5">
-                    <span className="font-display text-[16px] font-extrabold text-green-dark">Tagout</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.k} className="border-b border-ink/6 last:border-0">
-                    <td className="px-6 py-4 font-display text-[15px] font-extrabold text-ink">{r.k}</td>
-                    <td className="px-6 py-4 text-[14.5px] font-medium text-ink/50">{r.them}</td>
-                    <td className="bg-mint/40 px-6 py-4 text-[14.5px] font-bold text-green-dark">{r.us}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-10 hidden md:block">
+            <CompareThread rows={rows} />
           </div>
         </Reveal>
       </div>

@@ -51,10 +51,9 @@ export default function PricingPage() {
               $249 covers <span className="text-green-deep">the&nbsp;house.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft md:text-xl">
-              That&apos;s not a platform fee, it&apos;s your first 25 seats, about
-              $10 apiece with Tagout&apos;s AI, both portals, and unlimited texting
-              built in. A section adds 15 more for $99 and pulls the average under
-              $8. The bill moves when the house grows, never when someone&nbsp;quits.
+              Your first 25 seats, not a platform fee: Tagout&apos;s AI and both
+              portals built in. Sections add 15 more for $99, and the bill only
+              moves when the house&nbsp;grows.
             </p>
             <p className="mx-auto mt-5 inline-flex items-center gap-2 rounded-2xl rounded-bl-[6px] bg-mint px-4 py-2.5 text-[13.5px] font-extrabold text-green-dark sm:px-5 sm:text-[14.5px]">
               <span className="h-2 w-2 shrink-0 rounded-full bg-green" />

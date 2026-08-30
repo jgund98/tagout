@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal, Stagger, Item } from "@/components/Reveal";
 import CTABand from "@/components/CTABand";
+import CompareThread from "@/components/CompareThread";
 
 export const metadata: Metadata = {
-  title: "Tagout vs HotSchedules: the honest comparison",
+  title: "Compare: Tagout vs HotSchedules, 7shifts & more",
   description:
-    "HotSchedules built the category. Tagout rebuilt it around the one channel your staff actually answers: text messages. Here's the side-by-side.",
+    "HotSchedules built the category. Tagout rebuilt it around the one channel your staff actually answers: text messages. The honest side-by-side, plus how Tagout stacks up against 7shifts, When I Work, Homebase, and Sling.",
 };
 
 const rows: { k: string; hs: string; tg: string }[] = [
@@ -36,9 +37,9 @@ export default function VsPage() {
               <span className="text-green-deep">We rebuilt it around a&nbsp;text.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft md:text-xl">
-              Respect where it&apos;s due: HotSchedules taught the industry that scheduling
-              belongs in software. But it was designed when the answer to everything was
-              “open the app,” and your staff has voted on that with their thumbs.
+              Respect where it&apos;s due: HotSchedules taught the industry that
+              scheduling belongs in software. But it still answers everything with
+              &ldquo;open the app,&rdquo; and your staff has voted on&nbsp;that.
             </p>
           </Reveal>
         </div>
@@ -61,29 +62,11 @@ export default function VsPage() {
                 </div>
               ))}
             </div>
-            <div className="hidden overflow-x-auto rounded-3xl shadow-lift md:block">
-              <table className="w-full border-collapse md:min-w-[680px] bg-white text-left">
-                <thead>
-                  <tr className="border-b border-ink/8">
-                    <th className="w-[30%] px-6 py-5 text-[13px] font-extrabold uppercase tracking-wide text-ink/40" />
-                    <th className="w-[35%] px-6 py-5 font-display text-[16px] font-extrabold text-ink/55">
-                      HotSchedules
-                    </th>
-                    <th className="w-[35%] bg-mint/70 px-6 py-5 font-display text-[16px] font-extrabold text-green-dark">
-                      Tagout
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r) => (
-                    <tr key={r.k} className="border-b border-ink/6 last:border-0">
-                      <td className="px-6 py-4 font-display text-[15px] font-extrabold text-ink">{r.k}</td>
-                      <td className="px-6 py-4 text-[14.5px] font-medium text-ink/50">{r.hs}</td>
-                      <td className="bg-mint/40 px-6 py-4 text-[14.5px] font-bold text-green-dark">{r.tg}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="hidden md:block">
+              <CompareThread
+                themLabel="HotSchedules"
+                rows={rows.map((r) => ({ k: r.k, them: r.hs, us: r.tg }))}
+              />
             </div>
           </Reveal>
           <p className="mt-4 text-center text-[13px] font-medium text-ink/40">
@@ -164,6 +147,73 @@ export default function VsPage() {
               />
             </div>
           </Reveal>
+        </div>
+      </section>
+
+      {/* the rest of the field */}
+      <section className="bg-cream py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green-dark">
+              The rest of the field
+            </p>
+            <h2 className="mt-4 max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-ink sm:text-5xl">
+              Good products. Different&nbsp;job.
+            </h2>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-soft">
+              Respect to all of them: they schedule. Tagout schedules and then goes
+              and gets the shift covered. That difference is the whole&nbsp;company.
+            </p>
+          </Reveal>
+          <Stagger
+            className="no-scrollbar mt-12 flex snap-x snap-proximity overscroll-x-contain gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible"
+            gap={0.08}
+          >
+            {[
+              {
+                name: "7shifts",
+                what: "The restaurant favorite for schedules and team chat",
+                fair: "Genuinely strong scheduling, and staff like the chat.",
+                us: "A dropped shift gets posted for staff to claim. Tagout goes and gets the yes: ranked asks by text, confirmed, board updated.",
+              },
+              {
+                name: "When I Work",
+                what: "Broad small-business scheduling with easy swaps",
+                fair: "Clean scheduling and simple swaps across many industries.",
+                us: "Swaps still start with someone opening an app. With Tagout the whole exchange happens in the thread your team already answers.",
+              },
+              {
+                name: "Homebase",
+                what: "Scheduling, time clocks, and payroll for small teams",
+                fair: "A generous toolbox for small shops, clocks and payroll included.",
+                us: "When someone calls out, the manager is still the engine. Tagout is the engine: it works the list and hands you a confirmed name.",
+              },
+              {
+                name: "Sling by Toast",
+                what: "Scheduling that lives inside the Toast ecosystem",
+                fair: "Convenient if you run Toast: schedules sit next to the POS.",
+                us: "Open shifts go to a feed and wait. Tagout doesn't wait: it texts the right people, in order, until Friday is whole.",
+              },
+            ].map((c) => (
+              <Item key={c.name} className="min-w-[86%] snap-center sm:min-w-0">
+                <div className="flex h-full flex-col rounded-3xl bg-white p-6 shadow-pop sm:p-7">
+                  <h3 className="font-display text-[20px] font-extrabold text-ink">{c.name}</h3>
+                  <p className="mt-0.5 text-[13px] font-semibold text-ink/45">{c.what}</p>
+                  <p className="mt-4 w-fit max-w-[92%] rounded-[16px] rounded-bl-md bg-ink/[0.05] px-4 py-2.5 text-[14px] font-medium leading-snug text-ink/55">
+                    {c.fair}
+                  </p>
+                  <p className="mt-2.5 w-fit max-w-[92%] self-end rounded-[16px] rounded-br-md bg-green px-4 py-2.5 text-[14px] font-bold leading-snug text-white">
+                    {c.us}
+                  </p>
+                </div>
+              </Item>
+            ))}
+          </Stagger>
+          <p className="mt-6 max-w-3xl text-[12.5px] leading-relaxed text-ink/40">
+            Category-level comparisons based on public information as of August 2026;
+            features vary by plan and tier. All product names and trademarks are the
+            property of their respective owners.
+          </p>
         </div>
       </section>
 
