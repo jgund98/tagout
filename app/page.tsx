@@ -114,14 +114,23 @@ function Hero() {
                 <HeroThread />
               </PhoneShell>
 
-              {/* floating intel chips */}
-              <div className="absolute top-48 hidden rotate-[-4deg] rounded-2xl bg-white p-3.5 shadow-lift lg:-left-16 lg:block xl:-left-24">
-                <p className="text-[11px] font-extrabold uppercase tracking-wide text-ink/40">Overtime check</p>
-                <p className="mt-1 text-[14px] font-extrabold text-green-dark">31 / 40 hrs · safe ✓</p>
+              {/* the AI's actual reasoning, floated as telemetry */}
+              <div className="absolute top-[54%] hidden rotate-[-4deg] rounded-2xl bg-white p-3.5 shadow-lift lg:-left-16 lg:block xl:-left-24">
+                <p className="text-[11px] font-extrabold uppercase tracking-wide text-ink/40">Why Marisa got the text</p>
+                <p className="mt-1.5 text-[13px] font-bold leading-snug text-ink">
+                  <span className="text-green-dark">✓</span> Free Friday&ensp;
+                  <span className="text-green-dark">✓</span> 31 of 40 hrs
+                  <br />
+                  <span className="text-green-dark">✓</span> Took 8 of her last 9 offers
+                </p>
               </div>
-              <div className="absolute bottom-20 hidden rotate-[3deg] rounded-2xl bg-white p-3.5 shadow-lift lg:-right-12 lg:block xl:-right-20">
-                <p className="text-[11px] font-extrabold uppercase tracking-wide text-ink/40">Likely to say yes</p>
-                <p className="mt-1 text-[14px] font-extrabold text-violet-mid">8 of 9 past asks</p>
+              <div className="absolute bottom-24 hidden rotate-[3deg] rounded-2xl bg-white p-3.5 shadow-lift lg:-right-12 lg:block xl:-right-20">
+                <p className="text-[11px] font-extrabold uppercase tracking-wide text-ink/40">Skipped: Jake</p>
+                <p className="mt-1.5 text-[13px] font-bold leading-snug text-ink">
+                  38.5 hrs. This shift would&nbsp;have
+                  <br />
+                  cost you <span className="text-coral">$54 in overtime</span>
+                </p>
               </div>
             </div>
           </Reveal>
@@ -719,8 +728,8 @@ function GroupsSection() {
             <Reveal delay={0.18}>
               <figure className="relative overflow-hidden rounded-3xl shadow-lift">
                 <img
-                  src="/photos/bartender.jpg"
-                  alt="Bartender behind the bar of an upscale restaurant"
+                  src="/photos/groups-floor.jpg"
+                  alt="Server moving through a busy modern dining room mid-shift"
                   loading="lazy"
                   className="aspect-[16/9] w-full object-cover"
                 />
