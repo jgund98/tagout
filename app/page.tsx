@@ -40,9 +40,9 @@ export default function Home() {
 function Hero() {
   return (
     <section className="relative overflow-hidden bg-paper pt-16 md:pt-[72px]">
-      <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-10 sm:px-6 md:gap-12 md:pb-24 md:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
-        {/* copy */}
-        <div className="order-2 lg:order-1">
+      <div className="relative mx-auto flex min-h-[calc(100svh-64px)] w-full max-w-7xl flex-col justify-center gap-7 px-4 py-8 sm:px-6 md:min-h-[calc(100svh-72px)] lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:grid-rows-[auto_auto] lg:items-center lg:gap-x-10 lg:gap-y-0 lg:px-8 lg:py-6">
+        {/* headline first, everywhere */}
+        <div className="lg:self-end lg:[grid-area:1/1/2/2]">
           <Reveal>
             <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green text-[11px] text-white">⚡</span>
@@ -50,7 +50,7 @@ function Hero() {
             </p>
           </Reveal>
           <Reveal delay={0.08}>
-            <h1 className="mt-6 font-display text-[44px] font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl md:text-7xl">
+            <h1 className="mt-5 font-display text-[40px] font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl xl:text-7xl">
               Scheduling that{" "}
               <span className="relative inline-block text-green-deep">
                 texts&nbsp;back.
@@ -66,16 +66,19 @@ function Hero() {
               </span>
             </h1>
           </Reveal>
+        </div>
+
+        {/* the rest of the pitch: after the phone on mobile, under the headline on desktop */}
+        <div className="order-3 lg:order-none lg:self-start lg:[grid-area:2/1/3/2]">
           <Reveal delay={0.16}>
-            <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-soft md:text-xl">
-              The week builds itself in minutes. Dropped shifts cover themselves by
-              text, through <strong className="font-bold text-ink">an AI that knows your
-              restaurant</strong>: who&apos;s free, who&apos;s near overtime, who says yes.
-              Your crew replies in seconds. You never work the phones&nbsp;again.
+            <p className="mt-0 max-w-xl text-lg leading-relaxed text-ink-soft lg:mt-6 xl:text-xl">
+              The AI <strong className="font-bold text-ink">covers every dropped shift
+              by text</strong>. It knows who&apos;s free, who&apos;s under 40, and who
+              actually says yes. You never work the phones&nbsp;again.
             </p>
           </Reveal>
           <Reveal delay={0.24}>
-            <div className="mt-9 flex flex-wrap items-center gap-4">
+            <div className="mt-7 flex flex-wrap items-center gap-4">
               <Link
                 href="/demo"
                 className="group rounded-full bg-green px-7 py-4 text-lg font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white hover:shadow-lift"
@@ -92,7 +95,7 @@ function Hero() {
             </div>
           </Reveal>
           <Reveal delay={0.32}>
-            <ul className="mt-9 flex flex-wrap gap-x-7 gap-y-2 text-[14.5px] font-semibold text-ink-soft">
+            <ul className="mt-7 flex flex-wrap gap-x-7 gap-y-2 text-[14.5px] font-semibold text-ink-soft">
               {["$29 a seat, everything on", "Live in one shift", "Free import from your old scheduler"].map((t) => (
                 <li key={t} className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-mint text-[11px] font-black text-green-dark">✓</span>
@@ -104,7 +107,7 @@ function Hero() {
         </div>
 
         {/* phone on its stage */}
-        <div className="order-1 lg:order-2">
+        <div className="order-2 lg:order-none lg:[grid-area:1/2/3/3]">
           <Reveal delay={0.1} y={40}>
             <div className="relative mx-auto w-fit px-6 py-8 sm:px-10">
               {/* tilted brand stage instead of vapor */}
@@ -112,34 +115,9 @@ function Hero() {
                 className="absolute inset-x-0 bottom-2 top-14 -rotate-2 rounded-[44px] bg-mint sm:-inset-x-6"
                 aria-hidden
               />
-              <div
-                className="absolute -right-1 top-8 h-16 w-16 rotate-6 rounded-2xl bg-violet/90 sm:right-2"
-                aria-hidden
-              />
               <PhoneShell className="relative">
                 <HeroThread />
               </PhoneShell>
-
-              {/* the AI's actual reasoning, floated as telemetry.
-                  Anchored to the phone's chrome corners so the growing
-                  conversation can never run underneath them. */}
-              <div className="absolute -bottom-4 -left-2 hidden rotate-[-4deg] rounded-2xl bg-white p-3.5 shadow-lift lg:block xl:-left-12">
-                <p className="text-[11px] font-extrabold uppercase tracking-wide text-ink/40">Why Marisa got the text</p>
-                <p className="mt-1.5 text-[13px] font-bold leading-snug text-ink">
-                  <span className="text-green-dark">✓</span> Free Friday&ensp;
-                  <span className="text-green-dark">✓</span> 31 of 40 hrs
-                  <br />
-                  <span className="text-green-dark">✓</span> Took 8 of her last 9 offers
-                </p>
-              </div>
-              <div className="absolute -top-1 right-0 hidden rotate-[3deg] rounded-2xl bg-white p-3.5 shadow-lift lg:block xl:-right-12">
-                <p className="text-[11px] font-extrabold uppercase tracking-wide text-ink/40">Skipped: Jake</p>
-                <p className="mt-1.5 text-[13px] font-bold leading-snug text-ink">
-                  38.5 hrs. This shift would&nbsp;have
-                  <br />
-                  cost you <span className="text-coral">$54 in overtime</span>
-                </p>
-              </div>
             </div>
           </Reveal>
         </div>
@@ -412,16 +390,16 @@ function StaffSection() {
         <Reveal>
           <div className="relative">
             <img
-              src="/photos/server-portrait.jpg"
-              alt="A server in apron holding an order pad, looking at the camera"
-              className="aspect-[4/5] w-full max-w-md rounded-[32px] object-cover shadow-lift"
+              src="/photos/server-text.jpg"
+              alt="A server smiling at a text message on her phone between shifts"
+              className="aspect-[4/5] w-full max-w-md rounded-[32px] object-cover object-[38%_50%] shadow-lift"
               loading="lazy"
             />
             <div className="absolute -right-3 bottom-8 max-w-[240px] rounded-2xl rounded-bl-md bg-green p-4 text-white shadow-lift sm:-right-6">
               <p className="text-[14px] font-semibold leading-snug">
-                “Can you close Sat instead of Sun?”
+                “Friday 5–11 just opened up. Want it? You&apos;d stay under 40.”
               </p>
-              <p className="mt-1.5 text-[12px] font-bold text-white/70">— sent from her texts, 8 seconds</p>
+              <p className="mt-1.5 text-[12px] font-bold text-white/70">the text she&apos;s smiling at</p>
             </div>
           </div>
         </Reveal>

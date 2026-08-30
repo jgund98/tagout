@@ -18,13 +18,13 @@ export default function DemoPage() {
         <Reveal>
           <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
             <span className="h-2 w-2 rounded-full bg-green tg-pulse" />
-            20 minutes · a human · no deck
+            A 20-minute live demo with a real person
           </p>
           <h1 className="mt-6 font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl">
             Watch Tagout cover a&nbsp;shift. <span className="text-green-deep">Yours.</span>
           </h1>
           <p className="mt-6 max-w-lg text-lg leading-relaxed text-ink-soft">
-            We don&apos;t do slideware. Bring a week of your real schedule and we&apos;ll import
+            No slides, no canned pitch. Bring a week of your real schedule and we&apos;ll import
             it live, drop a shift on purpose, and let you watch Tagout put it back
             together.
           </p>
@@ -44,7 +44,19 @@ export default function DemoPage() {
             ))}
           </ul>
 
-          <div className="mt-10 rounded-3xl bg-cream p-6">
+          <figure className="relative mt-10 overflow-hidden rounded-3xl shadow-lift">
+            <img
+              src="/photos/manager-tablet.jpg"
+              alt="Manager reviewing the week on a tablet over coffee"
+              loading="lazy"
+              className="aspect-[16/9] w-full object-cover object-[50%_42%]"
+            />
+            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 to-transparent px-6 pb-4 pt-12 font-display text-[15px] font-extrabold text-paper">
+              Bring your week. We&apos;ll bring the coverage.
+            </figcaption>
+          </figure>
+
+          <div className="mt-6 rounded-3xl bg-cream p-6">
             <p className="font-display text-[16px] font-extrabold text-ink">
               Rolling out a group?
             </p>

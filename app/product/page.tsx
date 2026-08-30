@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Reveal, Stagger, Item } from "@/components/Reveal";
 import CTABand from "@/components/CTABand";
 import CoverTheater from "@/components/CoverTheater";
+import StaffPortalMock from "@/components/StaffPortalMock";
 import {
   ScheduleMock,
   ApprovalsMock,
@@ -169,12 +170,7 @@ export default function ProductPage() {
       <section id="staff" className="scroll-mt-24 bg-cream py-16 md:py-20">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:px-8">
           <Reveal>
-            <img
-              src="/photos/manager-tablet.jpg"
-              alt="Manager reviewing the week on a tablet with a coffee in hand"
-              loading="lazy"
-              className="aspect-[4/3] w-full rounded-[28px] object-cover shadow-lift"
-            />
+            <StaffPortalMock />
           </Reveal>
           <Reveal delay={0.1}>
             <h2 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">

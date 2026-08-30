@@ -1,8 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { site } from "@/lib/site";
+
+/** Springy dollar counter so the price feels alive as the slider moves. */
+function AnimatedDollars({ value, className }: { value: number; className: string }) {
+  const mv = useMotionValue(value);
+  const text = useTransform(mv, (v) => `$${Math.round(v).toLocaleString()}`);
+  useEffect(() => {
+    const controls = animate(mv, value, { duration: 0.45, ease: [0.22, 1, 0.36, 1] });
+    return () => controls.stop();
+  }, [value, mv]);
+  return <motion.p className={className}>{text}</motion.p>;
+}
 
 const { seatMinimum, launchFee, seatTiers } = site.pricing;
 
@@ -96,9 +108,10 @@ export default function PricingCalculator() {
               <p className="text-[12px] font-extrabold uppercase tracking-wide text-green-dark/70">
                 Your monthly
               </p>
-              <p className="mt-1 font-display text-3xl font-extrabold tabular-nums text-green-dark">
-                ${monthly.toLocaleString()}
-              </p>
+              <AnimatedDollars
+                value={monthly}
+                className="mt-1 font-display text-3xl font-extrabold tabular-nums text-green-dark"
+              />
               <p className="text-[12px] font-semibold text-green-dark/70">
                 {billable > 20
                   ? `blended $${blended.toFixed(2).replace(/\.00$/, "")} a seat`

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Reveal, Stagger, Item } from "@/components/Reveal";
 import { PhoneShell } from "@/components/Phone";
 import { StaffThread } from "@/components/PersonaThreads";
+import StaffPortalMock from "@/components/StaffPortalMock";
 import CTABand from "@/components/CTABand";
 
 export const metadata: Metadata = {
@@ -91,6 +92,28 @@ export default function StaffPage() {
               </Item>
             ))}
           </Stagger>
+        </div>
+      </section>
+
+      {/* yes, there's still an app */}
+      <section className="bg-cream py-16 md:py-20">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-8">
+          <Reveal>
+            <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green-dark">
+              And yes, there&apos;s an app
+            </p>
+            <h2 className="mt-4 font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-ink sm:text-5xl">
+              The full portal is there when you want the whole&nbsp;picture.
+            </h2>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-soft">
+              Your week at a glance, open shifts you can grab, time-off requests,
+              availability. It&apos;s all one tap away in the Tagout portal. The texts
+              just mean you never <em>have</em> to open it on a busy&nbsp;night.
+            </p>
+          </Reveal>
+          <Reveal delay={0.12}>
+            <StaffPortalMock />
+          </Reveal>
         </div>
       </section>
 
