@@ -28,7 +28,7 @@ const FAQS = [
     a: "No. That's the group-blast problem we exist to kill. Tagout ranks candidates by availability, hours, role, and real yes-history, then asks a few people in order. If nobody answers, it escalates early, with names and numbers ready to dial.",
   },
   {
-    q: "Can managers override the AI?",
+    q: "Can managers override Tagout?",
     a: "Always. Tagout drafts, ranks, and asks, while you set how much it does on its own, from “suggest only” to “handle it and tell me after.” Every action is logged and reversible.",
   },
   {
@@ -204,7 +204,7 @@ export default function ProductPage() {
             </h2>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-ink-soft">
               Tagout is a full platform: managers get a fast web portal (schedule
-              builder, approvals, labor dashboards, the AI&apos;s activity feed) and staff
+              builder, approvals, labor dashboards, Tagout&apos;s activity feed) and staff
               get their own portal for the week, open shifts, and time-off. The SMS layer
               sits on top, so nobody is <em>forced</em> to open an app for the everyday
               stuff. That&apos;s why adoption isn&apos;t a rollout&nbsp;project.

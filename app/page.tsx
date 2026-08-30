@@ -91,7 +91,7 @@ function Hero() {
         <div className="order-3 lg:order-none lg:self-start lg:[grid-area:2/1/3/2]">
           <Reveal delay={0.16}>
             <p className="mt-0 max-w-xl text-lg leading-relaxed text-ink-soft lg:mt-6 xl:text-xl">
-              The AI <strong className="font-bold text-ink">covers every dropped shift
+              Tagout <strong className="font-bold text-ink">covers every dropped shift
               by text</strong>. It knows who&apos;s free, who&apos;s under 40, and who
               actually says yes. You never work the phones&nbsp;again.
             </p>

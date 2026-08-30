@@ -60,7 +60,7 @@ export const site = {
     pilotNote:
       "Start with a 30-day pilot in one location. If you don't stay, the launch fee comes back.",
     included: [
-      "The AI coverage agent, working 24/7",
+      "Tagout’s AI agent, covering shifts 24/7",
       "Unlimited scheduling-related texting",
       "Manager portal: schedules, approvals, labor dashboards",
       "Staff portal: their week, open shifts, time-off",

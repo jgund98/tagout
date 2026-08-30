@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 const FAQS = [
   {
     q: "Is the AI really included for every seat?",
-    a: "Yes. The AI is the product, not an upsell. Every seat gets coverage, swaps, guardrails, and both portals.",
+    a: "Yes. The coverage engine is the whole product, not an upsell. Every seat gets Tagout end to end: coverage, swaps, guardrails, and both portals.",
   },
   {
     q: "Are text messages really unlimited?",
