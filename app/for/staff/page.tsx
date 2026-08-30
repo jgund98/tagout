@@ -117,7 +117,7 @@ export default function StaffPage() {
       </section>
 
       {/* the everyday asks */}
-      <section className="bg-paper py-20 md:py-28">
+      <section className="bg-cream py-20 md:py-28">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:px-8">
           <Reveal>
             <div className="relative">

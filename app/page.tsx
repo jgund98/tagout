@@ -180,7 +180,7 @@ function SegmentStrip() {
 
 function TickerBand() {
   return (
-    <section className="bg-paper py-10 md:py-14">
+    <section className="bg-cream py-10 md:py-14">
       <Reveal>
         <p className="mx-auto max-w-7xl px-4 text-center font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-ink/40 sm:px-6">
           A Friday with Tagout on shift
@@ -646,7 +646,7 @@ function EdgeCases() {
 
 function PhotoBand() {
   return (
-    <section className="bg-paper py-20 md:py-28">
+    <section className="bg-cream py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <h2 className="mx-auto max-w-3xl text-center font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-5xl">
@@ -777,7 +777,7 @@ function CompareTeaser() {
     { k: "Pricing", them: "Modules, add-ons, tiers", us: "One house price, everything on" },
   ];
   return (
-    <section className="bg-paper py-20 md:py-28">
+    <section className="bg-cream py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">

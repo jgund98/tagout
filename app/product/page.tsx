@@ -214,7 +214,7 @@ export default function ProductPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-paper py-20 md:py-28">
+      <section className="bg-cream py-20 md:py-28">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <Reveal>
             <h2 className="text-center font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">

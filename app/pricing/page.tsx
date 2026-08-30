@@ -146,7 +146,7 @@ export default function PricingPage() {
       </section>
 
       {/* pricing FAQ */}
-      <section className="bg-paper pb-20 md:pb-28">
+      <section className="bg-cream py-20 md:py-24">
         <div className="mx-auto max-w-3xl space-y-4 px-4 sm:px-6 lg:px-8">
           <FaqJsonLd faqs={FAQS} />
           {FAQS.map((f) => (

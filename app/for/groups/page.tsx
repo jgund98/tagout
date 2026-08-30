@@ -93,7 +93,7 @@ export default function GroupsPage() {
       </section>
 
       {/* what scale gets you */}
-      <section className="bg-paper py-20 md:py-28">
+      <section className="bg-cream py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-start gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
             <Reveal>
