@@ -1,8 +1,18 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
 
-/** The Tagout bubble — an SMS bubble with a check. Used as favicon, logo mark, avatar. */
-export function BubbleMark({ size = 30, className = "" }: { size?: number; className?: string }) {
+/** The Tagout bubble — an SMS bubble with a check. Used as favicon, logo mark, avatar.
+ *  Pass check={false} for faint background watermarks, where the solid white
+ *  check would punch through the low opacity. */
+export function BubbleMark({
+  size = 30,
+  className = "",
+  check = true,
+}: {
+  size?: number;
+  className?: string;
+  check?: boolean;
+}) {
   return (
     <svg
       width={size}
@@ -16,13 +26,15 @@ export function BubbleMark({ size = 30, className = "" }: { size?: number; class
         d="M24 4C12.4 4 3 12.3 3 22.6c0 5.9 3.1 11.2 8 14.6-.3 2.5-1.3 4.7-3.1 6.5-.5.5-.1 1.4.6 1.3 3.9-.4 7.3-1.8 9.9-3.7 1.8.4 3.7.7 5.6.7 11.6 0 21-8.3 21-18.7S35.6 4 24 4Z"
         fill="currentColor"
       />
-      <path
-        d="m15.5 23.5 5.5 5.5L33 17.5"
-        stroke="#fff"
-        strokeWidth="4.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {check && (
+        <path
+          d="m15.5 23.5 5.5 5.5L33 17.5"
+          stroke="#fff"
+          strokeWidth="4.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      )}
     </svg>
   );
 }

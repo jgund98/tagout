@@ -115,7 +115,7 @@ function Hero() {
           </Reveal>
           <Reveal delay={0.32}>
             <ul className="mt-7 flex flex-wrap gap-x-7 gap-y-2 text-[14.5px] font-semibold text-ink-soft">
-              {["$29 a seat, everything on", "Live in one shift", "Free import from your old scheduler"].map((t) => (
+              {["$21 a seat, everything on", "Live in one shift", "Free import from your old scheduler"].map((t) => (
                 <li key={t} className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-mint text-[11px] font-black text-green-dark">✓</span>
                   {t}
@@ -202,8 +202,8 @@ function OldWay() {
   return (
     <section className="relative mx-2 overflow-hidden rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
       <BubbleMark
-        size={340}
-        className="pointer-events-none absolute -bottom-24 -right-20 rotate-12 text-paper/[0.045]"
+        check={false}
+        size={340} className="pointer-events-none absolute -bottom-24 -right-20 rotate-12 text-paper/[0.045]"
       />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
@@ -501,8 +501,8 @@ function MeetTag() {
     <section className="relative mx-2 overflow-hidden rounded-[36px] bg-violet-deep py-20 sm:mx-4 md:rounded-[52px] md:py-28">
       <div className="pointer-events-none absolute -left-40 top-10 h-[480px] w-[480px] rounded-full bg-violet/25 blur-[110px]" />
       <BubbleMark
-        size={320}
-        className="pointer-events-none absolute -left-24 -bottom-24 -rotate-12 text-white/[0.05]"
+        check={false}
+        size={320} className="pointer-events-none absolute -left-24 -bottom-24 -rotate-12 text-white/[0.05]"
       />
       <div className="pointer-events-none absolute -right-32 bottom-0 h-[420px] w-[420px] rounded-full bg-green/14 blur-[110px]" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -707,8 +707,8 @@ function GroupsSection() {
   return (
     <section id="groups" className="relative mx-2 scroll-mt-24 overflow-hidden rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
       <BubbleMark
-        size={300}
-        className="pointer-events-none absolute -right-16 top-10 rotate-6 text-paper/[0.04]"
+        check={false}
+        size={300} className="pointer-events-none absolute -right-16 top-10 rotate-6 text-paper/[0.04]"
       />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-start gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
@@ -774,7 +774,7 @@ function CompareTeaser() {
     { k: "Open shift coverage", them: "Blast + hope + call list", us: "Tagout finds, asks, confirms" },
     { k: "Overtime protection", them: "Report after the damage", us: "Blocked before the offer" },
     { k: "Staff onboarding", them: "Downloads, logins, training", us: "One text: “reply YES”" },
-    { k: "Pricing", them: "Modules, add-ons, tiers", us: "$29 a seat, everything on" },
+    { k: "Pricing", them: "Modules, add-ons, tiers", us: "$21 a seat, everything on" },
   ];
   return (
     <section className="bg-paper py-20 md:py-28">

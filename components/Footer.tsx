@@ -35,8 +35,8 @@ export default function Footer() {
   return (
     <footer className="relative overflow-hidden bg-ink text-paper">
       <BubbleMark
-        size={380}
-        className="pointer-events-none absolute -bottom-24 -right-20 rotate-12 text-paper/[0.035]"
+        check={false}
+        size={380} className="pointer-events-none absolute -bottom-24 -right-20 rotate-12 text-paper/[0.035]"
       />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 md:py-20">
         <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">

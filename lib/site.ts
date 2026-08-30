@@ -21,7 +21,7 @@ export const site = {
       children: [
         { label: "Overview", short: "Overview", href: "/product", desc: "The whole platform, front to back" },
         { label: "Watch it cover a shift", short: "Watch it work", href: "/product#watch", desc: "The coverage engine, in motion" },
-        { label: "Pricing", short: "Pricing", href: "/pricing", desc: "$29 a seat, everything on" },
+        { label: "Pricing", short: "Pricing", href: "/pricing", desc: "$21 a seat, everything on" },
         { label: "Compare", short: "Compare", href: "/vs-hotschedules", desc: "The honest side-by-side" },
       ],
     },
@@ -50,14 +50,14 @@ export const site = {
   ],
 
   pricing: {
-    seatPrice: 29,
+    seatPrice: 21,
     seatMinimum: 12,
     launchFee: 299,
-    // volume tiers: first 20 seats at $29, next 15 at $24, everything past 35 at $19
+    // volume tiers: first 20 seats at $21, next 15 at $18, everything past 35 at $15
     seatTiers: [
-      { upTo: 20, price: 29 },
-      { upTo: 35, price: 24 },
-      { upTo: Infinity, price: 19 },
+      { upTo: 20, price: 21 },
+      { upTo: 35, price: 18 },
+      { upTo: Infinity, price: 15 },
     ],
     pilotNote:
       "Start with a 30-day pilot in one location. If you don't stay, the launch fee comes back.",

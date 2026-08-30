@@ -153,8 +153,8 @@ export default function PricingCalculator() {
         {/* what's in it */}
         <div className="relative flex flex-col overflow-hidden bg-ink p-7 sm:p-10">
           <BubbleMark
-            size={220}
-            className="pointer-events-none absolute -right-14 -bottom-14 rotate-12 text-paper/[0.05]"
+        check={false}
+        size={220} className="pointer-events-none absolute -right-14 -bottom-14 rotate-12 text-paper/[0.05]"
           />
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.12em] text-green">
             Every seat gets everything
