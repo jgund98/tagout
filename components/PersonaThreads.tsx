@@ -2,34 +2,38 @@
 
 import { ScriptedThread } from "./Phone";
 
-/** The GM's side of Tagout: short reports, not requests. */
+/** The GM's side of Tagout: text it like you'd text your AGM. */
 export function GmThread() {
   return (
     <ScriptedThread
       loop
       script={[
         {
-          beat: {
-            kind: "tag",
-            text: <>Fri close covered: Dana out, Marisa in. Nothing needed from you.</>,
-          },
-          wait: 2200,
+          beat: { kind: "them", text: <>marisa just called out for tonight. need a closer, 5–11</> },
+          wait: 2000,
         },
-        { beat: { kind: "them", text: <>👍</> }, wait: 1600 },
+        { beat: { kind: "typing", align: "left" }, wait: 1500 },
         {
           beat: {
             kind: "tag",
             text: (
               <>
-                Heads up: Thursday has a 40-top at 7. Want me to add a server to the
-                floor? Reply YES and I&apos;ll find one.
+                On it. Off tonight and under 40: Devon (26 hrs), Alex (31), Priya
+                (34). Text them in that order?
               </>
             ),
           },
-          wait: 2600,
+          wait: 2800,
         },
-        { beat: { kind: "them", text: <>yes</> }, wait: 1500 },
-        { beat: { kind: "pill", text: "Devon added to Thursday. Confirmed 3:12 PM" }, wait: 4500 },
+        { beat: { kind: "them", text: <>yes</> }, wait: 1400 },
+        {
+          beat: {
+            kind: "tag",
+            text: <>Texting Devon now. You&apos;ll hear from me the second someone locks&nbsp;in.</>,
+          },
+          wait: 2200,
+        },
+        { beat: { kind: "pill", text: "6:19 PM: Devon confirmed. Board updated" }, wait: 4500 },
       ]}
     />
   );

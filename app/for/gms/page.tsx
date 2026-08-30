@@ -28,8 +28,9 @@ export default function GmsPage() {
                 Get your Friday nights&nbsp;<span className="text-green-deep">back.</span>
               </h1>
               <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-soft md:text-xl">
-                You didn&apos;t take this job to run a phone tree. Tagout works the coverage
-                problem and reports back in one&nbsp;line.
+                Text Tagout like you&apos;d text your best AGM: &ldquo;Marisa called out
+                tonight.&rdquo; It comes back with a ranked list, and one word starts
+                the&nbsp;outreach.
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-4">
                 <Link

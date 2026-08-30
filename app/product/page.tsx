@@ -25,7 +25,7 @@ const FAQS = [
   },
   {
     q: "Does Tagout ever text the whole roster?",
-    a: "No. That's the group-blast problem we exist to kill. Tagout ranks candidates by availability, hours, role, and real yes-history, then asks a few people in order. Escalation to you happens early if nobody bites.",
+    a: "No. That's the group-blast problem we exist to kill. Tagout ranks candidates by availability, hours, role, and real yes-history, then asks a few people in order. If nobody answers, it escalates early, with names and numbers ready to dial.",
   },
   {
     q: "Can managers override the AI?",
@@ -83,9 +83,9 @@ export default function ProductPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" gap={0.08}>
             {[
-              { h: "Schedule builder", b: "Drag-fast weekly grid, templates, copy-forward, conflict checks as you type.", c: "bg-mint text-green-dark" },
+              { h: "Schedule builder", b: "Drag-fast weekly grid with pre-built rotation formats, copy-forward, and conflict checks as you type.", c: "bg-mint text-green-dark" },
               { h: "AI shift coverage", b: "Drops and no-shows handled by an AI that texts the right people in a human voice.", c: "bg-lav text-violet-mid" },
-              { h: "SMS everything", b: "Publishing, swaps, confirmations, reminders, on the channel with ~98% open rates.", c: "bg-mint text-green-dark" },
+              { h: "SMS both ways", b: "Staff reply to offers. Managers text commands: “need a closer tonight” comes back as a ranked list, and one word starts the outreach.", c: "bg-mint text-green-dark" },
               { h: "Overtime guardrails", b: "Hour caps and labor targets enforced before offers go out, not after payroll.", c: "bg-butter text-[#9a6a00]" },
               { h: "Approvals in one tap", b: "Requests arrive pre-checked against hours, roles, and your house rules.", c: "bg-lav text-violet-mid" },
               { h: "Group dashboard", b: "Coverage, open shifts, and OT exposure across every location, live.", c: "bg-mint text-green-dark" },
@@ -131,8 +131,8 @@ export default function ProductPage() {
                 The week, built before your coffee&nbsp;cools.
               </h3>
               <p className="mt-4 text-lg leading-relaxed text-ink-soft">
-                Templates for your Tuesday and your Saturday. Copy-forward that keeps
-                what worked. Availability, time-off, and role conflicts flagged inline
+                Templates for your Tuesday and your Saturday, plus pre-built rotation
+                formats that keep sections and closes fair week to week. Availability, time-off, and role conflicts flagged inline
                 while you build, not discovered by an angry text on Friday.
               </p>
             </Reveal>

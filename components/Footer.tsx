@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Wordmark from "./Wordmark";
+import Wordmark, { BubbleMark } from "./Wordmark";
 import { site } from "@/lib/site";
 
 const cols: { title: string; links: { label: string; href: string }[] }[] = [
@@ -33,8 +33,12 @@ const cols: { title: string; links: { label: string; href: string }[] }[] = [
 
 export default function Footer() {
   return (
-    <footer className="bg-ink text-paper">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 md:py-20">
+    <footer className="relative overflow-hidden bg-ink text-paper">
+      <BubbleMark
+        size={380}
+        className="pointer-events-none absolute -right-24 -top-28 rotate-12 text-paper/[0.035]"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 md:py-20">
         <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div>
             <Wordmark size={30} markClass="text-green" textClass="text-paper" />

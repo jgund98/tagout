@@ -2,6 +2,7 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import { Reveal, Stagger, Item } from "@/components/Reveal";
 import { PhoneShell, HeroThread } from "@/components/Phone";
+import { BubbleMark } from "@/components/Wordmark";
 import CoverTheater from "@/components/CoverTheater";
 import Marquee from "@/components/Marquee";
 import CTABand from "@/components/CTABand";
@@ -133,6 +134,10 @@ function Hero() {
                 className="absolute inset-x-0 bottom-2 top-14 -rotate-2 rounded-[44px] bg-mint sm:-inset-x-6"
                 aria-hidden
               />
+              <BubbleMark
+                size={110}
+                className="pointer-events-none absolute -left-2 bottom-6 -rotate-12 text-green/25 sm:-left-8"
+              />
               <PhoneShell className="relative">
                 <HeroThread />
               </PhoneShell>
@@ -195,8 +200,12 @@ function TickerBand() {
 
 function OldWay() {
   return (
-    <section className="mx-2 rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative mx-2 overflow-hidden rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
+      <BubbleMark
+        size={340}
+        className="pointer-events-none absolute -bottom-24 -right-20 rotate-12 text-paper/[0.045]"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green">
             The old way
@@ -306,6 +315,11 @@ function ManagerPillars() {
           <h2 className="mt-4 max-w-3xl font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-ink sm:text-5xl md:text-6xl">
             Run the floor, not the phone&nbsp;tree.
           </h2>
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-soft">
+            The portal is fast. The thread is faster: text &ldquo;Marisa called out
+            tonight&rdquo; and a ranked list comes back, ready to work. If nobody
+            answers, you get names and numbers to dial, never a&nbsp;mystery.
+          </p>
         </Reveal>
 
         {/* Row 1 — schedule builder */}
@@ -325,7 +339,7 @@ function ManagerPillars() {
               {[
                 "Copy-forward weeks and station templates",
                 "Conflicts and availability checked as you drag",
-                "Publish once. Everyone's notified where they'll actually see it",
+                "The board updates in real time as covers and swaps land",
               ].map((t) => (
                 <li key={t} className="flex items-start gap-3 text-[15.5px] font-semibold text-ink">
                   <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mint text-[12px] font-black text-green-dark">✓</span>
@@ -478,7 +492,7 @@ function MeetTag() {
     {
       title: "Escalates early, not at 4:55",
       mobile: false,
-      body: "If nobody bites, Tagout tells you while there's still time to act, with its shortlist and what it already tried.",
+      body: "If nobody answers, Tagout tells you while there's still time to act: what it tried, who's left, and their numbers ready to dial.",
       chip: "Heads-up at 1:15 PM",
       tone: "amber",
     },
@@ -486,6 +500,10 @@ function MeetTag() {
   return (
     <section className="relative mx-2 overflow-hidden rounded-[36px] bg-violet-deep py-20 sm:mx-4 md:rounded-[52px] md:py-28">
       <div className="pointer-events-none absolute -left-40 top-10 h-[480px] w-[480px] rounded-full bg-violet/25 blur-[110px]" />
+      <BubbleMark
+        size={320}
+        className="pointer-events-none absolute -left-24 -bottom-24 -rotate-12 text-white/[0.05]"
+      />
       <div className="pointer-events-none absolute -right-32 bottom-0 h-[420px] w-[420px] rounded-full bg-green/14 blur-[110px]" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
@@ -687,8 +705,12 @@ function PhotoBand() {
 
 function GroupsSection() {
   return (
-    <section id="groups" className="mx-2 scroll-mt-24 rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section id="groups" className="relative mx-2 scroll-mt-24 overflow-hidden rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
+      <BubbleMark
+        size={300}
+        className="pointer-events-none absolute -right-16 top-10 rotate-6 text-paper/[0.04]"
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-start gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
           <Reveal>
             <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green">

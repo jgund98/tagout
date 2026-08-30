@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { site } from "@/lib/site";
+import { BubbleMark } from "./Wordmark";
 
 /** Springy dollar counter so the price feels alive as the slider moves. */
 function AnimatedDollars({ value, className }: { value: number; className: string }) {
@@ -150,7 +151,11 @@ export default function PricingCalculator() {
         </div>
 
         {/* what's in it */}
-        <div className="flex flex-col bg-ink p-7 sm:p-10">
+        <div className="relative flex flex-col overflow-hidden bg-ink p-7 sm:p-10">
+          <BubbleMark
+            size={220}
+            className="pointer-events-none absolute -right-14 -bottom-14 rotate-12 text-paper/[0.05]"
+          />
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.12em] text-green">
             Every seat gets everything
           </p>

@@ -44,19 +44,7 @@ export default function DemoPage() {
             ))}
           </ul>
 
-          <figure className="relative mt-10 overflow-hidden rounded-3xl shadow-lift">
-            <img
-              src="/photos/manager-tablet.webp"
-              alt="Manager reviewing the week on a tablet over coffee"
-              loading="lazy"
-              className="aspect-[16/9] w-full object-cover object-[50%_42%]"
-            />
-            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 to-transparent px-6 pb-4 pt-12 font-display text-[15px] font-extrabold text-paper">
-              Bring your week. We&apos;ll bring the coverage.
-            </figcaption>
-          </figure>
-
-          <div className="mt-6 rounded-3xl bg-cream p-6">
+          <div className="mt-10 rounded-3xl bg-cream p-6">
             <p className="font-display text-[16px] font-extrabold text-ink">
               Rolling out a group?
             </p>
