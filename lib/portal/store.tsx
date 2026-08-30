@@ -140,7 +140,7 @@ type Action =
   | { type: "SECTION_SET"; shiftId: string; section: string }
   | { type: "PAUSE_TOGGLE" }
   | { type: "TABLE_CYCLE"; id: string; sections: string[] }
-  | { type: "TABLE_ADD"; seats: number; section: string; shape: "round" | "square" }
+  | { type: "TABLE_ADD"; seats: number; section: string; shape: "round" | "square"; room: string }
   | { type: "TABLE_REMOVE"; id: string }
   | { type: "TABLE_PATCH"; id: string; patch: Partial<import("./data").Table> }
   | { type: "FLOOR_BALANCE"; sections: string[] }
@@ -259,7 +259,7 @@ function reducer(state: PortalState, a: Action): PortalState {
         floorBalanced: false,
         tables: [
           ...state.tables,
-          { id: uid("t"), label: String(nextNum), seats: a.seats, section: a.section, shape: a.shape },
+          { id: uid("t"), label: String(nextNum), seats: a.seats, section: a.section, shape: a.shape, room: a.room, x: 50, y: 50 },
         ],
       };
     }

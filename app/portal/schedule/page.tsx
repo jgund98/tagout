@@ -8,6 +8,7 @@ import { Avatar, Burst, Chip, GreenBtn, GhostBtn, PageTitle, LiveDot } from "@/c
 import { DAYS, type Role, type Shift, type Staff } from "@/lib/portal/data";
 
 const ROLE_TONES: Record<Role, string> = {
+  Manager: "bg-pine text-paper",
   Server: "bg-mint text-green-dark",
   Bartender: "bg-lav text-violet-mid",
   Host: "bg-blush text-coral",
@@ -572,7 +573,7 @@ function ShiftEditor({
           <label className="block">
             <span className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">Working as</span>
             <select value={role} onChange={(e) => setRole(e.target.value as Role)} className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green">
-              {(["Server", "Bartender", "Host", "Line cook", "Prep", "Busser"] as Role[]).map((r) => <option key={r}>{r}</option>)}
+              {(["Server", "Bartender", "Host", "Line cook", "Prep", "Busser", "Manager"] as Role[]).map((r) => <option key={r}>{r}</option>)}
             </select>
           </label>
           <label className="block">

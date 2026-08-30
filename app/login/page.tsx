@@ -12,7 +12,7 @@ import { startDemoSession } from "@/lib/portal/store";
  * Until the SMS provider is wired up, the demo account (Jordan's number)
  * gets a visible bypass code of all zeros.
  */
-const DEMO_PHONE = "5613249522";
+const DEMO_PHONES = ["5613249522", "7209996287"];
 const OTP_LEN = 6;
 
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
@@ -40,7 +40,7 @@ export default function LoginPage() {
       return;
     }
     setErr("");
-    setStep(d === DEMO_PHONE ? "otp" : "waitlist");
+    setStep(DEMO_PHONES.includes(d) ? "otp" : "waitlist");
   };
 
   const setDigit = (i: number, v: string) => {

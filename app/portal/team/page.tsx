@@ -113,7 +113,8 @@ function StaffCard({
             {p.role} · {p.phone}
           </p>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {score > 0 && (
+            {p.role === "Manager" && <Chip tone="lav">Portal access</Chip>}
+            {score > 0 && p.role !== "Manager" && (
               <Chip tone={score >= 70 ? "mint" : score >= 45 ? "lav" : "white"}>
                 {rank > 0 && rank <= 3 ? `#${rank} · ` : ""}Flexibility {score}
               </Chip>
@@ -353,17 +354,33 @@ function InviteModal({ onClose }: { onClose: () => void }) {
                 onChange={(e) => setRole(e.target.value as Role)}
                 className="w-full rounded-xl border-2 border-ink/10 px-3.5 py-2.5 text-[14.5px] font-bold text-ink outline-none focus:border-green"
               >
-                {(["Server", "Bartender", "Host", "Line cook", "Prep", "Busser"] as Role[]).map((r) => (
+                {(["Server", "Bartender", "Host", "Line cook", "Prep", "Busser", "Manager"] as Role[]).map((r) => (
                   <option key={r}>{r}</option>
                 ))}
               </select>
+              {role === "Manager" && (
+                <p className="rounded-xl bg-lav/60 px-3.5 py-2.5 text-[12.5px] font-bold text-violet-mid">
+                  Managers get portal access: schedules, approvals, hours, and house rules.
+                </p>
+              )}
             </div>
             <div className="mt-4 rounded-2xl bg-[#f1f3f2] p-3.5">
               <p className="mb-2 text-center text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink/35">
                 Message preview
               </p>
               <TagBubble>
-                Hey {first}! {state.gmFirst} added you to the {state.houseName} schedule on Tagout. Reply YES and I&apos;ll text you a link to finish setting up: your availability, a photo, and you&apos;re on the schedule.
+                {role === "Manager" ? (
+                  <>
+                    Hey {first}! {state.gmFirst} added you as a manager at {state.houseName} on Tagout.
+                    Reply YES and I&apos;ll text you your sign-in link for the portal.
+                  </>
+                ) : (
+                  <>
+                    Hey {first}! {state.gmFirst} added you to the {state.houseName} schedule on Tagout.
+                    Reply YES and I&apos;ll text you a link to finish setting up: your availability, a
+                    photo, and you&apos;re on the schedule.
+                  </>
+                )}
               </TagBubble>
             </div>
             <GreenBtn className="mt-4 w-full" disabled={!valid} onClick={send}>

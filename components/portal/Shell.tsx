@@ -38,59 +38,87 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-cream">
       {/* sidebar (desktop) */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[220px] flex-col p-4 lg:flex">
-        <div className="flex h-full flex-col rounded-[28px] bg-pine p-4">
-          <Link href="/portal" className="flex items-center gap-2.5 px-2 pt-1">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green">
-              <BubbleMark size={18} className="text-white" />
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[264px] flex-col p-4 lg:flex">
+        <div className="flex h-full flex-col rounded-[28px] bg-pine px-4 pb-4 pt-5">
+          <Link href="/portal" className="flex items-center gap-2.5 px-2">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-green">
+              <BubbleMark size={20} className="text-white" />
             </span>
-            <span className="font-display text-[20px] font-extrabold text-paper">tagout</span>
+            <span className="font-display text-[22px] font-extrabold text-paper">tagout</span>
           </Link>
-          <nav className="mt-6 flex-1 space-y-1" aria-label="Portal">
-            {NAV.map((n) => {
-              const active = n.href === "/portal" ? pathname === "/portal" : pathname.startsWith(n.href);
-              return (
-                <Link
-                  key={n.href}
-                  href={n.href}
-                  className={`flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-[15px] font-bold transition-colors ${
-                    active ? "bg-green text-ink" : "text-paper/65 hover:bg-paper/8 hover:text-paper"
-                  }`}
-                >
-                  <span aria-hidden className="text-[16px]">{n.icon}</span>
-                  {n.label}
-                  {n.href === "/portal/coverage" && needs > 0 && (
-                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-coral px-1.5 text-[11px] font-extrabold text-white">
-                      {needs}
-                    </span>
-                  )}
-                  {n.href === "/portal/coverage" && needs === 0 && state.runs.some((r) => r.state === "live") && (
-                    <LiveDot className="ml-auto" />
-                  )}
-                </Link>
-              );
-            })}
+
+          <nav className="mt-7 flex-1" aria-label="Portal">
+            {[
+              { label: null, hrefs: ["/portal", "/portal/inbox"] },
+              { label: "Operate", hrefs: ["/portal/coverage", "/portal/schedule", "/portal/hours"] },
+              { label: "The house", hrefs: ["/portal/team", "/portal/floor", "/portal/rules"] },
+            ].map((group, gi) => (
+              <div key={gi} className={gi === 0 ? "" : "mt-6"}>
+                {group.label && (
+                  <p className="mb-1.5 px-3.5 text-[10.5px] font-extrabold uppercase tracking-[0.16em] text-paper/30">
+                    {group.label}
+                  </p>
+                )}
+                <div className="space-y-1">
+                  {group.hrefs.map((href) => {
+                    const n = NAV.find((x) => x.href === href)!;
+                    const active = href === "/portal" ? pathname === "/portal" : pathname.startsWith(href);
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        className={`flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-[15px] font-bold transition-colors ${
+                          active ? "bg-green text-ink" : "text-paper/65 hover:bg-paper/8 hover:text-paper"
+                        }`}
+                      >
+                        <span aria-hidden className="text-[16px]">{n.icon}</span>
+                        {n.label}
+                        {href === "/portal/coverage" && needs > 0 && (
+                          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-coral px-1.5 text-[11px] font-extrabold text-white">
+                            {needs}
+                          </span>
+                        )}
+                        {href === "/portal/coverage" && needs === 0 && state.runs.some((r) => r.state === "live") && (
+                          <LiveDot className="ml-auto" />
+                        )}
+                        {href === "/portal/inbox" && unread > 0 && (
+                          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-paper/15 px-1.5 text-[11px] font-extrabold text-paper/80">
+                            {unread}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
-          <div className="rounded-2xl bg-paper/8 p-3.5">
-            <p className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wide text-green">
-              <LiveDot /> Tagout is on shift
-            </p>
-            <p className="mt-1 font-display text-[14px] font-extrabold text-paper">(561) 555-8248</p>
-            <p className="mt-0.5 text-[12px] leading-snug text-paper/60">
-              Text it like a person: <span className="font-bold text-paper/85">&ldquo;need a closer friday&rdquo;</span>
-            </p>
+
+          <div className="space-y-1 border-t border-paper/10 pt-3">
+            <Link
+              href="/portal/settings"
+              className={`flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-[15px] font-bold transition-colors ${
+                pathname.startsWith("/portal/settings")
+                  ? "bg-green text-ink"
+                  : "text-paper/65 hover:bg-paper/8 hover:text-paper"
+              }`}
+            >
+              <span aria-hidden className="text-[16px]">⚙️</span>
+              Settings
+            </Link>
+            <button
+              onClick={logout}
+              className="flex w-full items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left text-[15px] font-bold text-paper/50 transition-colors hover:bg-paper/8 hover:text-paper"
+            >
+              <span aria-hidden className="text-[16px]">👋</span>
+              Log out
+            </button>
           </div>
-          <button
-            onClick={logout}
-            className="mt-3 rounded-2xl px-3.5 py-2.5 text-left text-[13.5px] font-bold text-paper/50 transition-colors hover:bg-paper/8 hover:text-paper"
-          >
-            Log out
-          </button>
         </div>
       </aside>
 
       {/* topbar */}
-      <header className="sticky top-0 z-30 border-b border-ink/6 bg-cream/85 backdrop-blur-xl lg:pl-[220px]">
+      <header className="sticky top-0 z-30 border-b border-ink/6 bg-cream/85 backdrop-blur-xl lg:pl-[264px]">
         <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
           <Link href="/portal" className="flex items-center gap-2 lg:hidden">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green">
@@ -194,7 +222,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
 
       {/* content: each screen slides in like an app */}
-      <main className="px-4 pb-28 pt-6 sm:px-6 lg:pb-10 lg:pl-[244px] lg:pr-8">
+      <main className="px-4 pb-28 pt-6 sm:px-6 lg:pb-10 lg:pl-[288px] lg:pr-8">
         <motion.div
           key={pathname}
           initial={{ opacity: 0, y: 10 }}

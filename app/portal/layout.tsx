@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PortalProvider, hasSession } from "@/lib/portal/store";
 import Shell from "@/components/portal/Shell";
+import { jakarta } from "@/components/portal/font";
 
 export default function PortalLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -26,8 +27,10 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   }
 
   return (
-    <PortalProvider>
-      <Shell>{children}</Shell>
-    </PortalProvider>
+    <div className={`${jakarta.variable} portal-font`}>
+      <PortalProvider>
+        <Shell>{children}</Shell>
+      </PortalProvider>
+    </div>
   );
 }

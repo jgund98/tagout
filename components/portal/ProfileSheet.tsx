@@ -138,7 +138,7 @@ export default function ProfileSheet({ person, onClose }: { person: Staff; onClo
               onChange={(e) => save({ role: e.target.value as Role }, `${p.first}'s role is now ${e.target.value}`)}
               className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green"
             >
-              {(["Server", "Bartender", "Host", "Line cook", "Prep", "Busser"] as Role[]).map((r) => (
+              {(["Server", "Bartender", "Host", "Line cook", "Prep", "Busser", "Manager"] as Role[]).map((r) => (
                 <option key={r}>{r}</option>
               ))}
             </select>

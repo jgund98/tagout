@@ -3,7 +3,7 @@
  * makeSeed() builds a fresh copy on every login so the demo always resets.
  */
 
-export type Role = "Server" | "Bartender" | "Host" | "Line cook" | "Prep" | "Busser";
+export type Role = "Manager" | "Server" | "Bartender" | "Host" | "Line cook" | "Prep" | "Busser";
 
 export type Staff = {
   id: string;
@@ -95,7 +95,18 @@ export type HouseEvent = { id: string; day: number; label: string; note: string 
 
 export type Note = { id: string; text: string; when: string };
 
-export type Table = { id: string; label: string; section: string; shape: "round" | "square"; seats: number };
+export type Table = {
+  id: string;
+  label: string;
+  section: string;
+  shape: "round" | "square";
+  seats: number;
+  room: string; // Dining room | Patio | Bar
+  x: number; // percent of room width, table center
+  y: number; // percent of room height
+};
+
+export const ROOMS = ["Dining room", "Patio", "Bar"];
 export type RotationMode = "even" | "seniority" | "training";
 
 export type PortalState = {
@@ -135,6 +146,7 @@ export function makeSeed(): PortalState {
     { id: "sasha", name: "Sasha Bell", first: "Sasha", role: "Server", phone: "(561) 555-0139", photo: av("sasha"), color: "#f4b53f", yesRate: 0.7, hoursWeek: 30, status: "active", availNote: "Anytime", rate: 12, since: "Nov 2025", certs: ["Food handler"], picks90: 8, drops90: 1 },
     { id: "sam", name: "Sam Okafor", first: "Sam", role: "Bartender", phone: "(561) 555-0163", photo: av("sam"), color: "#ff7a68", keyholder: true, yesRate: 0.66, hoursWeek: 38, status: "active", availNote: "Closes only", rate: 15, since: "Mar 2024", certs: ["Alcohol service", "Food handler"], picks90: 4, drops90: 1 },
     { id: "erin", name: "Erin Castillo", first: "Erin", role: "Host", phone: "(561) 555-0171", photo: av("erin"), color: "#0ecf7f", minor: true, yesRate: 0.8, hoursWeek: 16, status: "active", availNote: "School nights out by 10", rate: 13, since: "Jul 2026", certs: [], picks90: 4, drops90: 0 },
+    { id: "chris", name: "Chris Nolan", first: "Chris", role: "Manager", phone: "(561) 555-0107", photo: av("chris"), color: "#0b3527", keyholder: true, yesRate: 0.72, hoursWeek: 42, status: "active", availNote: "AGM · closes Tue-Sat", rate: 26, since: "Apr 2025", certs: ["Alcohol service", "Food handler", "Trainer"], picks90: 3, drops90: 0 },
     { id: "rosa", name: "Rosa Vega", first: "Rosa", role: "Line cook", phone: "(561) 555-0195", photo: av("rosa"), color: "#7c6cf6", keyholder: true, yesRate: 0.77, hoursWeek: 39, status: "active", availNote: "Not Mondays", rate: 19, since: "Oct 2023", certs: ["Alcohol service", "Food handler", "Trainer"], picks90: 5, drops90: 0 },
     { id: "tyler", name: "Tyler James", first: "Tyler", role: "Server", phone: "(561) 555-0102", photo: null, color: "#0ecf7f", yesRate: 0, hoursWeek: 0, status: "invited", availNote: "Invite sent 2:14 PM · waiting on YES", rate: 12, since: "Today", certs: [], picks90: 0, drops90: 0 },
     { id: "alex", name: "Alex Price", first: "Alex", role: "Busser", phone: "(561) 555-0187", photo: null, color: "#f4b53f", yesRate: 0, hoursWeek: 12, status: "pending", availNote: "Replied YES · picking photo & availability", rate: 11, since: "This week", certs: [], picks90: 0, drops90: 0 },
@@ -337,20 +349,26 @@ export function makeSeed(): PortalState {
     rotation: "even",
     floorBalanced: false,
     tables: [
-      { id: "t1", label: "1", section: "Main", shape: "round", seats: 4 },
-      { id: "t2", label: "2", section: "Main", shape: "square", seats: 2 },
-      { id: "t3", label: "3", section: "Main", shape: "round", seats: 6 },
-      { id: "t4", label: "4", section: "Main", shape: "square", seats: 4 },
-      { id: "t5", label: "5", section: "Main", shape: "round", seats: 4 },
-      { id: "t6", label: "6", section: "Bar side", shape: "square", seats: 2 },
-      { id: "t7", label: "7", section: "Bar side", shape: "square", seats: 2 },
-      { id: "t8", label: "8", section: "Bar side", shape: "round", seats: 4 },
-      { id: "t9", label: "9", section: "Bar side", shape: "square", seats: 2 },
-      { id: "t10", label: "10", section: "Patio", shape: "round", seats: 4 },
-      { id: "t11", label: "11", section: "Patio", shape: "round", seats: 4 },
-      { id: "t12", label: "12", section: "Patio", shape: "square", seats: 6 },
-      { id: "t13", label: "13", section: "Patio", shape: "round", seats: 2 },
-      { id: "t14", label: "14", section: "Patio", shape: "square", seats: 8 },
+      // Dining room: booths along the left wall, window two-tops up top, floor in the middle
+      { id: "t1", label: "1", section: "Main", shape: "square", seats: 4, room: "Dining room", x: 12, y: 22 },
+      { id: "t2", label: "2", section: "Main", shape: "square", seats: 4, room: "Dining room", x: 12, y: 50 },
+      { id: "t3", label: "3", section: "Main", shape: "square", seats: 4, room: "Dining room", x: 12, y: 78 },
+      { id: "t4", label: "4", section: "Main", shape: "round", seats: 2, room: "Dining room", x: 38, y: 16 },
+      { id: "t5", label: "5", section: "Main", shape: "round", seats: 2, room: "Dining room", x: 58, y: 16 },
+      { id: "t6", label: "6", section: "Main", shape: "round", seats: 6, room: "Dining room", x: 42, y: 52 },
+      { id: "t7", label: "7", section: "Main", shape: "round", seats: 4, room: "Dining room", x: 66, y: 46 },
+      { id: "t8", label: "8", section: "Bar side", shape: "round", seats: 4, room: "Dining room", x: 44, y: 82 },
+      { id: "t9", label: "9", section: "Bar side", shape: "square", seats: 2, room: "Dining room", x: 68, y: 78 },
+      // Patio: airy rows, the 8-top anchors the far end
+      { id: "t10", label: "10", section: "Patio", shape: "round", seats: 4, room: "Patio", x: 18, y: 30 },
+      { id: "t11", label: "11", section: "Patio", shape: "round", seats: 4, room: "Patio", x: 45, y: 30 },
+      { id: "t12", label: "12", section: "Patio", shape: "round", seats: 2, room: "Patio", x: 18, y: 70 },
+      { id: "t13", label: "13", section: "Patio", shape: "round", seats: 4, room: "Patio", x: 45, y: 70 },
+      { id: "t14", label: "14", section: "Patio", shape: "square", seats: 8, room: "Patio", x: 78, y: 50 },
+      // Bar: high-tops along the rail
+      { id: "t15", label: "15", section: "Bar side", shape: "square", seats: 2, room: "Bar", x: 20, y: 66 },
+      { id: "t16", label: "16", section: "Bar side", shape: "square", seats: 2, room: "Bar", x: 45, y: 66 },
+      { id: "t17", label: "17", section: "Bar side", shape: "square", seats: 2, room: "Bar", x: 70, y: 66 },
     ],
     staff,
     shifts,

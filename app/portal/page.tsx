@@ -16,6 +16,57 @@ const KIND_META: Record<FeedEvent["kind"], { chip: string; tone: "mint" | "lav" 
   rule: { chip: "House rule", tone: "lav" },
 };
 
+function LaborWeek() {
+  const { state } = usePortal();
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const perDay = days.map((_, day) => {
+    const dayShifts = state.shifts.filter((s) => s.day === day && s.state !== "open");
+    return dayShifts.reduce((c, s) => {
+      const person = state.staff.find((p) => p.id === s.staffId);
+      return c + shiftHours(s) * (person?.rate ?? 14);
+    }, 0);
+  });
+  const total = perDay.reduce((a, b) => a + b, 0);
+  const max = Math.max(...perDay, 1);
+
+  return (
+    <section className="mt-6 rounded-3xl bg-white p-5 shadow-pop">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="font-display text-[17px] font-extrabold text-ink">This week&apos;s labor</h2>
+        <p className="text-[14px] font-extrabold text-ink">
+          ${Math.round(total).toLocaleString()}
+          <span className="ml-1.5 text-[12px] font-semibold text-ink/40">scheduled</span>
+        </p>
+      </div>
+      <div className="mt-4 flex items-end gap-2 sm:gap-3" style={{ height: 110 }}>
+        {perDay.map((v, i) => (
+          <Link
+            key={i}
+            href="/portal/schedule"
+            className="group flex h-full flex-1 flex-col items-center justify-end gap-1.5"
+            title={`${days[i]} · ${Math.round(v).toLocaleString()}`}
+          >
+            <span className={`text-[10.5px] font-extrabold tabular-nums ${i === 4 ? "text-green-deep" : "text-ink/35"}`}>
+              ${Math.round(v / 100) / 10}k
+            </span>
+            <motion.span
+              initial={{ height: 0 }}
+              animate={{ height: `${Math.max(6, (v / max) * 100)}%` }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.04 }}
+              className={`w-full max-w-[44px] rounded-t-lg transition-opacity group-hover:opacity-80 ${
+                i === 4 ? "bg-green" : "bg-ink/12"
+              }`}
+            />
+            <span className={`text-[11px] font-extrabold ${i === 4 ? "text-green-deep" : "text-ink/40"}`}>
+              {days[i]}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Suggestions() {
   const { state, dispatch } = usePortal();
   const devon = state.staff.find((s) => s.id === "devon");
@@ -199,6 +250,9 @@ export default function TonightPage() {
         <StatTile label="Labor tonight" value={"$" + Math.round(laborTonight).toLocaleString()} sub="as scheduled" tone="butter" />
         <StatTile label="Tomorrow" value="Ready" sub="45-top at 7 · staffed +2" tone="lav" />
       </div>
+
+      {/* the week's labor, computed from real shifts and real rates */}
+      <LaborWeek />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
         {/* THE FEED */}

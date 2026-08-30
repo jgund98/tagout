@@ -42,6 +42,11 @@ html {
   scroll-behavior: smooth;
 }
 
+/* inside the app, headings run on the SaaS face instead of the brand face */
+.portal-font {
+  --font-display: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
+}
+
 /* horizontal strips never natively pan on touch: vertical page scrolling
    can't hook them, and StripGuard supplies the horizontal gesture */
 @media (pointer: coarse) {
