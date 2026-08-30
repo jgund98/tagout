@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { site } from "@/lib/site";
 import Header from "@/components/Header";
+import MarketingChrome from "@/components/MarketingChrome";
 import Footer from "@/components/Footer";
 import MobileDock from "@/components/MobileDock";
 import StripGuard from "@/components/StripGuard";
@@ -81,10 +82,14 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
-        <Header />
+        <MarketingChrome>
+          <Header />
+        </MarketingChrome>
         <main>{children}</main>
-        <Footer />
-        <MobileDock />
+        <MarketingChrome>
+          <Footer />
+          <MobileDock />
+        </MarketingChrome>
         <StripGuard />
         <Analytics />
       </body>

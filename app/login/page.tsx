@@ -1,60 +1,211 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { BubbleMark } from "@/components/Wordmark";
-import LoginForm from "@/components/LoginForm";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Log in",
-  description: "Log in to your Tagout manager dashboard.",
+import { useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import { BubbleMark } from "@/components/Wordmark";
+import { startDemoSession } from "@/lib/portal/store";
+
+/**
+ * Phone-first sign in, because everything at Tagout starts with a text.
+ * Until the SMS provider is wired up, the demo account (Jordan's number)
+ * gets a visible bypass code of all zeros.
+ */
+const DEMO_PHONE = "5613249522";
+const OTP_LEN = 6;
+
+const digitsOnly = (v: string) => v.replace(/\D/g, "");
+const fmtPhone = (v: string) => {
+  const d = digitsOnly(v).slice(0, 10);
+  if (d.length < 4) return d;
+  if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
 };
 
 export default function LoginPage() {
-  return (
-    <section className="grid min-h-screen bg-paper pt-16 md:pt-[72px] lg:grid-cols-2">
-      {/* form side */}
-      <div className="flex items-center justify-center px-4 py-16 sm:px-6">
-        <div className="w-full max-w-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green">
-            <BubbleMark size={26} className="text-white" />
-          </div>
-          <h1 className="mt-6 font-display text-4xl font-extrabold tracking-tight text-ink">
-            Welcome back.
-          </h1>
-          <p className="mt-2 text-[15.5px] font-medium text-ink-soft">
-            Managers log in here. Your staff never has to. They just text.
-          </p>
-          <LoginForm />
-          <p className="mt-8 text-center text-[14px] font-semibold text-ink-soft">
-            New to Tagout?{" "}
-            <Link href="/demo" className="font-extrabold text-green-dark underline decoration-green decoration-2 underline-offset-4">
-              Get a demo
-            </Link>
-          </p>
-        </div>
-      </div>
+  const router = useRouter();
+  const [step, setStep] = useState<"phone" | "otp" | "waitlist">("phone");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState<string[]>(Array(OTP_LEN).fill(""));
+  const [err, setErr] = useState("");
+  const boxes = useRef<(HTMLInputElement | null)[]>([]);
 
-      {/* brand side */}
-      <div className="relative hidden overflow-hidden bg-pine lg:block">
-        <div className="pointer-events-none absolute -right-32 -top-24 h-[460px] w-[460px] rounded-full bg-green/15 blur-[100px]" />
-        <div className="relative flex h-full flex-col justify-center gap-6 px-14 xl:px-20">
-          <div className="w-fit max-w-md rounded-3xl rounded-bl-md bg-white/95 p-5 shadow-lift">
-            <p className="text-[13px] font-extrabold uppercase tracking-wide text-ink/40">
-              While you were logged out
-            </p>
-            <p className="mt-2 text-[15.5px] font-medium leading-relaxed text-ink">
-              Tagout covered Sunday brunch (Katie said yes), lined up a swap for
-              Tuesday, and kept Jake out of overtime.
-            </p>
-          </div>
-          <div className="ml-auto w-fit max-w-xs rounded-3xl rounded-br-md bg-green p-5 shadow-lift">
-            <p className="text-[15.5px] font-bold leading-relaxed text-white">
-              Nothing needs you. It&apos;s all in the feed if you want the story.
-            </p>
-          </div>
-          <p className="mt-8 max-w-md font-display text-3xl font-extrabold leading-tight text-paper/90">
-            The best shift report is a short&nbsp;one.
-          </p>
+  const submitPhone = (e: React.FormEvent) => {
+    e.preventDefault();
+    const d = digitsOnly(phone);
+    if (d.length !== 10) {
+      setErr("That doesn't look like a 10-digit cell number.");
+      return;
+    }
+    setErr("");
+    setStep(d === DEMO_PHONE ? "otp" : "waitlist");
+  };
+
+  const setDigit = (i: number, v: string) => {
+    const d = digitsOnly(v).slice(-1);
+    const next = [...otp];
+    next[i] = d;
+    setOtp(next);
+    if (d && i < OTP_LEN - 1) boxes.current[i + 1]?.focus();
+    if (next.every((x) => x !== "")) {
+      if (next.join("") === "0".repeat(OTP_LEN)) {
+        startDemoSession();
+        router.push("/portal");
+      } else {
+        setErr("That code didn't match. The demo code is all zeros.");
+        setOtp(Array(OTP_LEN).fill(""));
+        boxes.current[0]?.focus();
+      }
+    }
+  };
+
+  const onKey = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !otp[i] && i > 0) boxes.current[i - 1]?.focus();
+  };
+
+  return (
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-cream px-4">
+      <div className="pointer-events-none absolute -top-32 right-[-10%] h-[480px] w-[480px] rounded-full bg-mint blur-[110px]" />
+      <div className="pointer-events-none absolute bottom-[-10%] left-[-8%] h-[400px] w-[400px] rounded-full bg-lav blur-[110px] opacity-80" />
+
+      <div className="relative w-full max-w-md">
+        <Link href="/" className="mb-8 flex items-center justify-center gap-2.5">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-green">
+            <BubbleMark size={20} className="text-white" />
+          </span>
+          <span className="font-display text-[26px] font-extrabold tracking-tight text-ink">tagout</span>
+        </Link>
+
+        <div className="rounded-[32px] bg-white p-7 shadow-lift sm:p-9">
+          <AnimatePresence mode="wait">
+            {step === "phone" && (
+              <motion.form
+                key="phone"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                onSubmit={submitPhone}
+              >
+                <h1 className="font-display text-[26px] font-extrabold tracking-tight text-ink">
+                  Sign in with a text.
+                </h1>
+                <p className="mt-2 text-[14.5px] leading-relaxed text-ink-soft">
+                  No passwords here. Enter your cell and we&apos;ll text you a six-digit code.
+                </p>
+                <label className="mt-6 block text-[12px] font-extrabold uppercase tracking-wide text-ink/45">
+                  Cell phone
+                </label>
+                <input
+                  inputMode="tel"
+                  autoFocus
+                  value={phone}
+                  onChange={(e) => setPhone(fmtPhone(e.target.value))}
+                  placeholder="(561) 555-0123"
+                  className="mt-1.5 w-full rounded-2xl border-2 border-ink/10 bg-white px-4 py-3.5 font-display text-[20px] font-extrabold tracking-wide text-ink outline-none transition-colors focus:border-green"
+                />
+                {err && <p className="mt-2 text-[13px] font-bold text-coral">{err}</p>}
+                <button
+                  type="submit"
+                  className="mt-5 w-full rounded-full bg-green py-4 text-[16.5px] font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white"
+                >
+                  Text me my code →
+                </button>
+                <p className="mt-4 text-center text-[12.5px] font-semibold text-ink/40">
+                  Staff and managers both sign in here. Your role decides what you see.
+                </p>
+              </motion.form>
+            )}
+
+            {step === "otp" && (
+              <motion.div
+                key="otp"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <h1 className="font-display text-[26px] font-extrabold tracking-tight text-ink">
+                  Check your texts.
+                </h1>
+                <p className="mt-2 text-[14.5px] leading-relaxed text-ink-soft">
+                  We sent a code to <span className="font-bold text-ink">{fmtPhone(phone)}</span>.
+                </p>
+                <div className="mt-6 flex justify-between gap-2">
+                  {otp.map((d, i) => (
+                    <input
+                      key={i}
+                      ref={(el) => {
+                        boxes.current[i] = el;
+                      }}
+                      inputMode="numeric"
+                      autoFocus={i === 0}
+                      value={d}
+                      onChange={(e) => setDigit(i, e.target.value)}
+                      onKeyDown={(e) => onKey(i, e)}
+                      aria-label={`Digit ${i + 1}`}
+                      className="h-14 w-full rounded-2xl border-2 border-ink/10 bg-white text-center font-display text-[24px] font-extrabold text-ink outline-none transition-colors focus:border-green"
+                    />
+                  ))}
+                </div>
+                {err && <p className="mt-3 text-[13px] font-bold text-coral">{err}</p>}
+                <div className="mt-5 rounded-2xl rounded-bl-md bg-mint p-4">
+                  <p className="text-[13px] font-bold leading-relaxed text-green-dark">
+                    Demo mode: SMS sending isn&apos;t connected yet, so your code is{" "}
+                    <span className="font-display text-[15px] font-extrabold tracking-[0.2em]">000000</span>.
+                    Real one-time texts turn on with the SMS provider.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setStep("phone");
+                    setOtp(Array(OTP_LEN).fill(""));
+                    setErr("");
+                  }}
+                  className="mt-4 text-[13.5px] font-bold text-ink/45 hover:text-ink"
+                >
+                  ← Different number
+                </button>
+              </motion.div>
+            )}
+
+            {step === "waitlist" && (
+              <motion.div
+                key="wait"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <h1 className="font-display text-[26px] font-extrabold tracking-tight text-ink">
+                  Your house isn&apos;t on Tagout yet.
+                </h1>
+                <p className="mt-2 text-[14.5px] leading-relaxed text-ink-soft">
+                  That number isn&apos;t on a roster we run. If your restaurant uses Tagout, ask
+                  your GM to add you — onboarding is one text. If you&apos;re the GM, we&apos;d love
+                  to show you around.
+                </p>
+                <Link
+                  href="/demo"
+                  className="mt-6 block w-full rounded-full bg-green py-4 text-center text-[16.5px] font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white"
+                >
+                  Get a demo →
+                </Link>
+                <button
+                  onClick={() => {
+                    setStep("phone");
+                    setErr("");
+                  }}
+                  className="mt-4 text-[13.5px] font-bold text-ink/45 hover:text-ink"
+                >
+                  ← Try another number
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
+
+        <p className="mt-6 text-center text-[13px] font-semibold text-ink/40">
+          <Link href="/" className="hover:text-ink">← Back to trytagout.com</Link>
+        </p>
       </div>
     </section>
   );
