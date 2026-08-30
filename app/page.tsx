@@ -40,17 +40,13 @@ export default function Home() {
 function Hero() {
   return (
     <section className="relative overflow-hidden bg-paper pt-16 md:pt-[72px]">
-      {/* intentional brand washes */}
-      <div className="pointer-events-none absolute -top-40 right-[-10%] h-[560px] w-[560px] rounded-full bg-mint blur-[100px]" />
-      <div className="pointer-events-none absolute top-[30%] left-[-14%] h-[460px] w-[460px] rounded-full bg-lav blur-[110px] opacity-80" />
-
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-10 sm:px-6 md:gap-12 md:pb-24 md:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
         {/* copy */}
         <div className="order-2 lg:order-1">
           <Reveal>
             <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green text-[11px] text-white">⚡</span>
-              Shift coverage on autopilot
+              For restaurants: single spots to 200-location groups
             </p>
           </Reveal>
           <Reveal delay={0.08}>
@@ -72,9 +68,10 @@ function Hero() {
           </Reveal>
           <Reveal delay={0.16}>
             <p className="mt-7 max-w-xl text-lg leading-relaxed text-ink-soft md:text-xl">
-              Tagout builds the week in minutes. Then <strong className="font-bold text-ink">its AI</strong> fills
-              every gap over SMS, checking who&apos;s free, who&apos;s under overtime, and who
-              actually says yes. Managers approve. Servers just&nbsp;reply.
+              The week builds itself in minutes. Dropped shifts cover themselves by
+              text, through <strong className="font-bold text-ink">an AI that knows your
+              restaurant</strong>: who&apos;s free, who&apos;s near overtime, who says yes.
+              Your crew replies in seconds. You never work the phones&nbsp;again.
             </p>
           </Reveal>
           <Reveal delay={0.24}>
@@ -96,7 +93,7 @@ function Hero() {
           </Reveal>
           <Reveal delay={0.32}>
             <ul className="mt-9 flex flex-wrap gap-x-7 gap-y-2 text-[14.5px] font-semibold text-ink-soft">
-              {["Live in one shift", "Free schedule import", "All texting included"].map((t) => (
+              {["$29 a seat, everything on", "Live in one shift", "Free import from your old scheduler"].map((t) => (
                 <li key={t} className="flex items-center gap-2">
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-mint text-[11px] font-black text-green-dark">✓</span>
                   {t}
@@ -106,11 +103,20 @@ function Hero() {
           </Reveal>
         </div>
 
-        {/* phone */}
+        {/* phone on its stage */}
         <div className="order-1 lg:order-2">
           <Reveal delay={0.1} y={40}>
-            <div className="relative mx-auto w-fit">
-              <PhoneShell>
+            <div className="relative mx-auto w-fit px-6 py-8 sm:px-10">
+              {/* tilted brand stage instead of vapor */}
+              <div
+                className="absolute inset-x-0 bottom-2 top-14 -rotate-2 rounded-[44px] bg-mint sm:-inset-x-6"
+                aria-hidden
+              />
+              <div
+                className="absolute -right-1 top-8 h-16 w-16 rotate-6 rounded-2xl bg-violet/90 sm:right-2"
+                aria-hidden
+              />
+              <PhoneShell className="relative">
                 <HeroThread />
               </PhoneShell>
 
@@ -191,7 +197,7 @@ function TickerBand() {
 
 function OldWay() {
   return (
-    <section className="bg-ink py-20 md:py-28">
+    <section className="mx-2 rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green">
@@ -484,7 +490,7 @@ function MeetTag() {
     },
   ];
   return (
-    <section className="relative overflow-hidden bg-violet-deep py-20 md:py-28">
+    <section className="relative mx-2 overflow-hidden rounded-[36px] bg-violet-deep py-20 sm:mx-4 md:rounded-[52px] md:py-28">
       <div className="pointer-events-none absolute -left-40 top-10 h-[480px] w-[480px] rounded-full bg-violet/25 blur-[110px]" />
       <div className="pointer-events-none absolute -right-32 bottom-0 h-[420px] w-[420px] rounded-full bg-green/14 blur-[110px]" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -688,7 +694,7 @@ function PhotoBand() {
 
 function GroupsSection() {
   return (
-    <section id="groups" className="scroll-mt-24 bg-ink py-20 md:py-28">
+    <section id="groups" className="mx-2 scroll-mt-24 rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-start gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
           <Reveal>
