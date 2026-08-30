@@ -20,12 +20,12 @@ export default function PricingPage() {
         <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-14 text-center sm:px-6 md:pt-20 lg:px-8">
           <Reveal>
             <h1 className="mx-auto max-w-3xl font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl md:text-7xl">
-              Twenty-nine bucks a&nbsp;<span className="text-green-deep">seat.</span>
+              $29 a seat. <span className="text-green-deep">Everything&nbsp;on.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft md:text-xl">
               Everyone on your schedule is a seat, and everything is in the rate: the AI
               agent, both portals, unlimited texting. No modules, no add-ons,
-              no math you need a rep to explain.
+              no math you need a rep to explain. Past 20 seats, volume discounts kick in on their own.
             </p>
             <p className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full bg-mint px-5 py-2.5 text-[14.5px] font-extrabold text-green-dark">
               <span className="h-2 w-2 rounded-full bg-green" />
@@ -58,7 +58,7 @@ export default function PricingPage() {
               },
               {
                 h: "Why per seat, not per module?",
-                b: `Legacy platforms sell scheduling, then messaging, then forecasting, and the invoice grows a line at a time. Ours grows only when your team does, at $${seatPrice} a head. Your accountant will get it in one glance.`,
+                b: `Legacy platforms sell scheduling, then messaging, then forecasting, and the invoice grows a line at a time. Ours grows only when your team does, starting at ${seatPrice} a head with automatic volume discounts past 20 seats. Your accountant will get it in one glance.`,
               },
             ].map((c) => (
               <Item key={c.h}>

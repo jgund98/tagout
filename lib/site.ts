@@ -53,6 +53,12 @@ export const site = {
     seatPrice: 29,
     seatMinimum: 12,
     launchFee: 299,
+    // volume tiers: first 20 seats at $29, next 15 at $24, everything past 35 at $19
+    seatTiers: [
+      { upTo: 20, price: 29 },
+      { upTo: 35, price: 24 },
+      { upTo: Infinity, price: 19 },
+    ],
     pilotNote:
       "Start with a 30-day pilot in one location. If you don't stay, the launch fee comes back.",
     included: [

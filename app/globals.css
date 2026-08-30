@@ -66,8 +66,11 @@ p, li, figcaption {
   color: var(--color-ink);
 }
 
-/* keep long words / numbers from causing sideways scroll anywhere */
-* { min-width: 0; }
+/* keep long words / numbers from causing sideways scroll anywhere.
+   Layered so min-w-* utilities still win. */
+@layer base {
+  * { min-width: 0; }
+}
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

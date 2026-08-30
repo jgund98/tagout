@@ -4,13 +4,29 @@ import { useState } from "react";
 import Link from "next/link";
 import { site } from "@/lib/site";
 
-const { seatPrice, seatMinimum, launchFee } = site.pricing;
+const { seatMinimum, launchFee, seatTiers } = site.pricing;
+
+function priceFor(seats: number) {
+  let remaining = seats;
+  let floor = 0;
+  let total = 0;
+  for (const tier of seatTiers) {
+    const span = Math.min(remaining, tier.upTo - floor);
+    if (span <= 0) break;
+    total += span * tier.price;
+    remaining -= span;
+    floor = tier.upTo;
+  }
+  return total;
+}
 
 export default function PricingCalculator() {
-  const [seats, setSeats] = useState(17);
+  const [seats, setSeats] = useState(18);
   const billable = Math.max(seats, seatMinimum);
-  const monthly = billable * seatPrice;
+  const monthly = priceFor(billable);
+  const blended = monthly / billable;
   const perDay = monthly / 30;
+  const activeTier = billable > 35 ? 2 : billable > 20 ? 1 : 0;
 
   return (
     <div className="overflow-hidden rounded-[32px] bg-white shadow-lift">
@@ -25,32 +41,57 @@ export default function PricingCalculator() {
           </h2>
 
           <div className="mt-8">
-            <div className="flex items-baseline justify-between">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
               <p className="font-display text-6xl font-extrabold tabular-nums tracking-tight text-ink">
                 {seats}
               </p>
-              <p className="text-[14px] font-bold text-ink/45">
+              <p className="text-[14px] font-bold text-ink/45 sm:text-right">
                 seats · servers, cooks, hosts, managers, everyone
               </p>
             </div>
             <input
               type="range"
               min={seatMinimum}
-              max={45}
+              max={60}
               value={seats}
               onChange={(e) => setSeats(parseInt(e.target.value, 10))}
               aria-label="Number of people on your schedule"
               className="mt-4 h-2.5 w-full cursor-pointer appearance-none rounded-full bg-ink/8 accent-[#0ecf7f]"
             />
             <div className="mt-2 flex justify-between text-[12px] font-bold text-ink/35">
-              <span>{seatMinimum}</span>
-              <span>a café crew</span>
-              <span>full-service house</span>
-              <span>45+</span>
+              <span>café · {seatMinimum}</span>
+              <span>fast casual</span>
+              <span>full service</span>
+              <span>60</span>
             </div>
           </div>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+          {/* volume tiers */}
+          <div className="mt-6">
+            <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">
+              Volume pricing, applied automatically
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {[
+                { label: `Seats 1–20 · $${seatTiers[0].price}` },
+                { label: `21–35 · $${seatTiers[1].price}` },
+                { label: `36+ · $${seatTiers[2].price}` },
+              ].map((t, i) => (
+                <span
+                  key={t.label}
+                  className={`rounded-full px-3.5 py-1.5 text-[13px] font-extrabold transition-colors ${
+                    i <= activeTier
+                      ? "bg-mint text-green-dark"
+                      : "bg-ink/5 text-ink/40"
+                  }`}
+                >
+                  {t.label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl bg-mint p-4">
               <p className="text-[12px] font-extrabold uppercase tracking-wide text-green-dark/70">
                 Your monthly
@@ -59,7 +100,9 @@ export default function PricingCalculator() {
                 ${monthly.toLocaleString()}
               </p>
               <p className="text-[12px] font-semibold text-green-dark/70">
-                ${seatPrice} × {billable} seats
+                {billable > 20
+                  ? `blended $${blended.toFixed(2).replace(/\.00$/, "")} a seat`
+                  : `$${seatTiers[0].price} × ${billable} seats`}
               </p>
             </div>
             <div className="rounded-2xl bg-cream p-4">
@@ -88,7 +131,8 @@ export default function PricingCalculator() {
 
           <p className="mt-5 text-[13px] font-medium text-ink/45">
             {seatMinimum}-seat minimum. A seat is anyone active on the schedule that
-            month; managers included, never billed extra.
+            month; managers included, never billed extra. Multiple locations unlock
+            deeper volume rates.
           </p>
         </div>
 

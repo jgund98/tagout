@@ -120,8 +120,10 @@ function Hero() {
                 <HeroThread />
               </PhoneShell>
 
-              {/* the AI's actual reasoning, floated as telemetry */}
-              <div className="absolute top-[54%] hidden rotate-[-4deg] rounded-2xl bg-white p-3.5 shadow-lift lg:-left-16 lg:block xl:-left-24">
+              {/* the AI's actual reasoning, floated as telemetry.
+                  Anchored to the phone's chrome corners so the growing
+                  conversation can never run underneath them. */}
+              <div className="absolute -bottom-4 -left-2 hidden rotate-[-4deg] rounded-2xl bg-white p-3.5 shadow-lift lg:block xl:-left-12">
                 <p className="text-[11px] font-extrabold uppercase tracking-wide text-ink/40">Why Marisa got the text</p>
                 <p className="mt-1.5 text-[13px] font-bold leading-snug text-ink">
                   <span className="text-green-dark">✓</span> Free Friday&ensp;
@@ -130,7 +132,7 @@ function Hero() {
                   <span className="text-green-dark">✓</span> Took 8 of her last 9 offers
                 </p>
               </div>
-              <div className="absolute bottom-24 hidden rotate-[3deg] rounded-2xl bg-white p-3.5 shadow-lift lg:-right-12 lg:block xl:-right-20">
+              <div className="absolute -top-1 right-0 hidden rotate-[3deg] rounded-2xl bg-white p-3.5 shadow-lift lg:block xl:-right-12">
                 <p className="text-[11px] font-extrabold uppercase tracking-wide text-ink/40">Skipped: Jake</p>
                 <p className="mt-1.5 text-[13px] font-bold leading-snug text-ink">
                   38.5 hrs. This shift would&nbsp;have
@@ -785,7 +787,7 @@ function CompareTeaser() {
 
         <Reveal delay={0.1}>
           <div className="mt-10 overflow-x-auto rounded-3xl shadow-lift">
-            <table className="w-full min-w-[640px] border-collapse overflow-hidden rounded-3xl bg-white text-left">
+            <table className="w-full border-collapse md:min-w-[640px] overflow-hidden rounded-3xl bg-white text-left">
               <thead>
                 <tr className="border-b border-ink/8">
                   <th className="px-6 py-5 text-[13px] font-extrabold uppercase tracking-wide text-ink/40">

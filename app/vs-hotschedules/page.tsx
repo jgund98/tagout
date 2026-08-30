@@ -30,10 +30,10 @@ export default function VsPage() {
             <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white px-4 py-2 text-[13.5px] font-bold text-ink shadow-[0_1px_2px_rgb(15_21_18/0.05)]">
               The respectful teardown
             </p>
-            <h1 className="mt-6 max-w-4xl font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl md:text-7xl">
+            <h1 className="mt-6 max-w-5xl font-display text-[40px] font-extrabold leading-[1.02] tracking-[-0.03em] text-ink sm:text-5xl md:text-6xl">
               HotSchedules built the&nbsp;category.
-              <br />
-              <span className="text-green-deep">We rebuilt it around a text.</span>
+              <br className="hidden md:block" />{" "}
+              <span className="text-green-deep">We rebuilt it around a&nbsp;text.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft md:text-xl">
               Respect where it&apos;s due: HotSchedules taught the industry that scheduling
@@ -48,7 +48,7 @@ export default function VsPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
             <div className="overflow-x-auto rounded-3xl shadow-lift">
-              <table className="w-full min-w-[680px] border-collapse bg-white text-left">
+              <table className="w-full border-collapse md:min-w-[680px] bg-white text-left">
                 <thead>
                   <tr className="border-b border-ink/8">
                     <th className="w-[30%] px-6 py-5 text-[13px] font-extrabold uppercase tracking-wide text-ink/40" />
