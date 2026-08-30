@@ -71,7 +71,7 @@ export default function StoresPage() {
               Your rules, enforced on every&nbsp;offer.
             </h2>
           </Reveal>
-          <Stagger className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible lg:grid-cols-3" gap={0.1}>
+          <Stagger className="no-scrollbar mt-12 flex snap-x snap-proximity overscroll-x-contain gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible lg:grid-cols-3" gap={0.1}>
             {[
               {
                 h: "Keyholder rules",

@@ -81,7 +81,7 @@ export default function ProductPage() {
       {/* capability grid */}
       <section className="bg-paper pb-6">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Stagger className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible lg:grid-cols-3" gap={0.08}>
+          <Stagger className="no-scrollbar flex snap-x snap-proximity overscroll-x-contain gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible lg:grid-cols-3" gap={0.08}>
             {[
               { h: "Schedule builder", b: "Drag-fast weekly grid with pre-built rotation formats, copy-forward, and conflict checks as you type.", c: "bg-mint text-green-dark" },
               { h: "AI shift coverage", b: "Drops and no-shows handled by an AI that texts the right people in a human voice.", c: "bg-lav text-violet-mid" },

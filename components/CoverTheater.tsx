@@ -138,7 +138,7 @@ export default function CoverTheater() {
       </div>
 
       {/* stage */}
-      <div className="relative min-h-[460px] sm:min-h-[440px] overflow-hidden rounded-[28px] bg-pine p-5 sm:p-8">
+      <div className="relative h-[560px] overflow-hidden rounded-[28px] bg-pine p-5 sm:h-auto sm:min-h-[440px] sm:p-8">
         {/* stage backdrop: soft spotlight, nothing gridded */}
         <div
           className="pointer-events-none absolute inset-0"
@@ -242,7 +242,7 @@ export default function CoverTheater() {
           {/* STEP 1 — the scan */}
           {active === 1 && (
             <Scene key={`s1-${runId}`}>
-              <p className="mb-4 text-center text-[14px] font-semibold text-paper/75">
+              <p className="mb-3 text-center text-[13px] font-semibold text-paper/75 sm:mb-4 sm:text-[14px]">
                 Tagout checks availability, weekly hours, and each person&apos;s real yes-rate
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -252,7 +252,7 @@ export default function CoverTheater() {
                     initial={{ opacity: 0, y: 18 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.25 + i * 0.45 }}
-                    className={`rounded-2xl p-4 ${
+                    className={`rounded-2xl p-3 sm:p-4 ${
                       p.status === "pick" || p.status === "backup"
                         ? "bg-white shadow-pop"
                         : "bg-white/55"
@@ -293,9 +293,9 @@ export default function CoverTheater() {
                         {p.status === "pick" ? "Top pick" : p.status === "backup" ? "Backup" : p.status === "skip-ot" ? "OT risk · skip" : "Off · skip"}
                       </motion.span>
                     </div>
-                    <p className="mt-2.5 text-[13px] font-medium text-ink-soft">{p.reason}</p>
+                    <p className="mt-2.5 hidden text-[13px] font-medium text-ink-soft sm:block">{p.reason}</p>
                     {p.yes && (
-                      <p className="mt-1 text-[12px] font-semibold text-ink/40">Said yes {p.yes}</p>
+                      <p className="mt-1 hidden text-[12px] font-semibold text-ink/40 sm:block">Said yes {p.yes}</p>
                     )}
                   </motion.div>
                 ))}

@@ -520,7 +520,7 @@ function MeetTag() {
           </p>
         </Reveal>
 
-        <Stagger className="no-scrollbar mt-14 flex snap-x snap-mandatory gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible" gap={0.1}>
+        <Stagger className="no-scrollbar mt-14 flex snap-x snap-proximity overscroll-x-contain gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible" gap={0.1}>
           {cards.map((c) => (
             <Item key={c.title} className="min-w-[84%] snap-center sm:min-w-0">
               <div className="group h-full rounded-3xl border border-white/10 bg-white/[0.06] p-6 backdrop-blur transition-colors hover:bg-white/[0.1] sm:p-8">
@@ -622,7 +622,7 @@ function EdgeCases() {
             trust the system with the&nbsp;keys.
           </p>
         </Reveal>
-        <Stagger className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible lg:grid-cols-3" gap={0.08}>
+        <Stagger className="no-scrollbar mt-12 flex snap-x snap-proximity overscroll-x-contain gap-4 overflow-x-auto sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible lg:grid-cols-3" gap={0.08}>
           {cases.map((c) => (
             <Item key={c.title} className="min-w-[84%] snap-center sm:min-w-0">
               <div className="flex h-full flex-col rounded-3xl bg-white p-6 shadow-pop transition-shadow hover:shadow-lift sm:p-7">
@@ -656,7 +656,7 @@ function PhotoBand() {
           </h2>
         </Reveal>
         <Stagger
-          className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible"
+          className="no-scrollbar mt-12 flex snap-x snap-proximity overscroll-x-contain gap-4 overflow-x-auto sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible"
           gap={0.12}
         >
           {[
@@ -883,7 +883,7 @@ function SwitchSteps() {
             Switch in a week, not a&nbsp;quarter.
           </h2>
         </Reveal>
-        <Stagger className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto md:grid md:grid-cols-3 md:gap-5 md:overflow-visible" gap={0.12}>
+        <Stagger className="no-scrollbar mt-12 flex snap-x snap-proximity overscroll-x-contain gap-4 overflow-x-auto md:grid md:grid-cols-3 md:gap-5 md:overflow-visible" gap={0.12}>
           {steps.map((s) => (
             <Item key={s.n} className="min-w-[82%] snap-center md:min-w-0">
               <div className="h-full rounded-3xl bg-white p-7 shadow-pop">

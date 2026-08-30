@@ -20,8 +20,9 @@ export default function DemoPage() {
             <span className="h-2 w-2 rounded-full bg-green tg-pulse" />
             A 20-minute live demo with a real person
           </p>
-          <h1 className="mt-6 font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl">
-            Watch Tagout cover a&nbsp;shift. <span className="text-green-deep">Yours.</span>
+          <h1 className="mt-6 font-display text-[38px] font-extrabold leading-[1.02] tracking-[-0.03em] text-ink sm:text-6xl sm:leading-[0.98]">
+            Watch&nbsp;Tagout cover&nbsp;a&nbsp;shift.{" "}
+            <span className="text-green-deep">Yours.</span>
           </h1>
           <p className="mt-6 max-w-lg text-lg leading-relaxed text-ink-soft">
             No slides, no canned pitch. Bring a week of your real schedule and we&apos;ll import
@@ -35,8 +36,8 @@ export default function DemoPage() {
               { h: "Minute 5–15", b: "A dropped shift, covered end-to-end in front of you." },
               { h: "Minute 15–20", b: "Your bill vs ours, on a whiteboard, in the open." },
             ].map((s) => (
-              <li key={s.h} className="flex gap-4">
-                <span className="mt-1 h-fit rounded-full bg-mint px-3 py-1 text-[12px] font-extrabold uppercase tracking-wide text-green-dark whitespace-nowrap">
+              <li key={s.h} className="flex flex-col gap-1.5 sm:flex-row sm:gap-4">
+                <span className="w-fit shrink-0 whitespace-nowrap rounded-full bg-mint px-3 py-1 text-[12px] font-extrabold uppercase tracking-wide text-green-dark sm:mt-1">
                   {s.h}
                 </span>
                 <p className="text-[15.5px] font-semibold leading-relaxed text-ink">{s.b}</p>
