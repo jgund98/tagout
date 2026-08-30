@@ -23,8 +23,11 @@ function sectionsFor(seats: number) {
   return Math.max(0, Math.ceil((seats - baseSeats) / sectionSeats));
 }
 
+const MAX_SEATS = 70;
+
 export default function PricingCalculator() {
   const [seats, setSeats] = useState(32);
+  const atMax = seats >= MAX_SEATS; // past here, the ladder hands off to custom rates
   const sections = sectionsFor(seats);
   const monthly = base + sections * sectionPrice;
   const perSeat = monthly / seats;
@@ -44,7 +47,7 @@ export default function PricingCalculator() {
           <div className="mt-8">
             <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
               <p className="font-display text-6xl font-extrabold tabular-nums tracking-tight text-ink">
-                {seats}
+                {atMax ? `${MAX_SEATS}+` : seats}
               </p>
               <p className="text-[14px] font-bold text-ink/45 sm:text-right">
                 seats · servers, cooks, hosts, managers, everyone
@@ -53,7 +56,7 @@ export default function PricingCalculator() {
             <input
               type="range"
               min={8}
-              max={70}
+              max={MAX_SEATS}
               value={seats}
               onChange={(e) => setSeats(parseInt(e.target.value, 10))}
               aria-label="Number of people on your schedule"
@@ -63,7 +66,7 @@ export default function PricingCalculator() {
               <span>café</span>
               <span>the house · {baseSeats}</span>
               <span>full service</span>
-              <span>70</span>
+              <span>custom</span>
             </div>
           </div>
 
@@ -98,14 +101,22 @@ export default function PricingCalculator() {
               <p className="text-[12px] font-extrabold uppercase tracking-wide text-green-dark/70">
                 Your monthly
               </p>
-              <AnimatedDollars
-                value={monthly}
-                className="mt-1 font-display text-3xl font-extrabold tabular-nums text-green-dark"
-              />
+              {atMax ? (
+                <p className="mt-1 font-display text-3xl font-extrabold text-green-dark">
+                  Custom
+                </p>
+              ) : (
+                <AnimatedDollars
+                  value={monthly}
+                  className="mt-1 font-display text-3xl font-extrabold tabular-nums text-green-dark"
+                />
+              )}
               <p className="text-[12px] font-semibold text-green-dark/70">
-                {sections === 0
-                  ? "the house covers it"
-                  : `the house + ${sections} section${sections > 1 ? "s" : ""}`}
+                {atMax
+                  ? "volume rates for a house this size"
+                  : sections === 0
+                    ? "the house covers it"
+                    : `the house + ${sections} section${sections > 1 ? "s" : ""}`}
               </p>
             </div>
             <div className="rounded-2xl bg-cream p-4">
@@ -113,10 +124,14 @@ export default function PricingCalculator() {
                 Works out to
               </p>
               <p className="mt-1 font-display text-3xl font-extrabold tabular-nums text-ink">
-                ${perSeat.toFixed(perSeat < 10 ? 2 : 1).replace(/\.0$/, "")}
+                {atMax
+                  ? "under $8"
+                  : `$${perSeat.toFixed(perSeat < 10 ? 2 : 1).replace(/\.0$/, "")}`}
               </p>
               <p className="text-[12px] font-semibold text-ink/45">
-                a seat, and it drops as you grow
+                {atMax
+                  ? "a seat, before volume rates even apply"
+                  : "a seat, and it drops as you grow"}
               </p>
             </div>
             <div className="rounded-2xl bg-cream p-4">
