@@ -18,12 +18,29 @@ const inputCls =
 
 export default function DemoForm() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState(false);
   const [locations, setLocations] = useState("1");
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // NOTE: stub — wire to your CRM / email endpoint before launch.
-    setSent(true);
+    if (sending) return;
+    setSending(true);
+    setError(false);
+    const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+    try {
+      const res = await fetch("/api/demo", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...data, locations }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      setSent(true);
+    } catch {
+      setError(true);
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -137,13 +154,31 @@ export default function DemoForm() {
               </select>
             </label>
 
+            {/* honeypot: humans never see it, bots always fill it */}
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute left-[-9999px] top-[-9999px] h-0 w-0 opacity-0"
+            />
+
             <button
               type="submit"
-              className="group w-full rounded-full bg-green py-4 text-[17px] font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white hover:shadow-lift"
+              disabled={sending}
+              className="group w-full rounded-full bg-green py-4 text-[17px] font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white hover:shadow-lift disabled:opacity-60"
             >
-              Get my demo
-              <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
+              {sending ? "Sending…" : "Get my demo"}
+              {!sending && (
+                <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
+              )}
             </button>
+            {error && (
+              <p className="text-center text-[13px] font-bold text-coral">
+                That didn&apos;t go through. Try again, or email hello@trytagout.com.
+              </p>
+            )}
             <p className="text-center text-[12.5px] font-medium text-ink/40">
               No spam, no drip campaign. One text, one demo, your call.
             </p>

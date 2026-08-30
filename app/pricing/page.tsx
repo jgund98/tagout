@@ -3,6 +3,7 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import { Reveal, Stagger, Item } from "@/components/Reveal";
 import CTABand from "@/components/CTABand";
+import FaqJsonLd from "@/components/FaqJsonLd";
 import PricingCalculator from "@/components/PricingCalculator";
 
 export const metadata: Metadata = {
@@ -10,6 +11,29 @@ export const metadata: Metadata = {
   description:
     "One rate: $29 per seat per month, with the AI agent, both portals, and unlimited texting included. White-glove launch, month to month, custom plans for groups.",
 };
+
+const FAQS = [
+  {
+    q: "Is the AI really included for every seat?",
+    a: "Yes. The AI is the product, not an upsell. Every seat gets coverage, swaps, guardrails, and both portals.",
+  },
+  {
+    q: "Are text messages really unlimited?",
+    a: "All scheduling-related texting is included: offers, confirmations, publishing, reminders. We never meter your coverage.",
+  },
+  {
+    q: "What does the pilot look like?",
+    a: "Thirty days in one location, full product, our team does the launch. If your GM doesn't fight to keep it, walk away and the launch fee comes back.",
+  },
+  {
+    q: "Any contracts?",
+    a: "Month to month, always. Groups & Enterprise agreements are annual with rollout milestones you set.",
+  },
+  {
+    q: "What if my roster swings with the season?",
+    a: "Billing follows the schedule. Patio season adds seats; January takes them away. You never pay for someone who isn't working.",
+  },
+];
 
 export default function PricingPage() {
   const { seatPrice, launchFee, custom } = site.pricing;
@@ -116,28 +140,8 @@ export default function PricingPage() {
       {/* pricing FAQ */}
       <section className="bg-paper pb-20 md:pb-28">
         <div className="mx-auto max-w-3xl space-y-4 px-4 sm:px-6 lg:px-8">
-          {[
-            {
-              q: "Is the AI really included for every seat?",
-              a: "Yes. The AI is the product, not an upsell. Every seat gets coverage, swaps, guardrails, and both portals.",
-            },
-            {
-              q: "Are text messages really unlimited?",
-              a: "All scheduling-related texting is included: offers, confirmations, publishing, reminders. We never meter your coverage.",
-            },
-            {
-              q: "What does the pilot look like?",
-              a: "Thirty days in one location, full product, our team does the launch. If your GM doesn't fight to keep it, walk away and the launch fee comes back.",
-            },
-            {
-              q: "Any contracts?",
-              a: "Month to month, always. Groups & Enterprise agreements are annual with rollout milestones you set.",
-            },
-            {
-              q: "What if my roster swings with the season?",
-              a: "Billing follows the schedule. Patio season adds seats; January takes them away. You never pay for someone who isn't working.",
-            },
-          ].map((f) => (
+          <FaqJsonLd faqs={FAQS} />
+          {FAQS.map((f) => (
             <Reveal key={f.q}>
               <details className="group rounded-2xl bg-white p-6 shadow-pop">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-[17px] font-extrabold text-ink [&::-webkit-details-marker]:hidden">

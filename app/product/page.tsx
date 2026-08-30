@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Reveal, Stagger, Item } from "@/components/Reveal";
 import CTABand from "@/components/CTABand";
 import CoverTheater from "@/components/CoverTheater";
+import FaqJsonLd from "@/components/FaqJsonLd";
 import StaffPortalMock from "@/components/StaffPortalMock";
 import {
   ScheduleMock,
@@ -16,6 +17,29 @@ export const metadata: Metadata = {
   description:
     "Everything in Tagout: fast schedule building, SMS-first shift swaps and coverage, the built-in AI agent, overtime guardrails, and multi-location dashboards.",
 };
+
+const FAQS = [
+  {
+    q: "What if someone doesn't want texts?",
+    a: "They opt in when they join and can text STOP anytime. Anyone who prefers the staff portal just uses that; Tagout adapts per person. In practice, texting is the option staff pick for themselves.",
+  },
+  {
+    q: "Does Tagout ever text the whole roster?",
+    a: "No. That's the group-blast problem we exist to kill. Tagout ranks candidates by availability, hours, role, and real yes-history, then asks a few people in order. Escalation to you happens early if nobody bites.",
+  },
+  {
+    q: "Can managers override the AI?",
+    a: "Always. Tagout drafts, ranks, and asks, while you set how much it does on its own, from “suggest only” to “handle it and tell me after.” Every action is logged and reversible.",
+  },
+  {
+    q: "What about tip pools, POS, and payroll?",
+    a: "Tagout exports clean hour data for payroll and is built to sit alongside your POS. Tell us your stack in the demo and we'll show you exactly how it fits.",
+  },
+  {
+    q: "How long does setup actually take?",
+    a: "Import your current schedule, text your staff one onboarding message, set your house rules. Most single locations are live inside a day, often inside a shift.",
+  },
+];
 
 export default function ProductPage() {
   return (
@@ -197,29 +221,9 @@ export default function ProductPage() {
               Fair questions.
             </h2>
           </Reveal>
+          <FaqJsonLd faqs={FAQS} />
           <div className="mt-10 space-y-4">
-            {[
-              {
-                q: "What if someone doesn't want texts?",
-                a: "They opt in when they join and can text STOP anytime. Anyone who prefers the staff portal just uses that; Tagout adapts per person. In practice, texting is the option staff pick for themselves.",
-              },
-              {
-                q: "Does Tagout ever text the whole roster?",
-                a: "No. That's the group-blast problem we exist to kill. Tagout ranks candidates by availability, hours, role, and real yes-history, then asks a few people in order. Escalation to you happens early if nobody bites.",
-              },
-              {
-                q: "Can managers override the AI?",
-                a: "Always. Tagout drafts, ranks, and asks, while you set how much it does on its own, from “suggest only” to “handle it and tell me after.” Every action is logged and reversible.",
-              },
-              {
-                q: "What about tip pools, POS, and payroll?",
-                a: "Tagout exports clean hour data for payroll and is built to sit alongside your POS. Tell us your stack in the demo and we'll show you exactly how it fits.",
-              },
-              {
-                q: "How long does setup actually take?",
-                a: "Import your current schedule, text your staff one onboarding message, set your house rules. Most single locations are live inside a day, often inside a shift.",
-              },
-            ].map((f) => (
+            {FAQS.map((f) => (
               <Reveal key={f.q}>
                 <details className="group rounded-2xl bg-white p-6 shadow-pop open:shadow-lift">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-display text-[18px] font-extrabold text-ink [&::-webkit-details-marker]:hidden">

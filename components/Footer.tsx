@@ -67,7 +67,8 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col gap-4 border-t border-paper/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
+        {/* extra bottom padding on mobile so the demo dock never covers the fine print */}
+        <div className="mt-14 flex flex-col gap-4 border-t border-paper/10 pb-16 pt-8 sm:flex-row sm:items-center sm:justify-between lg:pb-0">
           <p className="text-sm text-paper/45">
             © {new Date().getFullYear()} {site.legal.company} All rights reserved.
           </p>

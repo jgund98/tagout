@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Gabarito, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { site } from "@/lib/site";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MobileDock from "@/components/MobileDock";
 
 const gabarito = Gabarito({
   subsets: ["latin"],
@@ -39,15 +41,50 @@ export const metadata: Metadata = {
   },
 };
 
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${site.url}/#org`,
+      name: site.name,
+      url: site.url,
+      logo: `${site.url}/icon.svg`,
+      email: site.email,
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: site.name,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web, SMS",
+      description: site.description,
+      url: site.url,
+      offers: {
+        "@type": "Offer",
+        price: String(site.pricing.seatPrice),
+        priceCurrency: "USD",
+        description: `$${site.pricing.seatPrice} per seat per month with volume discounts; ${site.pricing.seatMinimum}-seat minimum.`,
+      },
+      publisher: { "@id": `${site.url}/#org` },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${gabarito.variable} ${inter.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
         <Header />
         <main>{children}</main>
         <Footer />
+        <MobileDock />
+        <Analytics />
       </body>
     </html>
   );
