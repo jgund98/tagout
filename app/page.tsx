@@ -4,7 +4,6 @@ import { Reveal, Stagger, Item } from "@/components/Reveal";
 import { PhoneShell, HeroThread } from "@/components/Phone";
 import { BubbleMark } from "@/components/Wordmark";
 import CoverTheater from "@/components/CoverTheater";
-import BRoll from "@/components/BRoll";
 import CTABand from "@/components/CTABand";
 import {
   ScheduleMock,
@@ -153,7 +152,16 @@ function SegmentStrip() {
   return (
     <section className="border-y border-ink/6 bg-cream">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <p className="text-center leading-[2.1]">
+        {/* mobile: one tight line instead of the full six-segment credit roll */}
+        <p className="text-center sm:hidden">
+          <span className="mr-2.5 align-middle font-display text-[11px] font-extrabold uppercase tracking-[0.18em] text-green-deep">
+            Built for
+          </span>
+          <span className="align-middle font-display text-[15px] font-extrabold tracking-tight text-ink">
+            Restaurants, caf&eacute;s, bars &amp; retail
+          </span>
+        </p>
+        <p className="hidden text-center leading-[2.1] sm:block">
           <span className="mr-4 align-middle font-display text-[12px] font-extrabold uppercase tracking-[0.18em] text-green-deep">
             Built for
           </span>
@@ -180,7 +188,7 @@ function SegmentStrip() {
 
 function OldWay() {
   return (
-    <section className="relative mx-2 overflow-hidden rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
+    <section className="relative mx-2 overflow-hidden rounded-[36px] bg-ink py-14 sm:mx-4 sm:py-20 md:rounded-[52px] md:py-28">
       <BubbleMark
         check={false}
         size={340} className="pointer-events-none absolute -bottom-24 -right-20 rotate-12 text-paper/[0.045]"
@@ -260,7 +268,7 @@ function OldWay() {
 
 function Theater() {
   return (
-    <section id="watch" className="scroll-mt-24 bg-mint/60 py-20 md:py-28">
+    <section id="watch" className="scroll-mt-24 bg-mint/60 py-14 sm:py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green-dark">
@@ -286,7 +294,7 @@ function Theater() {
 
 function ManagerPillars() {
   return (
-    <section id="managers" className="scroll-mt-24 bg-paper py-20 md:py-28">
+    <section id="managers" className="scroll-mt-24 bg-paper py-14 sm:py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-violet-mid">
@@ -316,7 +324,7 @@ function ManagerPillars() {
               Start from last week or a template. Conflicts get flagged while you build,
               not after you publish. One tap sends the week to every phone in the building.
             </p>
-            <ul className="mt-6 space-y-3">
+            <ul className="mt-6 hidden space-y-3 md:block">
               {[
                 "Copy-forward weeks and station templates",
                 "Conflicts and availability checked as you drag",
@@ -344,7 +352,7 @@ function ManagerPillars() {
               By the time a request reaches you, the hours, the roles, and usually the
               replacement are already handled. Your job shrinks to one tap: approve.
             </p>
-            <ul className="mt-6 space-y-3">
+            <ul className="mt-6 hidden space-y-3 md:block">
               {[
                 "Every swap sanity-checked before you see it",
                 "House rules: who can close, who can pour, who's still training",
@@ -395,14 +403,14 @@ function ManagerPillars() {
 
 function StaffSection() {
   return (
-    <section id="staff" className="scroll-mt-24 overflow-hidden bg-cream py-20 md:py-28">
+    <section id="staff" className="scroll-mt-24 overflow-hidden bg-cream py-14 sm:py-20 md:py-28">
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:px-8">
         <Reveal>
           <div className="relative">
             <img
               src="/photos/server-text.webp"
               alt="A server smiling at a text message on her phone between shifts"
-              className="aspect-[4/5] w-full max-w-md rounded-[32px] object-cover object-[38%_50%] shadow-lift"
+              className="aspect-square w-full max-w-md rounded-[32px] object-cover object-[38%_50%] shadow-lift sm:aspect-[4/5]"
               loading="lazy"
             />
             <div className="absolute -right-3 bottom-8 max-w-[240px] rounded-2xl rounded-bl-md bg-green p-4 text-white shadow-lift sm:-right-6">
@@ -479,7 +487,7 @@ function MeetTag() {
     },
   ];
   return (
-    <section className="relative mx-2 overflow-hidden rounded-[36px] bg-violet-deep py-20 sm:mx-4 md:rounded-[52px] md:py-28">
+    <section className="relative mx-2 overflow-hidden rounded-[36px] bg-violet-deep py-14 sm:mx-4 sm:py-20 md:rounded-[52px] md:py-28">
       <div className="pointer-events-none absolute -left-40 top-10 h-[480px] w-[480px] rounded-full bg-violet/25 blur-[110px]" />
       <BubbleMark
         check={false}
@@ -581,7 +589,7 @@ function EdgeCases() {
     },
   ];
   return (
-    <section className="bg-cream py-20 md:py-28">
+    <section className="bg-cream py-14 sm:py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <p className="font-display text-[15px] font-extrabold uppercase tracking-[0.14em] text-green-dark">
@@ -620,7 +628,7 @@ function EdgeCases() {
 
 function PhotoBand() {
   return (
-    <section className="bg-cream py-20 md:py-28">
+    <section className="hidden bg-cream py-14 sm:py-20 md:block md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <h2 className="mx-auto max-w-3xl text-center font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-5xl">
@@ -634,24 +642,18 @@ function PhotoBand() {
         >
           {[
             {
-              video: "/video/floor.mp4",
-              poster: "/video/floor-poster.webp",
+              src: "/photos/dining-room.webp",
+              alt: "Server setting tables in a warm dining room before service",
               cap: "Friday, fully staffed",
-              src: "",
-              alt: "",
-              pos: "",
+              pos: "50% 45%",
             },
             {
-              video: "/video/plating.mp4",
-              poster: "/video/plating-poster.webp",
-              cap: "The pass, keeping pace",
-              src: "",
-              alt: "",
-              pos: "",
+              src: "/photos/counter-service.webp",
+              alt: "Coffee shop employee working the register",
+              cap: "Counter covered, line moving",
+              pos: "92% 50%",
             },
             {
-              video: "",
-              poster: "",
               src: "/photos/server-burgers.webp",
               alt: "Server delivering plates of burgers and fries on a patio",
               cap: "Nobody working a double they didn't ask for",
@@ -661,21 +663,13 @@ function PhotoBand() {
             <Item key={p.cap} className="min-w-[78%] snap-center sm:min-w-0">
               <figure className="group overflow-hidden rounded-[28px] shadow-pop">
                 <div className="overflow-hidden">
-                  {p.video ? (
-                    <BRoll
-                      src={p.video}
-                      poster={p.poster}
-                      className="aspect-[4/5] w-full object-cover"
-                    />
-                  ) : (
-                    <img
-                      src={p.src}
-                      alt={p.alt}
-                      loading="lazy"
-                      style={{ objectPosition: p.pos }}
-                      className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                    />
-                  )}
+                  <img
+                    src={p.src}
+                    alt={p.alt}
+                    loading="lazy"
+                    style={{ objectPosition: p.pos }}
+                    className="aspect-[4/5] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  />
                 </div>
                 <figcaption className="bg-white px-5 py-4 font-display text-[15.5px] font-extrabold text-ink">
                   {p.cap}
@@ -693,7 +687,7 @@ function PhotoBand() {
 
 function GroupsSection() {
   return (
-    <section id="groups" className="relative mx-2 scroll-mt-24 overflow-hidden rounded-[36px] bg-ink py-20 sm:mx-4 md:rounded-[52px] md:py-28">
+    <section id="groups" className="relative mx-2 scroll-mt-24 overflow-hidden rounded-[36px] bg-ink py-14 sm:mx-4 sm:py-20 md:rounded-[52px] md:py-28">
       <BubbleMark
         check={false}
         size={300} className="pointer-events-none absolute -right-16 top-10 rotate-6 text-paper/[0.04]"
@@ -714,12 +708,12 @@ function GroupsSection() {
             </p>
             <ul className="mt-8 space-y-4">
               {[
-                { h: "Group dashboard", b: "Coverage, open shifts, and OT exposure across every store, live." },
-                { h: "Shared talent pool", b: "Let Tagout borrow a closer from your store two miles away, rules included." },
-                { h: "Rollout without retraining", b: "Staff onboarding is one text. GMs learn it in an afternoon." },
-                { h: "Enterprise-grade controls", b: "SSO, roles and permissions, exports, API access on Enterprise." },
+                { h: "Group dashboard", b: "Coverage, open shifts, and OT exposure across every store, live.", mob: true },
+                { h: "Shared talent pool", b: "Let Tagout borrow a closer from your store two miles away, rules included.", mob: true },
+                { h: "Rollout without retraining", b: "Staff onboarding is one text. GMs learn it in an afternoon.", mob: false },
+                { h: "Enterprise-grade controls", b: "SSO, roles and permissions, exports, API access on Enterprise.", mob: false },
               ].map((r) => (
-                <li key={r.h} className="flex gap-4">
+                <li key={r.h} className={(r.mob ? "flex" : "hidden md:flex") + " gap-4"}>
                   <span className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green/15 text-[13px] font-black text-green">✓</span>
                   <div>
                     <p className="font-display text-[17px] font-extrabold text-paper">{r.h}</p>
@@ -737,10 +731,9 @@ function GroupsSection() {
             <Reveal delay={0.18} className="hidden md:block">
               <figure className="relative overflow-hidden rounded-3xl shadow-lift">
                 <img
-                  src="/photos/dining-room.webp"
-                  alt="Warm dining room set and ready for service"
+                  src="/photos/groups-floor.webp"
+                  alt="Server moving through a busy modern dining room mid-shift"
                   loading="lazy"
-                  style={{ objectPosition: "50% 60%" }}
                   className="aspect-[16/9] w-full object-cover"
                 />
                 <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/85 to-transparent px-6 pb-5 pt-14 font-display text-[15.5px] font-extrabold text-paper">
@@ -759,14 +752,14 @@ function GroupsSection() {
 
 function CompareTeaser() {
   const rows = [
-    { k: "Staff responds via", them: "App they have to open", us: "A text they answer anyway" },
-    { k: "Open shift coverage", them: "Blast + hope + call list", us: "Tagout finds, asks, confirms" },
-    { k: "Overtime protection", them: "Report after the damage", us: "Blocked before the offer" },
-    { k: "Staff onboarding", them: "Downloads, logins, training", us: "One text: “reply YES”" },
-    { k: "Pricing", them: "Modules, add-ons, tiers", us: "One house price, everything on" },
+    { k: "Staff responds via", them: "App they have to open", us: "A text they answer anyway", mob: true },
+    { k: "Open shift coverage", them: "Blast + hope + call list", us: "Tagout finds, asks, confirms", mob: true },
+    { k: "Overtime protection", them: "Report after the damage", us: "Blocked before the offer", mob: false },
+    { k: "Staff onboarding", them: "Downloads, logins, training", us: "One text: “reply YES”", mob: false },
+    { k: "Pricing", them: "Modules, add-ons, tiers", us: "One house price, everything on", mob: true },
   ];
   return (
-    <section className="bg-cream py-20 md:py-28">
+    <section className="bg-cream py-14 sm:py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -790,7 +783,7 @@ function CompareTeaser() {
         <Reveal delay={0.1}>
           {/* mobile: stacked cards, one per row */}
           <div className="mt-10 space-y-3 md:hidden">
-            {rows.map((r) => (
+            {rows.filter((r) => r.mob).map((r) => (
               <div key={r.k} className="rounded-2xl bg-white p-4 shadow-pop">
                 <p className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">{r.k}</p>
                 <p className="mt-1.5 text-[13.5px] font-medium text-ink/40 line-through decoration-ink/25">{r.them}</p>

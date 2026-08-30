@@ -40,7 +40,7 @@ export default function Footer() {
         size={380} className="pointer-events-none absolute -bottom-24 -right-20 rotate-12 text-paper/[0.035]"
       />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 md:py-20">
-        <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+        <div className="grid gap-10 md:gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div>
             <Wordmark size={30} markClass="text-green" textClass="text-paper" />
             <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-paper/60">
@@ -51,29 +51,31 @@ export default function Footer() {
               Tagout is on shift 24/7
             </p>
           </div>
-          {cols.map((col) => (
-            <div key={col.title}>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-paper/40">
-                {col.title}
-              </h3>
-              <ul className="mt-4 space-y-3">
-                {col.links.map((l) => (
-                  <li key={l.label}>
-                    <Link
-                      href={l.href}
-                      className="text-[15px] font-medium text-paper/75 transition-colors hover:text-green"
-                    >
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="grid grid-cols-3 gap-4 md:contents">
+            {cols.map((col) => (
+              <div key={col.title}>
+                <h3 className="text-[12px] font-bold uppercase tracking-wider text-paper/40 md:text-sm">
+                  {col.title}
+                </h3>
+                <ul className="mt-3 space-y-2.5 md:mt-4 md:space-y-3">
+                  {col.links.map((l) => (
+                    <li key={l.label}>
+                      <Link
+                        href={l.href}
+                        className="break-words text-[13px] font-medium text-paper/75 transition-colors hover:text-green md:text-[15px]"
+                      >
+                        {l.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* extra bottom padding on mobile so the demo dock never covers the fine print */}
-        <div className="mt-14 flex flex-col gap-4 border-t border-paper/10 pb-16 pt-8 sm:flex-row sm:items-center sm:justify-between lg:pb-0">
+        <div className="mt-10 flex flex-col gap-4 border-t border-paper/10 pb-16 pt-8 sm:flex-row sm:items-center sm:justify-between md:mt-14 lg:pb-0">
           <p className="text-sm text-paper/45">
             © {new Date().getFullYear()} {site.legal.company} All rights reserved.
           </p>

@@ -21,7 +21,7 @@ export function PhoneShell({
     <div
       className={`relative w-[300px] sm:w-[320px] rounded-[44px] bg-ink p-[10px] shadow-lift ${className}`}
     >
-      <div className="relative flex h-full min-h-[560px] flex-col overflow-hidden rounded-[36px] bg-[#f4f2ec]">
+      <div className="relative flex h-[560px] flex-col overflow-hidden rounded-[36px] bg-[#f4f2ec]">
         {/* status bar */}
         <div className="flex items-center justify-between px-6 pt-3 text-[12px] font-semibold text-ink">
           <span>{time}</span>
@@ -50,7 +50,12 @@ export function PhoneShell({
           <p className="text-[10px] text-ink/45">Text Message · SMS</p>
         </div>
 
-        <div className="flex-1 space-y-2.5 overflow-hidden px-3.5 py-4">{children}</div>
+        <div
+          data-thread-scroll
+          className="no-scrollbar flex-1 space-y-2.5 overflow-y-auto px-3.5 py-4"
+        >
+          {children}
+        </div>
 
         {/* input bar */}
         <div className="flex items-center gap-2 px-3.5 pb-5">
@@ -336,6 +341,17 @@ function ThreadPlayer({
     const t = setTimeout(() => setStep((s) => s + 1), script[step].wait);
     return () => clearTimeout(t);
   }, [step, inView, loop, reduced, script, onDone]);
+
+  // Real-Messages behavior: the phone never grows — when the thread outruns
+  // the screen, scroll it up so the newest text is always in view.
+  useEffect(() => {
+    const scroller = ref.current?.closest("[data-thread-scroll]");
+    if (!scroller) return;
+    scroller.scrollTo({
+      top: scroller.scrollHeight,
+      behavior: reduced ? "auto" : "smooth",
+    });
+  }, [step, reduced]);
 
   const visible = script.slice(0, step === 0 ? 1 : step + 1).map((s) => s.beat);
   // drop typing indicators that have been superseded by the next beat
