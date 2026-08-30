@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+  /* Tagout brand — vibrant, complementary, 2026 */
+  --color-ink: #0f1512;
+  --color-ink-soft: #3d4a44;
+  --color-paper: #fdfcf8;
+  --color-cream: #f6f3ea;
+
+  --color-green: #0ecf7f;
+  --color-green-deep: #08b46c;
+  --color-green-dark: #056443;
+  --color-pine: #0b3527;
+  --color-mint: #dcf8ea;
+
+  --color-violet: #6d5bff;
+  --color-violet-deep: #17103f;
+  --color-violet-mid: #4b3ad9;
+  --color-lav: #ebe7ff;
+
+  --color-amber: #ffb020;
+  --color-butter: #fff2d2;
+  --color-coral: #ff5c48;
+  --color-blush: #ffe4df;
+
+  --font-display: var(--font-gabarito), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+
+  --shadow-pop: 0 1px 2px rgb(15 21 18 / 0.06), 0 12px 32px -8px rgb(15 21 18 / 0.14);
+  --shadow-lift: 0 2px 4px rgb(15 21 18 / 0.05), 0 24px 64px -16px rgb(15 21 18 / 0.22);
+
+  --animate-marquee: marquee 46s linear infinite;
+  --animate-marquee-slow: marquee 72s linear infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  text-wrap: balance; /* every heading stacks with intent, at every width */
+}
+
+p, li, figcaption {
+  text-wrap: pretty; /* no orphan words in running text */
+}
+
+::selection {
+  background: var(--color-green);
+  color: var(--color-ink);
+}
+
+/* keep long words / numbers from causing sideways scroll anywhere */
+* { min-width: 0; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* typing dots for SMS bubbles */
+@keyframes tg-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: .45; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+.tg-dot { animation: tg-dot 1.1s ease-in-out infinite; }
+.tg-dot:nth-child(2) { animation-delay: .15s; }
+.tg-dot:nth-child(3) { animation-delay: .3s; }
+
+/* soft pulse for live badges */
+@keyframes tg-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .35; }
+}
+.tg-pulse { animation: tg-pulse 2.2s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .tg-dot, .tg-pulse { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
