@@ -655,7 +655,7 @@ function EdgeCases() {
             <Item key={c.title} className="min-w-[84%] snap-center sm:min-w-0">
               <div className="flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-pop transition-shadow hover:shadow-lift">
                 {/* a slice of the phone screen: timestamp + the actual text */}
-                <div className="bg-[#f4f2ec] px-5 pb-5 pt-3.5">
+                <div className="bg-[#f1f3f2] px-5 pb-5 pt-3.5">
                   <p className="text-center text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink/35">
                     {c.time}
                   </p>

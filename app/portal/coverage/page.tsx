@@ -40,7 +40,7 @@ export default function CoveragePage() {
         sub="Every dropped shift, who Tagout asked, what they said, and where you come in."
         right={
           <div className="flex items-center gap-2">
-            <span className={`text-[12.5px] font-extrabold ${state.paused ? "text-coral" : "text-ink/45"}`}>
+            <span className={`hidden text-[12.5px] font-extrabold sm:inline ${state.paused ? "text-coral" : "text-ink/45"}`}>
               {state.paused ? "Tagout is paused" : "Tagout is on shift"}
             </span>
             <button
@@ -52,7 +52,7 @@ export default function CoveragePage() {
                     id: uid("f"),
                     kind: "rule",
                     who: null,
-                    text: state.paused ? "You put Tagout back on shift" : "You paused Tagout — no texts go out until you resume",
+                    text: state.paused ? "You put Tagout back on shift" : "You paused Tagout. No texts go out until you resume",
                     sub: state.paused ? "outreach resumes where it left off" : "live covers hold their place",
                     when: "Just now",
                   },
@@ -90,13 +90,17 @@ export default function CoveragePage() {
         </div>
         <div className="mt-4 space-y-2.5">
           {needsApproval && liveRun && (
-            <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-paper/8 p-3.5">
-              <Avatar person={staffOf("sasha")} size={36} />
-              <div className="min-w-0 flex-1">
-                <p className="text-[14px] font-bold text-paper">Sasha said yes to Dana&apos;s Friday close</p>
-                <p className="text-[12px] font-semibold text-paper/50">one tap and everyone gets confirmed</p>
+            <div className="rounded-2xl bg-paper/8 p-3.5 sm:flex sm:items-center sm:gap-3">
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <Avatar person={staffOf("sasha")} size={36} />
+                <div className="min-w-0">
+                  <p className="text-[14px] font-bold leading-snug text-paper">Sasha said yes to Dana&apos;s Friday close</p>
+                  <p className="text-[12px] font-semibold text-paper/50">one tap and everyone gets confirmed</p>
+                </div>
               </div>
-              <GreenBtn onClick={approve}>Approve ✓</GreenBtn>
+              <GreenBtn className="mt-3 w-full sm:mt-0 sm:w-auto sm:shrink-0" onClick={approve}>
+                Approve ✓
+              </GreenBtn>
             </div>
           )}
           {pendingCards > 0 && (
@@ -153,36 +157,37 @@ export default function CoveragePage() {
             );
           })}
         </div>
-        <DemoNote>
-          This setting drives the live demo below: on &ldquo;Handle it,&rdquo; Tagout confirms Sasha without waiting for you.
-        </DemoNote>
+
       </section>
 
-      {/* runs */}
+      {/* runs: happening now first, history below */}
+      {state.runs.some((r) => r.state === "live") && (
+        <section className="mt-6">
+          <h2 className="mb-3 flex items-center gap-2 font-display text-[18px] font-extrabold text-ink">
+            <LiveDot /> Happening right now
+          </h2>
+          <div className="space-y-3">
+            {state.runs
+              .filter((r) => r.state === "live")
+              .map((r) => (
+                <RunCard key={r.id} run={r} open={openRun === r.id} onToggle={() => setOpenRun(openRun === r.id ? null : r.id)} staffOf={staffOf} />
+              ))}
+          </div>
+        </section>
+      )}
       <section className="mt-6">
-        <h2 className="mb-3 font-display text-[18px] font-extrabold text-ink">Every cover, receipts included</h2>
+        <h2 className="mb-3 font-display text-[18px] font-extrabold text-ink">
+          Coverage history
+        </h2>
         <div className="space-y-3">
-          {state.runs.map((r) => (
-            <RunCard
-              key={r.id}
-              run={r}
-              open={openRun === r.id}
-              onToggle={() => setOpenRun(openRun === r.id ? null : r.id)}
-              staffOf={staffOf}
-            />
-          ))}
+          {state.runs
+            .filter((r) => r.state !== "live")
+            .map((r) => (
+              <RunCard key={r.id} run={r} open={openRun === r.id} onToggle={() => setOpenRun(openRun === r.id ? null : r.id)} staffOf={staffOf} />
+            ))}
         </div>
       </section>
 
-      {/* the guarantee, restated where it matters */}
-      <section className="mt-6 rounded-[28px] bg-mint/60 p-5 sm:p-6">
-        <h3 className="font-display text-[16px] font-extrabold text-ink">When nobody says yes</h3>
-        <p className="mt-1.5 max-w-2xl text-[13.5px] font-medium leading-relaxed text-ink/65">
-          Tagout asks every eligible person, one at a time, before it ever hands a shift back. If the whole
-          list passes, you get names and numbers early enough to act, and one reply
-          (&ldquo;COVERED Rosa&rdquo;) closes the loop. See &ldquo;Sunday brunch&rdquo; above for exactly how that looked.
-        </p>
-      </section>
     </div>
   );
 }
@@ -200,11 +205,11 @@ function RunCard({
 }) {
   const tone =
     run.state === "live" ? (
-      <Chip tone="mint"><LiveDot /> live</Chip>
+      <Chip tone="mint"><LiveDot /> Live</Chip>
     ) : run.state === "covered" ? (
-      <Chip tone="mint">covered ✓</Chip>
+      <Chip tone="mint">Covered ✓</Chip>
     ) : (
-      <Chip tone="butter">handed to you</Chip>
+      <Chip tone="butter">Handed to you</Chip>
     );
   return (
     <div className="overflow-hidden rounded-3xl bg-white shadow-pop">
@@ -260,7 +265,7 @@ function RunCard({
                 )}
               </div>
               {/* thread */}
-              <div className="rounded-2xl bg-[#f4f2ec] p-3.5">
+              <div className="rounded-2xl bg-[#f1f3f2] p-3.5">
                 <p className="mb-2.5 text-center text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink/35">
                   The actual texts
                 </p>

@@ -17,9 +17,9 @@ export default function TeamPage() {
   return (
     <div className="mx-auto max-w-6xl">
       <PageTitle
-        title="The crew"
+        title="Team"
         sub="Everyone on your roster, how their week looks, and who's still onboarding."
-        right={<GreenBtn onClick={() => setInviteOpen(true)}>+ Add someone</GreenBtn>}
+        right={<GreenBtn onClick={() => setInviteOpen(true)}>+ Add team member</GreenBtn>}
       />
 
       {/* time off requests: decisions first */}
@@ -30,21 +30,23 @@ export default function TeamPage() {
             {pendingTimeOff.map((t) => {
               const p = staffOf(t.staffId);
               return (
-                <div key={t.id} className="flex flex-wrap items-center gap-3 rounded-2xl bg-white p-3.5 shadow-pop">
-                  <Avatar person={p ?? null} size={38} />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[14px] font-extrabold text-ink">
-                      {p?.first} · {t.range}
-                    </p>
-                    <p className="text-[12.5px] font-semibold text-ink/50">{t.reason}</p>
+                <div key={t.id} className="rounded-2xl bg-white p-3.5 shadow-pop sm:flex sm:items-center sm:gap-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <Avatar person={p ?? null} size={38} />
+                    <div className="min-w-0">
+                      <p className="truncate text-[14px] font-extrabold text-ink">
+                        {p?.first} · {t.range}
+                      </p>
+                      <p className="truncate text-[12.5px] font-semibold text-ink/50">{t.reason}</p>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="mt-3 flex gap-2 sm:mt-0 sm:shrink-0">
                     <button
                       onClick={() => {
                         dispatch({ type: "TIMEOFF", id: t.id, state: "approved" });
                         dispatch({ type: "FEED_PUSH", event: { id: uid("f"), kind: "swap", who: t.staffId, text: `You approved ${p?.first}'s time off (${t.range})`, sub: "Tagout texted the confirmation and blocked those days", when: "Just now" } });
                       }}
-                      className="rounded-full bg-green px-4 py-2 text-[13px] font-extrabold text-ink hover:bg-green-deep hover:text-white"
+                      className="flex-1 rounded-full bg-green px-4 py-2.5 text-[13px] font-extrabold text-ink hover:bg-green-deep hover:text-white sm:flex-none"
                     >
                       Approve
                     </button>
@@ -53,7 +55,7 @@ export default function TeamPage() {
                         dispatch({ type: "TIMEOFF", id: t.id, state: "denied" });
                         dispatch({ type: "FEED_PUSH", event: { id: uid("f"), kind: "swap", who: t.staffId, text: `You passed on ${p?.first}'s time off (${t.range})`, sub: "Tagout let them down easy and offered to find a swap instead", when: "Just now" } });
                       }}
-                      className="rounded-full border-2 border-ink/12 px-4 py-2 text-[13px] font-extrabold text-ink/60 hover:border-ink"
+                      className="flex-1 whitespace-nowrap rounded-full border-2 border-ink/12 px-4 py-2.5 text-[13px] font-extrabold text-ink/60 hover:border-ink sm:flex-none"
                     >
                       Can&apos;t this time
                     </button>
@@ -101,10 +103,10 @@ function StaffCard({ p, dispatch }: { p: Staff; dispatch: ReturnType<typeof useP
             {p.role} · {p.phone}
           </p>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {p.status === "invited" && <Chip tone="butter">invite out</Chip>}
-            {p.status === "pending" && <Chip tone="lav">onboarding</Chip>}
-            {p.keyholder && <Chip tone="mint">🔑 keyholder</Chip>}
-            {p.minor && <Chip tone="blush">17 · curfew rules</Chip>}
+            {p.status === "invited" && <Chip tone="butter">Invite sent</Chip>}
+            {p.status === "pending" && <Chip tone="lav">Onboarding</Chip>}
+            {p.keyholder && <Chip tone="mint">🔑 Keyholder</Chip>}
+            {p.minor && <Chip tone="blush">Minor · 17</Chip>}
           </div>
         </div>
       </div>
@@ -124,11 +126,11 @@ function StaffCard({ p, dispatch }: { p: Staff; dispatch: ReturnType<typeof useP
               />
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between text-[12px] font-semibold text-ink/50">
-            <span>
-              Says yes {p.yesRate > 0 ? `${Math.round(p.yesRate * 10)} of 10 asks` : "— new"}
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[12px] font-semibold text-ink/50">
+            <span className="whitespace-nowrap">
+              Says yes {p.yesRate > 0 ? `${Math.round(p.yesRate * 10)} of 10 asks` : "· new"}
             </span>
-            <span className="text-right">{p.availNote}</span>
+            <span className="min-w-0 truncate text-right">{p.availNote}</span>
           </div>
         </>
       ) : (
@@ -152,6 +154,21 @@ function StaffCard({ p, dispatch }: { p: Staff; dispatch: ReturnType<typeof useP
             >
               Mark onboarded
             </button>
+            {p.status === "invited" && (
+              <button
+                onClick={() => {
+                  if (!window.confirm(`Take back ${p.first}'s invite? Their link stops working right away.`)) return;
+                  dispatch({ type: "STAFF_REMOVE", id: p.id });
+                  dispatch({
+                    type: "FEED_PUSH",
+                    event: { id: uid("f"), kind: "onboard", who: null, text: `You took back ${p.first}'s invite`, sub: "their onboarding link no longer works", when: "Just now" },
+                  });
+                }}
+                className="rounded-full px-2.5 py-1.5 text-[12px] font-extrabold text-coral/70 hover:text-coral"
+              >
+                Take back
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -173,7 +190,7 @@ function InviteModal({ onClose }: { onClose: () => void }) {
     dispatch({ type: "STAFF_INVITE", name: name.trim(), phone, role });
     dispatch({
       type: "FEED_PUSH",
-      event: { id: uid("f"), kind: "onboard", who: null, text: `Invite texted to ${name.trim()}`, sub: "one YES and they're on the roster — no app, no meeting", when: "Just now" },
+      event: { id: uid("f"), kind: "onboard", who: null, text: `Invite texted to ${name.trim()}`, sub: "one YES and they're on the roster. No app, no meeting", when: "Just now" },
     });
     setSent(true);
     setTimeout(onClose, 1600);
@@ -199,9 +216,9 @@ function InviteModal({ onClose }: { onClose: () => void }) {
       >
         {!sent ? (
           <>
-            <h2 className="font-display text-[20px] font-extrabold text-ink">Add someone to the crew</h2>
+            <h2 className="font-display text-[21px] font-extrabold text-ink">Add a team member</h2>
             <p className="mt-1 text-[13px] font-medium text-ink/50">
-              Onboarding is one text. They reply YES, answer availability, add a photo — done.
+              Onboarding is one text. They reply YES, answer availability, add a photo. Done.
             </p>
             <div className="mt-4 space-y-3">
               <input
@@ -227,13 +244,13 @@ function InviteModal({ onClose }: { onClose: () => void }) {
                 ))}
               </select>
             </div>
-            <div className="mt-4 rounded-2xl bg-[#f4f2ec] p-3.5">
+            <div className="mt-4 rounded-2xl bg-[#f1f3f2] p-3.5">
               <p className="mb-2 text-center text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink/35">
                 The text {first} will get
               </p>
               <TagBubble>
                 Hey {first}! {state.gmFirst} added you to the {state.houseName} schedule on Tagout. Reply
-                YES and I&apos;ll get you set up — takes about a minute, right here in texts.
+                YES and I&apos;ll get you set up. Takes about a minute, right here in texts.
               </TagBubble>
             </div>
             <GreenBtn className="mt-4 w-full" disabled={!valid} onClick={send}>

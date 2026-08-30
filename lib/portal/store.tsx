@@ -59,6 +59,14 @@ export function fmtClock(mins: number): string {
   return `${hh}:${String(m).padStart(2, "0")} ${ap}`;
 }
 
+/** Everything currently waiting on the GM, counted once, shown everywhere. */
+export function needsYouCount(state: PortalState): number {
+  const approval = state.runs.some((r) => r.state === "live" && r.outcome?.includes("needs your approval")) ? 1 : 0;
+  const cards = state.punches.filter((p) => p.outAt !== null && !p.approved).length;
+  const timeOff = state.timeOff.filter((t) => t.state === "pending").length;
+  return approval + cards + timeOff;
+}
+
 let idc = 100;
 export const uid = (p: string) => `${p}-${++idc}-${Math.random().toString(36).slice(2, 6)}`;
 
@@ -75,6 +83,7 @@ type Action =
   | { type: "SHIFT_DELETE"; id: string }
   | { type: "PUBLISH_WEEK" }
   | { type: "RULE_TOGGLE"; id: string }
+  | { type: "RULE_VALUE"; id: string; value: string }
   | { type: "AUTOPILOT"; mode: PortalState["autopilot"] }
   | { type: "TIMEOFF"; id: string; state: "approved" | "denied" }
   | { type: "NOTE_ADD"; text: string }
@@ -83,6 +92,10 @@ type Action =
   | { type: "PUNCH_PATCH"; id: string; patch: Partial<import("./data").Punch> }
   | { type: "SECTION_SET"; shiftId: string; section: string }
   | { type: "PAUSE_TOGGLE" }
+  | { type: "TABLE_CYCLE"; id: string; sections: string[] }
+  | { type: "FLOOR_BALANCE" }
+  | { type: "ROTATION_SET"; mode: import("./data").RotationMode }
+  | { type: "STAFF_REMOVE"; id: string }
   | { type: "APPROVE_LIVE_COVER" };
 
 function reducer(state: PortalState, a: Action): PortalState {
@@ -132,6 +145,8 @@ function reducer(state: PortalState, a: Action): PortalState {
       };
     case "RULE_TOGGLE":
       return { ...state, rules: state.rules.map((r) => (r.id === a.id ? { ...r, on: !r.on } : r)) };
+    case "RULE_VALUE":
+      return { ...state, rules: state.rules.map((r) => (r.id === a.id ? { ...r, value: a.value } : r)) };
     case "AUTOPILOT":
       return { ...state, autopilot: a.mode };
     case "TIMEOFF":
@@ -171,6 +186,27 @@ function reducer(state: PortalState, a: Action): PortalState {
       };
     case "PAUSE_TOGGLE":
       return { ...state, paused: !state.paused };
+    case "TABLE_CYCLE":
+      return {
+        ...state,
+        tables: state.tables.map((t) => {
+          if (t.id !== a.id) return t;
+          const i = a.sections.indexOf(t.section);
+          return { ...t, section: a.sections[(i + 1) % a.sections.length] };
+        }),
+      };
+    case "FLOOR_BALANCE":
+      return {
+        ...state,
+        floorBalanced: true,
+        tables: state.tables.map((t) =>
+          t.id === "t5" ? { ...t, section: "Bar side" } : t.id === "t13" ? { ...t, section: "Main" } : t
+        ),
+      };
+    case "ROTATION_SET":
+      return { ...state, rotation: a.mode };
+    case "STAFF_REMOVE":
+      return { ...state, staff: state.staff.filter((s) => s.id !== a.id) };
     case "APPROVE_LIVE_COVER": {
       // Sasha takes Dana's Friday close; the board updates in front of you.
       return {

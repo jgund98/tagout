@@ -70,8 +70,10 @@ export type Rule = {
   id: string;
   name: string;
   plain: string; // GM-plain explanation
+  group: "Hours & pay" | "Compliance" | "How Tagout asks" | "Approvals";
   on: boolean;
   value?: string;
+  options?: string[]; // when set, the GM can change the value, not just the switch
   lastUsed: string;
 };
 
@@ -87,11 +89,17 @@ export type HouseEvent = { id: string; day: number; label: string; note: string 
 
 export type Note = { id: string; text: string; when: string };
 
+export type Table = { id: string; label: string; section: string; shape: "round" | "square"; seats: number };
+export type RotationMode = "even" | "seniority" | "training";
+
 export type PortalState = {
   houseName: string;
   gmFirst: string;
   autopilot: "suggest" | "ask-first" | "full";
   paused: boolean; // GM hit the big red switch: Tagout stops texting until turned back on
+  tables: Table[];
+  rotation: RotationMode;
+  floorBalanced: boolean;
   staff: Staff[];
   shifts: Shift[];
   punches: Punch[];
@@ -272,12 +280,23 @@ export function makeSeed(): PortalState {
   ];
 
   const rules: Rule[] = [
-    { id: "ot", name: "No overtime surprises", plain: "Nobody gets offered a shift that would push them past 40 hours. Hard stop.", on: true, value: "40 hrs/week", lastUsed: "Kept Sam off Friday close (would've hit 44)" },
-    { id: "minor", name: "School-night curfew", plain: "Erin is 17. On school nights she's never offered anything past 10 PM. Florida rules, handled.", on: true, value: "Out by 10 PM", lastUsed: "Friday host shift ends 10 PM sharp" },
-    { id: "keys", name: "Keyholders open & close", plain: "Opens and closes only go to people who can unlock the door: Sam and Rosa.", on: true, value: "2 keyholders", lastUsed: "Sunday open offered to Rosa first" },
-    { id: "clopen", name: "No accidental clopens", plain: "Closing then opening the next morning needs 10 hours between. Tagout asks the person before it ever books one.", on: true, value: "10 hr gap", lastUsed: "Blocked Katie's Sat/Sun clopen, 3:22 PM" },
-    { id: "quiet", name: "Quiet hours", plain: "No texts between 9:30 PM and 7 AM unless it's a same-morning emergency.", on: true, value: "9:30 PM – 7 AM", lastUsed: "Held Sunday asks until 7:01 AM" },
-    { id: "fair", name: "Fair first dibs", plain: "Extra shifts go to whoever asked for more hours first, then by who actually says yes. No favorites.", on: true, value: "Devon flagged: wants hours", lastUsed: "Devon got first ask on Tuesday pickup" },
+    // Hours & pay
+    { id: "ot", group: "Hours & pay", name: "Overtime cap", plain: "Nobody gets offered a shift that would push them past the cap. Hard stop, not a warning after payroll.", on: true, value: "40 hrs/week", options: ["38 hrs/week", "40 hrs/week", "45 hrs/week"], lastUsed: "Kept Sam off Friday close (would've hit 44)" },
+    { id: "maxasks", group: "Hours & pay", name: "Don't burn out the yes-people", plain: "Caps how many extra-shift asks any one person gets per week, so your most reliable people don't carry every gap.", on: true, value: "3 asks/week", options: ["2 asks/week", "3 asks/week", "No limit"], lastUsed: "Skipped Devon on Thursday, he'd hit 3" },
+    { id: "cuts", group: "Hours & pay", name: "Slow-night voluntary cuts", plain: "When a night books light, Tagout can offer voluntary cuts. First replies win, nobody gets forced off.", on: true, value: "Offer automatically", options: ["Offer automatically", "Only when I ask"], lastUsed: "Tuesday's rained-out patio, saved ~$118" },
+    // Compliance
+    { id: "minor", group: "Compliance", name: "Minor curfew", plain: "Erin is 17. On school nights she's never offered anything past curfew. State rules, handled.", on: true, value: "Out by 10 PM", options: ["Out by 9 PM", "Out by 10 PM", "Out by 11 PM"], lastUsed: "Friday host shift ends 10 PM sharp" },
+    { id: "breaks", group: "Compliance", name: "Break reminders", plain: "Anyone past six hours without a 30-minute break gets flagged on their timecard before you approve it.", on: true, value: "30 min by hour 6", options: ["30 min by hour 5", "30 min by hour 6", "Off"], lastUsed: "Flagged Devon's 20-minute break today" },
+    { id: "keys", group: "Compliance", name: "Keyholders open & close", plain: "Opens and closes only go to people who can unlock the door: Sam and Rosa.", on: true, value: "2 keyholders", lastUsed: "Sunday open offered to Rosa first" },
+    { id: "clopen", group: "Compliance", name: "No accidental clopens", plain: "Closing then opening the next morning needs a real night's rest between. Tagout asks the person before it ever books one.", on: true, value: "10 hr gap", options: ["8 hr gap", "10 hr gap", "12 hr gap"], lastUsed: "Blocked Katie's Sat/Sun clopen, 3:22 PM" },
+    // How Tagout asks
+    { id: "quiet", group: "How Tagout asks", name: "Quiet hours", plain: "No texts during quiet hours unless it's a same-morning emergency.", on: true, value: "9:30 PM to 7 AM", options: ["9 PM to 8 AM", "9:30 PM to 7 AM", "10 PM to 6 AM"], lastUsed: "Held Sunday asks until 7:01 AM" },
+    { id: "spacing", group: "How Tagout asks", name: "Time per person", plain: "How long each person gets to answer before Tagout moves down the list.", on: true, value: "15 min each", options: ["10 min each", "15 min each", "30 min each"], lastUsed: "Moved from Marisa to Sasha at the 15" },
+    { id: "escalate", group: "How Tagout asks", name: "When you get the dial list", plain: "Tagout always asks everyone eligible. This sets how early you also get names and numbers to dial yourself.", on: true, value: "1 hr before shift", options: ["2 hrs before shift", "1 hr before shift", "Only if the list runs dry"], lastUsed: "Sunday brunch: list handed over at 8:12 AM" },
+    { id: "fair", group: "How Tagout asks", name: "Fair first dibs", plain: "Extra shifts go to whoever asked for more hours first, then by who actually says yes. No favorites.", on: true, value: "Devon flagged: wants hours", lastUsed: "Devon got first ask on Tuesday pickup" },
+    // Approvals
+    { id: "swaps", group: "Approvals", name: "Swaps that pass every rule", plain: "When a swap clears hours, roles, and rest rules, Tagout can finish it alone or still bring it to you.", on: true, value: "Still ask me", options: ["Auto-approve", "Still ask me"], lastUsed: "Erin and Katie's Sunday swap came to you first" },
+    { id: "training", group: "Approvals", name: "New-hire training window", plain: "New hires don't get solo shifts until they've been on the floor long enough. Tagout pairs them with a trainer instead.", on: true, value: "First 2 weeks", options: ["First week", "First 2 weeks", "First month"], lastUsed: "Tyler will pair with Marisa once he's onboarded" },
   ];
 
   const timeOff: TimeOff[] = [
@@ -301,6 +320,24 @@ export function makeSeed(): PortalState {
     gmFirst: "Jordan",
     autopilot: "ask-first",
     paused: false,
+    rotation: "even",
+    floorBalanced: false,
+    tables: [
+      { id: "t1", label: "1", section: "Main", shape: "round", seats: 4 },
+      { id: "t2", label: "2", section: "Main", shape: "square", seats: 2 },
+      { id: "t3", label: "3", section: "Main", shape: "round", seats: 6 },
+      { id: "t4", label: "4", section: "Main", shape: "square", seats: 4 },
+      { id: "t5", label: "5", section: "Main", shape: "round", seats: 4 },
+      { id: "t6", label: "6", section: "Bar side", shape: "square", seats: 2 },
+      { id: "t7", label: "7", section: "Bar side", shape: "square", seats: 2 },
+      { id: "t8", label: "8", section: "Bar side", shape: "round", seats: 4 },
+      { id: "t9", label: "9", section: "Bar side", shape: "square", seats: 2 },
+      { id: "t10", label: "10", section: "Patio", shape: "round", seats: 4 },
+      { id: "t11", label: "11", section: "Patio", shape: "round", seats: 4 },
+      { id: "t12", label: "12", section: "Patio", shape: "square", seats: 6 },
+      { id: "t13", label: "13", section: "Patio", shape: "round", seats: 2 },
+      { id: "t14", label: "14", section: "Patio", shape: "square", seats: 8 },
+    ],
     staff,
     shifts,
     punches,

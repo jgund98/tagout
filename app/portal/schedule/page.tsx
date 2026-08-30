@@ -40,14 +40,14 @@ export default function SchedulePage() {
     if (otRule) {
       for (const p of active) {
         const h = hoursOf(p.id);
-        if (h > 40) list.push(`${p.first} is at ${Math.round(h)} hrs — over the 40-hour guard.`);
+        if (h > 40) list.push(`${p.first} is at ${Math.round(h)} hrs, past the 40-hour guard.`);
       }
     }
     if (minorRule) {
       for (const s of state.shifts) {
         const p = state.staff.find((x) => x.id === s.staffId);
         if (p?.minor && toMins(s.end) > toMins("10:00 PM") && toMins(s.end) < toMins("11:59 PM"))
-          list.push(`${p.first} is 17 — this ${DAYS[s.day]} shift runs past the 10 PM curfew.`);
+          list.push(`${p.first} is 17, and this ${DAYS[s.day]} shift runs past the 10 PM curfew.`);
       }
     }
     return list;
@@ -64,7 +64,7 @@ export default function SchedulePage() {
         id: uid("f"),
         kind: "rule",
         who: null,
-        text: "Week published — everyone just got their schedule by text",
+        text: "Week published. Everyone just got their schedule by text",
         sub: "no app downloads, no 'check the portal'",
         when: "Just now",
       },
@@ -76,18 +76,10 @@ export default function SchedulePage() {
   return (
     <div className="mx-auto max-w-7xl">
       <PageTitle
-        title="The week"
+        title="Schedule"
         sub="Build it in minutes. Tagout keeps it whole after you publish."
         right={
           <div className="flex items-center gap-2">
-            <GhostBtn
-              onClick={() => {
-                setToast("Next week drafted from this one. Adjust and publish when ready.");
-                setTimeout(() => setToast(""), 3500);
-              }}
-            >
-              Copy to next week
-            </GhostBtn>
             <GreenBtn onClick={publish} disabled={state.weekPublished && draftCount === 0}>
               {state.weekPublished && draftCount === 0 ? "Published ✓" : `Publish week${draftCount ? ` (${draftCount} new)` : ""}`}
             </GreenBtn>
@@ -278,7 +270,7 @@ function MobileDayView({
       </div>
       {events.filter((e) => e.day === day).map((e) => (
         <p key={e.id} className="mt-3 rounded-2xl rounded-bl-md bg-lav/60 px-4 py-2.5 text-[13px] font-bold text-violet-mid">
-          📌 {e.label} — {e.note}
+          📌 {e.label} · {e.note}
         </p>
       ))}
       <div className="mt-3 space-y-2">

@@ -43,6 +43,16 @@ Settings reset) wipes and reseeds — every walkthrough starts identical.
    customers on client state.
 4. Toast POS / payroll: stubs shown as "Coming soon" in Settings.
 
+## Source of truth & the future brain
+The portal state is the system of record; every human and AI action flows through the
+reducer and lands in the feed, which doubles as the audit/event log. That log is the
+learning substrate for the brain: yes-rates per person, patterns (Dana's three dropped
+Fridays), section balance, reply speed. When the Anthropic-powered brain arrives, it
+reads and writes the same actions the UI does today — nothing about the surfaces changes,
+only who's generating the events. Time model is explicit across the UI: Needs-you = act
+now, "Happening right now" = live, "Up next" = future, "Past covers" / "Earlier this
+week" = history.
+
 ## Next phase (not yet built)
 - Owner/multi-location rollup view; platform-owner internal admin.
 - New-restaurant onboarding wizard (the demo seeds one house).

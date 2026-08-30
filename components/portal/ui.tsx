@@ -94,7 +94,7 @@ export function Chip({
   };
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-lg rounded-bl-[4px] px-2.5 py-1 text-[11.5px] font-extrabold ${tones[tone]} ${className}`}
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg rounded-bl-[4px] px-2.5 py-1 text-[12px] font-extrabold ${tones[tone]} ${className}`}
     >
       {children}
     </span>
@@ -128,14 +128,14 @@ export function StatTile({
   };
   return (
     <div className={`rounded-3xl p-4 shadow-pop sm:p-5 ${tones[tone]}`}>
-      <p className="flex items-center gap-1.5 text-[11.5px] font-extrabold uppercase tracking-wide text-ink/45">
+      <p className="flex items-center gap-1.5 whitespace-nowrap text-[11px] font-extrabold uppercase tracking-wide text-ink/45 sm:text-[11.5px]">
         {live && <LiveDot />}
-        {label}
+        <span className="truncate">{label}</span>
       </p>
-      <p className="mt-1 font-display text-[26px] font-extrabold leading-none tracking-tight text-ink sm:text-3xl">
+      <p className="mt-1.5 truncate font-display text-[26px] font-extrabold leading-none tracking-tight text-ink sm:text-[32px]">
         {value}
       </p>
-      {sub && <p className="mt-1.5 text-[12.5px] font-semibold text-ink/50">{sub}</p>}
+      {sub && <p className="mt-1.5 truncate text-[12.5px] font-semibold text-ink/50 sm:text-[13px]">{sub}</p>}
     </div>
   );
 }
@@ -146,8 +146,8 @@ export function PageTitle({ title, sub, right }: { title: string; sub?: string; 
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="font-display text-[28px] font-extrabold tracking-tight text-ink sm:text-4xl">{title}</h1>
-        {sub && <p className="mt-1.5 max-w-xl text-[14.5px] font-medium text-ink/55">{sub}</p>}
+        <h1 className="font-display text-[30px] font-extrabold tracking-tight text-ink sm:text-4xl">{title}</h1>
+        {sub && <p className="mt-1.5 max-w-xl text-[15.5px] font-medium text-ink/55">{sub}</p>}
       </div>
       {right}
     </div>
@@ -213,7 +213,7 @@ export function GreenBtn({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`rounded-full bg-green px-5 py-2.5 text-[14.5px] font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white disabled:opacity-40 ${className}`}
+      className={`rounded-full bg-green px-5 py-3 text-[15px] font-extrabold text-ink transition-all hover:bg-green-deep hover:text-white disabled:opacity-40 ${className}`}
     >
       {children}
     </button>
@@ -232,7 +232,7 @@ export function GhostBtn({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border-2 border-ink/12 px-5 py-2.5 text-[14.5px] font-extrabold text-ink transition-colors hover:border-ink ${className}`}
+      className={`rounded-full border-2 border-ink/12 px-5 py-3 text-[15px] font-extrabold text-ink transition-colors hover:border-ink ${className}`}
     >
       {children}
     </button>

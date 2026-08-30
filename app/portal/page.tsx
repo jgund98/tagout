@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { usePortal, shiftHours, uid } from "@/lib/portal/store";
+import { usePortal, shiftHours, uid, needsYouCount } from "@/lib/portal/store";
 import { Avatar, AvatarStack, Chip, StatTile, LiveDot, GreenBtn } from "@/components/portal/ui";
 import type { FeedEvent } from "@/lib/portal/data";
 
@@ -45,8 +45,31 @@ export default function TonightPage() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
+  const needs = needsYouCount(state);
+
   return (
     <div className="mx-auto max-w-6xl">
+      {needs > 0 && (
+        <Link
+          href="/portal/coverage"
+          className="mb-5 flex items-center gap-3 rounded-3xl bg-ink p-4 shadow-pop transition-transform hover:scale-[1.005]"
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-coral font-display text-[16px] font-extrabold text-white">
+            {needs}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[14.5px] font-extrabold leading-snug text-paper">
+              {needs === 1 ? "One thing needs" : `${needs} things need`} your call
+            </span>
+            <span className="block text-[12.5px] font-semibold text-paper/50">
+              approvals, timecards, time off · everything else is handled
+            </span>
+          </span>
+          <span className="shrink-0 rounded-full bg-green px-4 py-2 text-[13px] font-extrabold text-ink">
+            Start here →
+          </span>
+        </Link>
+      )}
       {/* greeting */}
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -54,7 +77,7 @@ export default function TonightPage() {
             {greeting}, {state.gmFirst} 👋
           </h1>
           <p className="mt-1 text-[14.5px] font-medium text-ink/55">
-            Friday night at {state.houseName}. Tagout has the phones — here&apos;s everything it&apos;s doing.
+            Friday night at {state.houseName}. Tagout has the phones. Here&apos;s everything it&apos;s doing.
           </p>
         </div>
         {liveRun ? (
@@ -73,17 +96,17 @@ export default function TonightPage() {
 
       {/* pulse */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatTile label="Tonight's coverage" value={liveRun ? "1 gap · working" : "100%"} sub={liveRun ? "Tagout is on it, no action needed yet" : "every shift confirmed"} tone="mint" live={!!liveRun} />
-        <StatTile label="On the clock" value={onClock.length} sub="live from the time clock" tone="white" live />
-        <StatTile label="Tonight's labor" value={`$${Math.round(laborTonight).toLocaleString()}`} sub="scheduled, at blended rate" tone="butter" />
-        <StatTile label="Covers, last 90 days" value={state.stats.covers90d} sub={`median ${state.stats.medianCoverMins} min to covered`} tone="lav" />
+        <StatTile label="Coverage" value={liveRun ? "1 gap" : "100%"} sub={liveRun ? "Tagout's working it" : "every shift confirmed"} tone="mint" live={!!liveRun} />
+        <StatTile label="On the clock" value={onClock.length} sub="live time clock" tone="white" live />
+        <StatTile label="Labor tonight" value={"$" + Math.round(laborTonight).toLocaleString()} sub="as scheduled" tone="butter" />
+        <StatTile label="90-day covers" value={state.stats.covers90d} sub={`median ${state.stats.medianCoverMins} min to yes`} tone="lav" />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
         {/* THE FEED */}
         <section aria-label="Live activity">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <h2 className="mr-1 font-display text-[18px] font-extrabold text-ink">The house feed</h2>
+            <h2 className="mr-1 font-display text-[20px] font-extrabold text-ink">Activity</h2>
             {FILTERS.map((f) => (
               <button
                 key={f.key}
@@ -98,11 +121,18 @@ export default function TonightPage() {
           </div>
           <div className="space-y-2.5">
             <AnimatePresence initial={false}>
-              {feed.slice(0, 10).map((f) => {
+              {feed.slice(0, 10).map((f, i, arr) => {
                 const meta = KIND_META[f.kind];
+                const isPast = (w: string) => w === "Yesterday" || w === "Tuesday" || w === "Last Sunday";
+                const firstPast = isPast(f.when) && (i === 0 || !isPast(arr[i - 1].when));
                 return (
+                  <div key={f.id}>
+                  {firstPast && (
+                    <p className="mb-2 mt-4 text-[11px] font-extrabold uppercase tracking-[0.14em] text-ink/30">
+                      Earlier this week
+                    </p>
+                  )}
                   <motion.article
-                    key={f.id}
                     layout
                     initial={{ opacity: 0, y: -14, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -118,10 +148,11 @@ export default function TonightPage() {
                         <Chip tone={meta.tone}>{meta.chip}</Chip>
                         <span className="text-[11.5px] font-bold text-ink/35">{f.when}</span>
                       </div>
-                      <p className="mt-1.5 text-[14.5px] font-bold leading-snug text-ink">{f.text}</p>
-                      {f.sub && <p className="mt-0.5 text-[13px] font-medium text-ink/50">{f.sub}</p>}
+                      <p className="mt-1.5 text-[15.5px] font-bold leading-snug text-ink">{f.text}</p>
+                      {f.sub && <p className="mt-0.5 text-[13.5px] font-medium text-ink/50">{f.sub}</p>}
                     </div>
                   </motion.article>
+                  </div>
                 );
               })}
             </AnimatePresence>
@@ -200,13 +231,13 @@ export default function TonightPage() {
                   <div key={s.id} className="flex items-center gap-3 rounded-2xl bg-cream/70 px-3 py-2">
                     <Avatar person={p} size={30} />
                     <div className="min-w-0 flex-1 leading-tight">
-                      <p className="truncate text-[13.5px] font-extrabold text-ink">{p?.first}</p>
-                      <p className="text-[11px] font-semibold text-ink/45">
+                      <p className="truncate text-[14.5px] font-extrabold text-ink">{p?.first}</p>
+                      <p className="text-[12px] font-semibold text-ink/45">
                         {s.role} · {s.start}–{s.end}
                         {s.section ? ` · ${s.section}` : ""}
                       </p>
                     </div>
-                    {s.state === "covering" && <Chip tone="butter">covering…</Chip>}
+                    {s.state === "covering" && <Chip tone="butter">Covering…</Chip>}
                   </div>
                 );
               })}
@@ -216,9 +247,48 @@ export default function TonightPage() {
             </Link>
           </section>
 
+          {/* up next: the future, one glance */}
+          <section className="rounded-3xl bg-white p-5 shadow-pop">
+            <h3 className="font-display text-[17px] font-extrabold text-ink">Up next</h3>
+            <ul className="mt-2.5 space-y-2">
+              <li className="flex items-start gap-2.5 rounded-2xl bg-lav/50 px-3.5 py-2.5">
+                <span aria-hidden>📌</span>
+                <p className="text-[13px] font-bold leading-snug text-ink">
+                  Tomorrow · 45-top at 7
+                  <span className="block text-[11.5px] font-semibold text-ink/45">
+                    rehearsal dinner, patio · staffed +2, all confirmed
+                  </span>
+                </p>
+              </li>
+              <li className="flex items-start gap-2.5 rounded-2xl bg-mint/60 px-3.5 py-2.5">
+                <span aria-hidden>🌅</span>
+                <p className="text-[13px] font-bold leading-snug text-ink">
+                  Sunday brunch · one server shift open
+                  <span className="block text-[11.5px] font-semibold text-ink/45">
+                    Tagout starts asking Saturday morning, quiet hours respected
+                  </span>
+                </p>
+              </li>
+              {state.timeOff.filter((t) => t.state === "approved").map((t) => {
+                const p = state.staff.find((s) => s.id === t.staffId);
+                return (
+                  <li key={t.id} className="flex items-start gap-2.5 rounded-2xl bg-butter/50 px-3.5 py-2.5">
+                    <span aria-hidden>🌴</span>
+                    <p className="text-[13px] font-bold leading-snug text-ink">
+                      {p?.first} off {t.range}
+                      <span className="block text-[11.5px] font-semibold text-ink/45">
+                        approved · Tagout plans around it
+                      </span>
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+
           {/* note to tomorrow */}
           <section className="rounded-3xl bg-white p-5 shadow-pop">
-            <h3 className="font-display text-[16px] font-extrabold text-ink">Manager&apos;s notebook</h3>
+            <h3 className="font-display text-[17px] font-extrabold text-ink">Shift notes</h3>
             <form
               onSubmit={(e) => {
                 e.preventDefault();

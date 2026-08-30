@@ -21,7 +21,7 @@ export function PhoneShell({
     <div
       className={`relative w-[300px] sm:w-[320px] rounded-[44px] bg-ink p-[10px] shadow-lift ${className}`}
     >
-      <div className="relative flex h-[560px] flex-col overflow-hidden rounded-[36px] bg-[#f4f2ec]">
+      <div className="relative flex h-[560px] flex-col overflow-hidden rounded-[36px] bg-[#f1f3f2]">
         {/* status bar */}
         <div className="flex items-center justify-between px-6 pt-3 text-[12px] font-semibold text-ink">
           <span>{time}</span>

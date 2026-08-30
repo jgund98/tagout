@@ -29,6 +29,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState<string[]>(Array(OTP_LEN).fill(""));
   const [err, setErr] = useState("");
+  const [resent, setResent] = useState(false);
   const boxes = useRef<(HTMLInputElement | null)[]>([]);
 
   const submitPhone = (e: React.FormEvent) => {
@@ -53,7 +54,7 @@ export default function LoginPage() {
         startDemoSession();
         router.push("/portal");
       } else {
-        setErr("That code didn't match. The demo code is all zeros.");
+        setErr("That code didn't match. Check the text or resend.");
         setOtp(Array(OTP_LEN).fill(""));
         boxes.current[0]?.focus();
       }
@@ -148,13 +149,16 @@ export default function LoginPage() {
                   ))}
                 </div>
                 {err && <p className="mt-3 text-[13px] font-bold text-coral">{err}</p>}
-                <div className="mt-5 rounded-2xl rounded-bl-md bg-mint p-4">
-                  <p className="text-[13px] font-bold leading-relaxed text-green-dark">
-                    Demo mode: SMS sending isn&apos;t connected yet, so your code is{" "}
-                    <span className="font-display text-[15px] font-extrabold tracking-[0.2em]">000000</span>.
-                    Real one-time texts turn on with the SMS provider.
-                  </p>
-                </div>
+                <button
+                  onClick={() => {
+                    setErr("");
+                    setResent(true);
+                    setTimeout(() => setResent(false), 4000);
+                  }}
+                  className="mt-5 w-full rounded-full border-2 border-ink/10 py-3 text-[14px] font-extrabold text-ink/60 transition-colors hover:border-ink hover:text-ink"
+                >
+                  {resent ? "Code re-sent ✓" : "Didn't get it? Resend"}
+                </button>
                 <button
                   onClick={() => {
                     setStep("phone");
@@ -180,7 +184,7 @@ export default function LoginPage() {
                 </h1>
                 <p className="mt-2 text-[14.5px] leading-relaxed text-ink-soft">
                   That number isn&apos;t on a roster we run. If your restaurant uses Tagout, ask
-                  your GM to add you — onboarding is one text. If you&apos;re the GM, we&apos;d love
+                  your GM to add you; onboarding is one text. If you&apos;re the GM, we&apos;d love
                   to show you around.
                 </p>
                 <Link

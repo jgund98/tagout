@@ -53,7 +53,7 @@ export default function HoursPage() {
   return (
     <div className="mx-auto max-w-5xl">
       <PageTitle
-        title="Hours"
+        title="Time clock"
         sub="The time clock runs itself over text: crew texts IN and OUT, you just approve."
         right={<GreenBtn onClick={exportCsv}>Export for payroll (CSV)</GreenBtn>}
       />
@@ -163,7 +163,7 @@ export default function HoursPage() {
                     <td className="px-3 py-3 font-display text-[15px] font-extrabold text-ink">{hrs}</td>
                     <td className="px-3 py-3 text-right">
                       {p.approved ? (
-                        <Chip tone="mint">approved ✓</Chip>
+                        <Chip tone="mint">Approved ✓</Chip>
                       ) : (
                         <button
                           onClick={() => {
@@ -187,7 +187,7 @@ export default function HoursPage() {
         </div>
         {doneToday.some((p) => p.outMins! - p.inMins > 360 && p.breakMins < 30) && (
           <p className="mt-2.5 text-[12.5px] font-semibold text-ink/45">
-            ⚠︎ Over 6 hours with a short break. Some states require 30 minutes — worth a look before approving.
+            ⚠︎ Over 6 hours with a short break. Some states require 30 minutes, so give it a look before approving.
           </p>
         )}
       </section>
@@ -219,7 +219,7 @@ export default function HoursPage() {
             })}
         </div>
         <p className="mt-3 text-[12.5px] font-semibold text-ink/45">
-          Anyone in amber is close to 40. Tagout already won&apos;t offer them overtime — that&apos;s the house rule doing its job.
+          Anyone in amber is close to 40. Tagout already won&apos;t offer them overtime. That&apos;s the house rule doing its job.
         </p>
       </section>
     </div>

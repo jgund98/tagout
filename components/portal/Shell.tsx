@@ -5,16 +5,17 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { BubbleMark } from "@/components/Wordmark";
-import { usePortal, endDemoSession } from "@/lib/portal/store";
+import { usePortal, endDemoSession, needsYouCount } from "@/lib/portal/store";
 import { Avatar, LiveDot } from "./ui";
 
 const NAV = [
-  { href: "/portal", label: "Tonight", icon: "🌙" },
+  { href: "/portal", label: "Today", icon: "🏠" },
   { href: "/portal/coverage", label: "Coverage", icon: "💬" },
   { href: "/portal/schedule", label: "Schedule", icon: "🗓️" },
   { href: "/portal/team", label: "Team", icon: "👥" },
   { href: "/portal/hours", label: "Hours", icon: "⏱️" },
-  { href: "/portal/floor", label: "Floor", icon: "🍽️" },
+  { href: "/portal/inbox", label: "Inbox", icon: "🔔" },
+  { href: "/portal/floor", label: "Floor plan", icon: "🍽️" },
   { href: "/portal/rules", label: "House rules", icon: "🛡️" },
   { href: "/portal/settings", label: "Settings", icon: "⚙️" },
 ];
@@ -26,6 +27,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const unread = state.feed.filter((f) => f.fresh).length;
+  const needs = needsYouCount(state);
   const staffOf = (id: string | null) => state.staff.find((s) => s.id === id) ?? null;
 
   const logout = () => {
@@ -51,13 +53,18 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 <Link
                   key={n.href}
                   href={n.href}
-                  className={`flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-[14.5px] font-bold transition-colors ${
+                  className={`flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-[15px] font-bold transition-colors ${
                     active ? "bg-green text-ink" : "text-paper/65 hover:bg-paper/8 hover:text-paper"
                   }`}
                 >
                   <span aria-hidden className="text-[16px]">{n.icon}</span>
                   {n.label}
-                  {n.href === "/portal/coverage" && state.runs.some((r) => r.state === "live") && (
+                  {n.href === "/portal/coverage" && needs > 0 && (
+                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-coral px-1.5 text-[11px] font-extrabold text-white">
+                      {needs}
+                    </span>
+                  )}
+                  {n.href === "/portal/coverage" && needs === 0 && state.runs.some((r) => r.state === "live") && (
                     <LiveDot className="ml-auto" />
                   )}
                 </Link>
@@ -68,7 +75,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <p className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wide text-green">
               <LiveDot /> Tagout is on shift
             </p>
-            <p className="mt-1 text-[12px] leading-snug text-paper/60">
+            <p className="mt-1 font-display text-[14px] font-extrabold text-paper">(561) 555-8248</p>
+            <p className="mt-0.5 text-[12px] leading-snug text-paper/60">
               Text it like a person: <span className="font-bold text-paper/85">&ldquo;need a closer friday&rdquo;</span>
             </p>
           </div>
@@ -95,6 +103,14 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <span className="rounded-lg rounded-bl-[4px] bg-mint px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-green-dark">
               Demo mode
             </span>
+            {needs > 0 && (
+              <Link
+                href="/portal/coverage"
+                className="ml-1 flex items-center gap-1.5 rounded-full bg-coral px-3 py-1 text-[12px] font-extrabold text-white transition-transform hover:scale-[1.03]"
+              >
+                Needs you · {needs}
+              </Link>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -144,16 +160,35 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
             <div className="max-h-[50vh] space-y-1 overflow-y-auto">
-              {state.feed.slice(0, 12).map((f) => (
-                <div key={f.id} className="flex items-start gap-2.5 rounded-2xl p-2.5 hover:bg-cream">
-                  <Avatar person={staffOf(f.who)} size={30} />
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-bold leading-snug text-ink">{f.text}</p>
-                    <p className="text-[11.5px] font-semibold text-ink/40">{f.when}</p>
-                  </div>
-                </div>
-              ))}
+              {state.feed.slice(0, 12).map((f) => {
+                const href =
+                  f.kind === "clock" ? "/portal/hours"
+                  : f.kind === "swap" || f.kind === "onboard" ? "/portal/team"
+                  : f.kind === "rule" ? "/portal/rules"
+                  : "/portal/coverage";
+                return (
+                  <Link
+                    key={f.id}
+                    href={href}
+                    onClick={() => setNotifOpen(false)}
+                    className="flex items-start gap-2.5 rounded-2xl p-2.5 transition-colors hover:bg-cream"
+                  >
+                    <Avatar person={staffOf(f.who)} size={30} />
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-bold leading-snug text-ink">{f.text}</p>
+                      <p className="text-[11.5px] font-semibold text-ink/40">{f.when}</p>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
+            <Link
+              href="/portal/inbox"
+              onClick={() => setNotifOpen(false)}
+              className="mt-1 block rounded-2xl bg-ink py-2.5 text-center text-[13px] font-extrabold text-paper"
+            >
+              Open the full inbox →
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
@@ -173,18 +208,23 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <Link
               key={n.href}
               href={n.href}
-              className={`flex flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 text-[10px] font-extrabold ${
+              className={`relative flex flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 text-[11px] font-extrabold ${
                 active ? "bg-green text-ink" : "text-paper/60"
               }`}
             >
               <span className="text-[16px]" aria-hidden>{n.icon}</span>
               {n.label}
+              {n.href === "/portal/coverage" && needs > 0 && (
+                <span className="absolute -top-1 right-1 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-white">
+                  {needs}
+                </span>
+              )}
             </Link>
           );
         })}
         <button
           onClick={() => setMoreOpen(true)}
-          className={`flex flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 text-[10px] font-extrabold ${
+          className={`flex flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 text-[11px] font-extrabold ${
             pathname.startsWith("/portal/rules") || pathname.startsWith("/portal/settings") || pathname.startsWith("/portal/floor")
               ? "bg-green text-ink"
               : "text-paper/60"
@@ -215,7 +255,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
             >
               <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-ink/15" />
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {NAV.slice(5).map((n) => (
                   <Link
                     key={n.href}
