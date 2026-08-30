@@ -172,7 +172,36 @@ const SCRIPTS: Script[] = [
     },
     { beat: { kind: "pill", text: "Covered in 7 min. No app was opened" }, wait: 4200 },
   ],
-  // 2 — the 6 AM sick call
+  // 2 — the manager, on the fly, mid-shift
+  [
+    {
+      beat: { kind: "them", text: <>down a busser tonight. who&apos;s off right now?</> },
+      wait: 2000,
+    },
+    { beat: { kind: "typing", align: "left" }, wait: 1500 },
+    {
+      beat: {
+        kind: "tag",
+        text: (
+          <>
+            Off tonight and under 40: Devon (26 hrs), Alex (31), Sam (33). Devon&apos;s
+            covered last-minute twice this month. Text him first?
+          </>
+        ),
+      },
+      wait: 2800,
+    },
+    { beat: { kind: "them", text: <>yes go</> }, wait: 1400 },
+    {
+      beat: {
+        kind: "tag",
+        text: <>On it. If nobody bites in 15 minutes, you get their numbers to&nbsp;dial.</>,
+      },
+      wait: 2200,
+    },
+    { beat: { kind: "pill", text: "6:12 PM: Devon's in. There by 6:45" }, wait: 4200 },
+  ],
+  // 3 — the 6 AM call-out
   [
     {
       beat: {
@@ -194,7 +223,7 @@ const SCRIPTS: Script[] = [
     },
     { beat: { kind: "pill", text: "Covered 6:41 AM, GM still asleep" }, wait: 4200 },
   ],
-  // 3 — staff-initiated swap
+  // 4 — staff-initiated swap
   [
     {
       beat: { kind: "them", text: <>can I swap my Saturday? it&apos;s my mom&apos;s birthday 🎂</> },
