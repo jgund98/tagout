@@ -26,6 +26,7 @@ export default function SettingsPage() {
           <dl className="mt-3 space-y-2.5 text-[14px]">
             {[
               ["Name", state.houseName],
+              ["Address", "428 Clematis St, West Palm Beach, FL"],
               ["Timezone", "Eastern Time (ET)"],
               ["Service hours", "11:00 AM – 12:00 AM"],
               ["Tagout's number", "(561) 555-8248"],
@@ -81,7 +82,8 @@ export default function SettingsPage() {
           <div className="mt-3 flex items-center justify-between rounded-2xl bg-cream px-4 py-3">
             <div>
               <p className="text-[14px] font-extrabold text-ink">{state.houseName}</p>
-              <p className="text-[13px] font-semibold text-ink/45">12 on the roster · you&apos;re the GM</p>
+              <p className="text-[13px] font-semibold text-ink/55">428 Clematis St, West Palm Beach, FL</p>
+              <p className="mt-0.5 text-[12.5px] font-semibold text-ink/40">{state.staff.length} team members</p>
             </div>
             <Chip tone="mint">Current</Chip>
           </div>
