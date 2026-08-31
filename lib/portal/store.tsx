@@ -154,7 +154,10 @@ export function needsYouCount(state: PortalState): number {
   const approval = state.runs.some((r) => r.state === "live" && r.outcome?.includes("needs your approval")) ? 1 : 0;
   const cards = state.punches.filter((p) => p.outAt !== null && !p.approved).length;
   const timeOff = state.timeOff.filter((t) => t.state === "pending").length;
-  return approval + cards + timeOff;
+  const claims = state.claims.filter((c) =>
+    state.shifts.some((s) => s.id === c.shiftId && s.state === "open")
+  ).length;
+  return approval + cards + timeOff + claims;
 }
 
 /** "5:00 PM" <-> "17:00" for native time inputs */

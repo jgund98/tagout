@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePortal, uid } from "@/lib/portal/store";
 import { Avatar, Burst, Chip, LiveDot, GreenBtn, GhostBtn, PageTitle, TagBubble, ThemBubble } from "@/components/portal/ui";
-import type { CoverageRun } from "@/lib/portal/data";
+import { DAYS, type CoverageRun } from "@/lib/portal/data";
 
 const MODES = [
   { key: "suggest", label: "Suggest only", plain: "Tagout ranks the list and drafts the texts. Nothing sends until you say go." },
@@ -21,10 +21,43 @@ export default function CoveragePage() {
 
   const liveRun = state.runs.find((r) => r.state === "live");
   const needsApproval = liveRun?.outcome?.includes("needs your approval");
-  const pendingCards = state.punches.filter((p) => p.outAt !== null && !p.approved).length;
-  const pendingTimeOff = state.timeOff.filter((t) => t.state === "pending").length;
-  const needsYou =
-    (needsApproval ? 1 : 0) + pendingCards + pendingTimeOff;
+  const cardsToApprove = state.punches.filter((p) => p.outAt !== null && !p.approved);
+  const offToDecide = state.timeOff.filter((t) => t.state === "pending");
+  const claimsToDecide = state.claims
+    .map((c) => ({ claim: c, shift: state.shifts.find((s) => s.id === c.shiftId) }))
+    .filter((x) => x.shift && x.shift.state === "open");
+  const pendingCards = cardsToApprove.length;
+  const pendingTimeOff = offToDecide.length;
+  const needsYou = (needsApproval ? 1 : 0) + pendingCards + pendingTimeOff + claimsToDecide.length;
+
+  const decideOff = (t: (typeof offToDecide)[number], verdict: "approved" | "denied") => {
+    const p = staffOf(t.staffId);
+    dispatch({ type: "TIMEOFF", id: t.id, state: verdict });
+    dispatch({
+      type: "FEED_PUSH",
+      event: { id: uid("f"), kind: "swap", who: t.staffId, text: `You ${verdict === "approved" ? "approved" : "declined"} ${p?.first}'s time off (${t.range})`, sub: `${p?.first} got a text with the answer`, when: "Just now" },
+    });
+  };
+
+  const approveCard = (id: string) => {
+    const punch = state.punches.find((p) => p.id === id);
+    const p = staffOf(punch?.staffId);
+    dispatch({ type: "PUNCH_PATCH", id, patch: { approved: true } });
+    dispatch({
+      type: "FEED_PUSH",
+      event: { id: uid("f"), kind: "clock", who: punch?.staffId ?? null, text: `You approved ${p?.first}'s timecard`, sub: "ready for payroll", when: "Just now" },
+    });
+  };
+
+  const grantClaim = (shiftId: string, staffId: string) => {
+    const p = staffOf(staffId);
+    dispatch({ type: "SHIFT_CLAIM", shiftId, staffId });
+    dispatch({ type: "CLAIM_CANCEL", shiftId, staffId });
+    dispatch({
+      type: "FEED_PUSH",
+      event: { id: uid("f"), kind: "cover", who: staffId, text: `${p?.first} got the open shift`, sub: "board updated · confirmed by text", when: "Just now" },
+    });
+  };
 
   const approve = () => {
     setBurst(true);
@@ -107,31 +140,79 @@ export default function CoveragePage() {
               </GreenBtn>
             </div>
           )}
-          {pendingCards > 0 && (
-            <Link href="/portal/hours" className="flex items-center gap-3 rounded-2xl bg-paper/8 p-3.5 transition-colors hover:bg-paper/12">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-butter text-[16px]">⏱️</span>
-              <div className="flex-1">
-                <p className="text-[14px] font-bold text-paper">{pendingCards} timecard{pendingCards > 1 ? "s" : ""} to approve</p>
-                <p className="text-[12px] font-semibold text-paper/50">from today&apos;s clock-outs</p>
+          {claimsToDecide.map(({ claim, shift }) => {
+            const p = staffOf(claim.staffId);
+            return (
+              <div key={claim.shiftId + claim.staffId} className="rounded-2xl bg-paper/8 p-3.5 sm:flex sm:items-center sm:gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <Avatar person={p} size={36} />
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-bold leading-snug text-paper">
+                      {p?.first} wants the open {DAYS[shift!.day]} {shift!.role.toLowerCase()} shift
+                    </p>
+                    <p className="text-[12px] font-semibold text-paper/50">
+                      {shift!.start}–{shift!.end} · first request wins
+                    </p>
+                  </div>
+                </div>
+                <GreenBtn className="mt-3 w-full sm:mt-0 sm:w-auto sm:shrink-0" onClick={() => grantClaim(claim.shiftId, claim.staffId)}>
+                  Give it to {p?.first ?? "them"}
+                </GreenBtn>
               </div>
-              <span className="shrink-0 text-[12px] font-bold text-paper/40">Review in Hours →</span>
-            </Link>
-          )}
-          {pendingTimeOff > 0 && (
-            <Link href="/portal/team" className="flex items-center gap-3 rounded-2xl bg-paper/8 p-3.5 transition-colors hover:bg-paper/12">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-lav text-[16px]">🌴</span>
-              <div className="flex-1">
-                <p className="text-[14px] font-bold text-paper">{pendingTimeOff} time-off request{pendingTimeOff > 1 ? "s" : ""} waiting</p>
-                <p className="truncate text-[12px] font-semibold text-paper/50">
-                  {state.timeOff
-                    .filter((t) => t.state === "pending")
-                    .map((t) => `${staffOf(t.staffId)?.first ?? "Someone"} (${t.range})`)
-                    .join(", ")}
-                </p>
+            );
+          })}
+          {offToDecide.map((t) => {
+            const p = staffOf(t.staffId);
+            return (
+              <div key={t.id} className="rounded-2xl bg-paper/8 p-3.5 sm:flex sm:items-center sm:gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <Avatar person={p} size={36} />
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-bold leading-snug text-paper">
+                      {p?.first} requested {t.range} off
+                    </p>
+                    <p className="truncate text-[12px] font-semibold text-paper/50">{t.reason}</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex gap-2 sm:mt-0 sm:shrink-0">
+                  <button
+                    onClick={() => decideOff(t, "approved")}
+                    className="flex-1 rounded-full bg-green px-4 py-2 text-[13px] font-extrabold text-ink transition-transform hover:scale-[1.02] sm:flex-none"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => decideOff(t, "denied")}
+                    className="flex-1 rounded-full border-2 border-paper/20 px-4 py-2 text-[13px] font-extrabold text-paper/70 hover:border-paper/50 hover:text-paper sm:flex-none"
+                  >
+                    Decline
+                  </button>
+                </div>
               </div>
-              <span className="shrink-0 text-[12px] font-bold text-paper/40">Review in Team →</span>
-            </Link>
-          )}
+            );
+          })}
+          {cardsToApprove.map((punch) => {
+            const p = staffOf(punch.staffId);
+            const hrs = ((punch.outMins! - punch.inMins - punch.breakMins) / 60).toFixed(1);
+            return (
+              <div key={punch.id} className="rounded-2xl bg-paper/8 p-3.5 sm:flex sm:items-center sm:gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <Avatar person={p} size={36} />
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-bold leading-snug text-paper">
+                      {p?.first}&apos;s timecard · {hrs} hrs
+                    </p>
+                    <p className="text-[12px] font-semibold text-paper/50">
+                      {punch.inAt} – {punch.outAt} · {punch.breakMins} min break
+                    </p>
+                  </div>
+                </div>
+                <GreenBtn className="mt-3 w-full sm:mt-0 sm:w-auto sm:shrink-0" onClick={() => approveCard(punch.id)}>
+                  Approve
+                </GreenBtn>
+              </div>
+            );
+          })}
           {needsYou === 0 && (
             <div className="rounded-2xl bg-paper/8 p-4 text-center">
               <p className="text-[14px] font-bold text-paper">All caught up</p>
