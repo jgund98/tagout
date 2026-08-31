@@ -373,6 +373,9 @@ export default function AdminPage() {
             <span className="rounded-lg rounded-bl-[4px] bg-pine px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-paper">
               Internal
             </span>
+            <span className="rounded-lg rounded-bl-[4px] bg-mint px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-green-dark">
+              Demo mode
+            </span>
             <PovSwitch current="admin" />
           </div>
           <div className="flex items-center gap-2">

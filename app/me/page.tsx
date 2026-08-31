@@ -320,6 +320,9 @@ export default function MePage() {
           <div className="hidden items-center gap-2 lg:flex">
             <p className="font-display text-[15px] font-extrabold text-ink">{state.houseName}</p>
             <span className="rounded-lg rounded-bl-[4px] bg-mint px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-green-dark">
+              Demo mode
+            </span>
+            <span className="rounded-lg rounded-bl-[4px] bg-lav px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-violet-mid">
               Staff
             </span>
           </div>
