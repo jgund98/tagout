@@ -550,33 +550,33 @@ function ShiftEditor({
           })}
         </div>
         <div className="mt-3 grid grid-cols-2 gap-3">
-          <label className="block">
+          <label className="block min-w-0">
             <span className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">Starts</span>
             <input
               type="time"
               step={900}
               value={to24h(start)}
               onChange={(e) => e.target.value && setStart(from24h(e.target.value))}
-              className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green"
+              className="mt-1 block h-11 w-full min-w-0 appearance-none rounded-xl border-2 border-ink/10 bg-white px-3 text-[14px] font-bold text-ink outline-none focus:border-green [&::-webkit-date-and-time-value]:text-left"
             />
           </label>
-          <label className="block">
+          <label className="block min-w-0">
             <span className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">Ends</span>
             <input
               type="time"
               step={900}
               value={to24h(end)}
               onChange={(e) => e.target.value && setEnd(from24h(e.target.value))}
-              className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green"
+              className="mt-1 block h-11 w-full min-w-0 appearance-none rounded-xl border-2 border-ink/10 bg-white px-3 text-[14px] font-bold text-ink outline-none focus:border-green [&::-webkit-date-and-time-value]:text-left"
             />
           </label>
-          <label className="block">
+          <label className="block min-w-0">
             <span className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">Working as</span>
             <select value={role} onChange={(e) => setRole(e.target.value as Role)} className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green">
               {(["Server", "Bartender", "Host", "Line cook", "Prep", "Busser", "Manager"] as Role[]).map((r) => <option key={r}>{r}</option>)}
             </select>
           </label>
-          <label className="block">
+          <label className="block min-w-0">
             <span className="text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">Section</span>
             <select value={section} onChange={(e) => setSection(e.target.value)} className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green">
               <option value="">—</option>
