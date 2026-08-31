@@ -51,6 +51,8 @@ export type Punch = {
 };
 
 export type RunStep = { label: string; detail?: string; state: "done" | "live" | "todo"; at?: string };
+// who = the staff member on the other end of this text (or "you" for the GM);
+// a tag bubble without who is a group blast
 export type Bubble = { from: "tag" | "them"; who?: string; text: string };
 export type CoverageRun = {
   id: string;
@@ -133,7 +135,7 @@ export type Fixture = {
 };
 export type RotationMode = "even" | "seniority" | "training";
 
-export const SEED_VERSION = 7;
+export const SEED_VERSION = 8;
 
 export type PortalState = {
   v: number;
@@ -247,7 +249,7 @@ export function makeSeed(): PortalState {
       title: "Friday close · Dana dropped it",
       sub: "5–11 PM server shift, Main dining",
       state: "live",
-      when: "Started 4:41 PM",
+      when: "Fri Aug 29 · started 4:41 PM",
       steps: [
         { label: "Dana dropped Friday close", detail: "reason: sitter fell through", state: "done", at: "4:41 PM" },
         { label: "Ranked everyone eligible", detail: "6 can work it · sorted by hours, availability, yes-rate", state: "done", at: "4:41 PM" },
@@ -256,7 +258,7 @@ export function makeSeed(): PortalState {
         { label: "You approve, board updates", state: "todo" },
       ],
       thread: [
-        { from: "tag", text: "Hey Marisa, it's Tagout for Harbor & Vine. Dana dropped Friday close, 5–11 PM. You'd end the week at 37 hrs. Want it?" },
+        { from: "tag", who: "marisa", text: "Hey Marisa, it's Tagout for Harbor & Vine. Dana dropped Friday close, 5–11 PM. You'd end the week at 37 hrs. Want it?" },
       ],
     },
     {
@@ -264,17 +266,17 @@ export function makeSeed(): PortalState {
       title: "Sunday brunch host · covered",
       sub: "Erin's swap, caught before publish",
       state: "covered",
-      when: "Yesterday",
+      when: "Thu Aug 28 · 5:03 PM",
       outcome: "Covered in 11 min · Katie confirmed",
       steps: [
-        { label: "Erin asked to swap Sunday", detail: "family thing", state: "done" },
-        { label: "Katie said yes", detail: "2nd ask · stayed under 40", state: "done" },
-        { label: "You tapped Approve", detail: "board updated, both got confirmations", state: "done" },
+        { label: "Erin asked to swap Sunday", detail: "family thing", state: "done", at: "5:03 PM" },
+        { label: "Katie said yes", detail: "2nd ask · stayed under 40", state: "done", at: "5:11 PM" },
+        { label: "You tapped Approve", detail: "board updated, both got confirmations", state: "done", at: "5:14 PM" },
       ],
       thread: [
         { from: "them", who: "erin", text: "any chance i can swap sunday? family thing 🙏" },
-        { from: "tag", text: "On it. Checking who's free and under hours." },
-        { from: "tag", text: "Katie can take Sunday if you cover her Tuesday close. Deal?" },
+        { from: "tag", who: "erin", text: "On it. Checking who's free and under hours." },
+        { from: "tag", who: "erin", text: "Katie can take Sunday if you cover her Tuesday close. Deal?" },
         { from: "them", who: "erin", text: "deal!! thank you" },
       ],
     },
@@ -283,18 +285,18 @@ export function makeSeed(): PortalState {
       title: "Sunday brunch server · handed to you",
       sub: "7 AM server shift · all 5 eligible passed",
       state: "handed-off",
-      when: "Last Sunday",
+      when: "Sun Aug 24 · 6:58 AM",
       outcome: "All 5 eligible passed · you got the dial list at 8:12 AM · you called Rosa, marked it covered",
       steps: [
-        { label: "Priya's old shift opened when she left", detail: "7 AM Sunday, brunch server", state: "done" },
-        { label: "Asked all 5 eligible, one at a time", detail: "4 passed, 1 never answered", state: "done" },
-        { label: "Handed you the dial list, early", detail: "names + numbers at 8:12 AM, not 10:55", state: "done" },
-        { label: "You called Rosa, marked it covered", detail: "Tagout confirmed her by text and updated the board", state: "done" },
+        { label: "Priya's old shift opened when she left", detail: "7 AM Sunday, brunch server", state: "done", at: "6:58 AM" },
+        { label: "Asked all 5 eligible, one at a time", detail: "4 passed, 1 never answered", state: "done", at: "7:46 AM" },
+        { label: "Handed you the dial list, early", detail: "names + numbers, not at the last minute", state: "done", at: "8:12 AM" },
+        { label: "You called Rosa, marked it covered", detail: "Tagout confirmed her by text and updated the board", state: "done", at: "8:31 AM" },
       ],
       thread: [
-        { from: "tag", text: "Heads-up: I've asked everyone eligible for Sunday brunch and nobody can take it. Here's your dial list: Rosa (561) 555-0195 · Sam (561) 555-0163 · Katie (561) 555-0177. Reply COVERED <name> when someone's in." },
+        { from: "tag", who: "you", text: "Heads-up: I've asked everyone eligible for Sunday brunch and nobody can take it. Here's your dial list: Rosa (561) 555-0195 · Sam (561) 555-0163 · Katie (561) 555-0177. Reply COVERED <name> when someone's in." },
         { from: "them", who: "you", text: "covered rosa" },
-        { from: "tag", text: "Got it. Rosa's on Sunday 10–4, board's updated, and she just got her confirmation. Nice save 🤝" },
+        { from: "tag", who: "you", text: "Got it. Rosa's on Sunday 10–4, board's updated, and she just got her confirmation. Nice save 🤝" },
       ],
     },
     {
@@ -302,17 +304,17 @@ export function makeSeed(): PortalState {
       title: "Tuesday patio · voluntary cut",
       sub: "Rain flipped the forecast",
       state: "covered",
-      when: "Tuesday",
+      when: "Tue Aug 26 · 3:40 PM",
       outcome: "2 volunteers in 9 min · saved about $118 in labor",
       steps: [
-        { label: "Rain forecast for service", detail: "patio covers projected to drop", state: "done" },
-        { label: "Offered voluntary cuts", detail: "first replies win, nobody forced", state: "done" },
-        { label: "Jake & Devon took the night", state: "done" },
+        { label: "Rain forecast for service", detail: "patio covers projected to drop", state: "done", at: "3:40 PM" },
+        { label: "Offered voluntary cuts", detail: "first replies win, nobody forced", state: "done", at: "3:42 PM" },
+        { label: "Jake & Devon took the night", state: "done", at: "3:51 PM" },
       ],
       thread: [
         { from: "tag", text: "Rain tonight and the patio's booked light. Anyone want the evening off? Two spots, first come." },
         { from: "them", who: "jake", text: "me 🙋" },
-        { from: "tag", text: "You got it. Enjoy the night, Jake." },
+        { from: "tag", who: "jake", text: "You got it. Enjoy the night, Jake." },
       ],
     },
   ];

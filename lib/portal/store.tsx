@@ -457,7 +457,8 @@ function buildTimeline(): Cue[] {
       run: (d) => {
         d({ type: "RUN_STEP", runId: "r-live", stepIndex: 2, state: "done", detail: "Marisa passed (dentist)" });
         d({ type: "RUN_STEP", runId: "r-live", stepIndex: 3, state: "live", detail: "texting Sasha now · 30 hrs, free tonight" });
-        d({ type: "RUN_BUBBLE", runId: "r-live", bubble: { from: "tag", text: "All good, feel better! (Now texting Sasha)" } });
+        d({ type: "RUN_BUBBLE", runId: "r-live", bubble: { from: "tag", who: "marisa", text: "All good, feel better!" } });
+        d({ type: "RUN_BUBBLE", runId: "r-live", bubble: { from: "tag", who: "sasha", text: "Hey Sasha, it's Tagout for Harbor & Vine. Dana dropped Friday close, 5–11 PM. You'd be at 36 hrs. Want it?" } });
         d(F({ kind: "cover", who: "sasha", text: "Tagout moved to Sasha, 2nd of 6 on the list", sub: "asked in order, one at a time", when: "Just now" }));
       },
     },

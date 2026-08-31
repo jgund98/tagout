@@ -370,7 +370,7 @@ export default function MePage() {
       </header>
 
       <main className="px-4 pt-6 sm:px-6 lg:pl-[288px] lg:pr-8">
-        <div className="mx-auto w-full max-w-[640px] lg:mx-0 lg:max-w-2xl">
+        <div className="mx-auto w-full max-w-[640px] lg:max-w-3xl">
         <AnimatePresence mode="wait">
           <motion.div
             key={tab}
@@ -491,7 +491,7 @@ export default function MePage() {
                       <LiveDot /> Tagout texted you · {liveRun.steps.find((s) => s.state === "live")?.at ?? "just now"}
                     </p>
                     <div className="mt-3 space-y-2 rounded-2xl bg-cream/70 p-3">
-                      {liveRun.thread.filter((b) => b.from === "tag").slice(-2).map((b, i) => (
+                      {liveRun.thread.filter((b) => b.from === "tag" && b.who === me.id).slice(-2).map((b, i) => (
                         <TagBubble key={i}>{b.text}</TagBubble>
                       ))}
                       {offerState === "yes" && <ThemBubble>Yes, I&apos;ll take it 🙌</ThemBubble>}

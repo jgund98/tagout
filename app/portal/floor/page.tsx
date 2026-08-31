@@ -289,49 +289,52 @@ export default function FloorPage() {
           </button>
         )}
         {roomFixtures.map((f) => (
-          <motion.div
-            // position in the key: committing a move remounts with a clean
-            // transform, so the piece never double-applies the drag offset
+          // the static wrapper owns position + centering; the inner motion node
+          // owns the drag transform. Framer replaces `transform` while dragging,
+          // so centering must never live on the dragged element itself.
+          <div
             key={`${f.id}:${f.x}:${f.y}`}
-            drag
-            dragMomentum={false}
-            dragElastic={0}
-            onDragStart={() => (draggedRef.current = true)}
-            onDragEnd={(_, info) => {
-              const p = dropAt(f, info);
-              if (p) dispatch({ type: "FIXTURE_PATCH", id: f.id, patch: p });
-              setTimeout(() => (draggedRef.current = false), 50);
-            }}
-            onDoubleClick={() => !draggedRef.current && setEditingFx(f)}
-            whileDrag={{ scale: 1.03, zIndex: 25 }}
-            className={`absolute flex cursor-grab items-center justify-center rounded-2xl border ${
-              f.kind === "Bar counter" ? "border-pine bg-pine/90" : "border-ink/10 bg-ink/[0.05]"
-            }`}
-            style={{
-              width: `${f.w}%`,
-              height: `${f.h}%`,
-              left: `${f.x}%`,
-              top: `${f.y}%`,
-              transform: "translate(-50%, -50%)",
-            }}
-            title={`${f.kind} · drag to move, double-tap to edit`}
+            className="absolute -translate-x-1/2 -translate-y-1/2"
+            style={{ width: `${f.w}%`, height: `${f.h}%`, left: `${f.x}%`, top: `${f.y}%` }}
           >
-            <span
-              className={`px-1 text-center text-[10px] font-extrabold uppercase tracking-wider ${
-                f.kind === "Bar counter" ? "text-paper/80" : "text-ink/35"
+            <motion.div
+              drag
+              dragMomentum={false}
+              dragElastic={0}
+              onDragStart={() => (draggedRef.current = true)}
+              onDragEnd={(_, info) => {
+                const p = dropAt(f, info);
+                if (p) dispatch({ type: "FIXTURE_PATCH", id: f.id, patch: p });
+                setTimeout(() => (draggedRef.current = false), 50);
+              }}
+              onDoubleClick={() => !draggedRef.current && setEditingFx(f)}
+              whileDrag={{ zIndex: 25 }}
+              className={`flex h-full w-full cursor-grab items-center justify-center rounded-2xl border ${
+                f.kind === "Bar counter" ? "border-pine bg-pine/90" : "border-ink/10 bg-ink/[0.05]"
               }`}
+              title={`${f.kind} · drag to move, double-tap to edit`}
             >
-              {f.kind}
-            </span>
-          </motion.div>
+              <span
+                className={`px-1 text-center text-[10px] font-extrabold uppercase tracking-wider ${
+                  f.kind === "Bar counter" ? "text-paper/80" : "text-ink/35"
+                }`}
+              >
+                {f.kind}
+              </span>
+            </motion.div>
+          </div>
         ))}
 
         {roomTables.map((t) => {
           const sec = SECTIONS.find((s) => s.name === t.section) ?? SECTIONS[0];
           const { w, ratio } = sizeFor(t);
           return (
-            <motion.button
+            <div
               key={`${t.id}:${t.x}:${t.y}`}
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{ width: `${w}%`, aspectRatio: String(ratio), left: `${t.x}%`, top: `${t.y}%` }}
+            >
+            <motion.button
               drag
               dragMomentum={false}
               dragElastic={0}
@@ -342,16 +345,11 @@ export default function FloorPage() {
                 setTimeout(() => (draggedRef.current = false), 50);
               }}
               onDoubleClick={() => !draggedRef.current && setEditing(t)}
-              whileDrag={{ scale: 1.06, zIndex: 30 }}
-              className={`absolute flex cursor-grab flex-col items-center justify-center border-2 border-white shadow-[0_2px_10px_rgb(15_21_18/0.14)] ${
+              whileDrag={{ zIndex: 30 }}
+              className={`flex h-full w-full cursor-grab flex-col items-center justify-center border-2 border-white shadow-[0_2px_10px_rgb(15_21_18/0.14)] ${
                 t.shape === "round" || t.shape === "hightop" ? "rounded-full" : t.shape === "booth" ? "rounded-xl" : "rounded-lg"
               }`}
               style={{
-                width: `${w}%`,
-                aspectRatio: String(ratio),
-                left: `${t.x}%`,
-                top: `${t.y}%`,
-                transform: "translate(-50%, -50%)",
                 background: sec.soft,
                 ...(t.shape === "hightop" ? { boxShadow: `0 0 0 3px ${sec.fill}44, 0 2px 10px rgb(15 21 18 / 0.14)` } : {}),
               }}
@@ -369,6 +367,7 @@ export default function FloorPage() {
                 </span>
               )}
             </motion.button>
+            </div>
           );
         })}
       </div>

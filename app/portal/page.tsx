@@ -191,8 +191,13 @@ export default function TonightPage() {
 
   const feed = state.feed.filter((f) => (filter === "all" ? true : f.kind === filter));
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  // the demo world is frozen on Friday evening; the greeting matches it
+  const greeting = "Good evening";
+
+  // tomorrow's tile is computed, never asserted: staffed count, open gaps, events
+  const tmrwStaffed = state.shifts.filter((s) => s.day === 5 && s.state !== "open").length;
+  const tmrwOpen = state.shifts.filter((s) => s.day === 5 && s.state === "open").length;
+  const tmrwEvents = state.events.filter((e) => e.day === 5);
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -226,7 +231,16 @@ export default function TonightPage() {
         <StatTile label="Coverage" value={liveRun ? "1 gap" : "100%"} sub={liveRun ? "Tagout's working it" : "every shift confirmed"} tone="mint" live={!!liveRun} />
         <StatTile label="On the clock" value={onClock.length} sub="live time clock" tone="white" live />
         <StatTile label="Labor tonight" value={"$" + Math.round(laborTonight).toLocaleString()} sub="as scheduled" tone="butter" />
-        <StatTile label="Tomorrow" value="Ready" sub="45-top at 7 · staffed +2" tone="lav" />
+        <StatTile
+          label="Tomorrow"
+          value={tmrwOpen > 0 ? `${tmrwOpen} open` : "Set"}
+          sub={
+            tmrwEvents.length
+              ? `${tmrwStaffed} on the board · ${tmrwEvents.map((e) => e.label).join(" · ")}`
+              : `${tmrwStaffed} on the board`
+          }
+          tone={tmrwOpen > 0 ? "butter" : "lav"}
+        />
       </div>
 
       {/* the week's labor, computed from real shifts and real rates */}

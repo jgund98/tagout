@@ -341,10 +341,13 @@ function RunCard({
                       >
                         {s.state === "done" ? "✓" : i + 1}
                       </span>
-                      <p className={`text-[13.5px] font-semibold leading-snug ${s.state === "todo" ? "text-ink/35" : "text-ink"}`}>
+                      <p className={`min-w-0 flex-1 text-[13.5px] font-semibold leading-snug ${s.state === "todo" ? "text-ink/35" : "text-ink"}`}>
                         {s.label}
                         {s.detail && <span className="block text-[12px] font-medium text-ink/45">{s.detail}</span>}
                       </p>
+                      {s.at && (
+                        <span className="shrink-0 pt-0.5 text-[11px] font-bold tabular-nums text-ink/35">{s.at}</span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -360,16 +363,35 @@ function RunCard({
                   Messages
                 </p>
                 <div className="space-y-2">
-                  {run.thread.map((b, i) =>
-                    b.from === "tag" ? (
-                      <TagBubble key={i}>{b.text}</TagBubble>
-                    ) : (
-                      <div key={i} className="flex items-end justify-end gap-1.5">
-                        <ThemBubble>{b.text}</ThemBubble>
-                        {b.who && b.who !== "you" && <Avatar person={staffOf(b.who)} size={22} />}
-                      </div>
-                    )
-                  )}
+                  {(() => {
+                    let current: string | null = null;
+                    return run.thread.map((b, i) => {
+                      const person = b.who && b.who !== "you" ? b.who : null;
+                      const divider = !!person && person !== current;
+                      if (person) current = person;
+                      const p = person ? staffOf(person) : null;
+                      return (
+                        <div key={i}>
+                          {divider && (
+                            <div className={`flex items-center justify-center gap-1.5 pb-1.5 ${i > 0 ? "pt-3" : ""}`}>
+                              <Avatar person={p} size={18} />
+                              <span className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-ink/40">
+                                With {p?.first}
+                              </span>
+                            </div>
+                          )}
+                          {b.from === "tag" ? (
+                            <TagBubble>{b.text}</TagBubble>
+                          ) : (
+                            <div className="flex items-end justify-end gap-1.5">
+                              <ThemBubble>{b.text}</ThemBubble>
+                              {b.who && b.who !== "you" && <Avatar person={staffOf(b.who)} size={22} />}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             </div>
