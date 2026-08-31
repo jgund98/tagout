@@ -510,7 +510,7 @@ export default function AdminPage() {
 
               <div className="mt-5 space-y-2 text-[13.5px] font-semibold text-ink/60">
                 <p className="flex justify-between"><span>GM</span><span className="font-extrabold text-ink">{openClient.gm}</span></p>
-                <p className="flex justify-between"><span>GM phone</span><span className="font-extrabold text-ink">{openClient.gmPhone}</span></p>
+                <p className="flex justify-between"><span>GM phone</span><a href={`tel:${openClient.gmPhone.replace(/\D/g, "")}`} className="font-extrabold text-green-deep">{openClient.gmPhone}</a></p>
                 <p className="flex justify-between"><span>Tagout number</span><span className="font-extrabold text-ink">{openClient.number ?? "provisioning"}</span></p>
                 <p className="flex justify-between"><span>Last activity</span><span className="font-extrabold text-ink">{openClient.lastActive}</span></p>
               </div>

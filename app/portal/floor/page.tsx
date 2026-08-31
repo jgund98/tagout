@@ -45,6 +45,7 @@ export default function FloorPage() {
   // the full-screen editor owns the viewport: nothing scrolls behind it
   useEffect(() => {
     if (!expanded) return;
+    window.getSelection()?.removeAllRanges();
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
@@ -181,10 +182,11 @@ export default function FloorPage() {
       <div
         className={
           expanded
-            ? "fixed inset-0 z-50 flex flex-col overflow-hidden bg-cream px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]"
+            ? "no-touch-menus fixed inset-0 z-50 flex flex-col overflow-hidden bg-cream px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]"
             : ""
         }
         style={expanded ? { paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" } : undefined}
+        onContextMenu={expanded ? (e) => e.preventDefault() : undefined}
       >
       <div className={`flex items-center justify-between gap-2 ${expanded ? "" : "mt-5"}`}>
         <div className="no-scrollbar flex max-w-full overflow-x-auto rounded-full bg-white p-1 shadow-pop">
@@ -262,7 +264,7 @@ export default function FloorPage() {
       {/* the room canvas */}
       <div
         ref={canvasRef}
-        className={`relative mt-3 w-full touch-none select-none overflow-hidden rounded-[28px] border border-ink/8 bg-white shadow-pop ${
+        className={`no-touch-menus relative mt-3 w-full touch-none select-none overflow-hidden rounded-[28px] border border-ink/8 bg-white shadow-pop ${
           expanded ? "min-h-0 flex-1" : "aspect-[16/10] sm:aspect-[16/9]"
         }`}
         style={{

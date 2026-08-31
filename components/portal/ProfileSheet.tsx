@@ -64,12 +64,20 @@ export default function ProfileSheet({ person, onClose }: { person: Staff; onClo
               ))}
             </div>
           </div>
-          <a
-            href={`sms:${p.phone.replace(/\D/g, "")}`}
-            className="shrink-0 rounded-full bg-green px-4 py-2.5 text-[13.5px] font-extrabold text-ink"
-          >
-            Text
-          </a>
+          <div className="flex shrink-0 flex-col gap-1.5 sm:flex-row">
+            <a
+              href={`tel:${p.phone.replace(/\D/g, "")}`}
+              className="rounded-full bg-green px-4 py-2 text-center text-[13px] font-extrabold text-ink"
+            >
+              Call
+            </a>
+            <a
+              href={`sms:${p.phone.replace(/\D/g, "")}`}
+              className="rounded-full border-2 border-ink/10 px-4 py-2 text-center text-[13px] font-extrabold text-ink/60 transition-colors hover:border-green hover:text-green-deep"
+            >
+              Text
+            </a>
+          </div>
         </div>
 
         {/* what Tagout has learned */}

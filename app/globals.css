@@ -69,6 +69,15 @@ html {
   }
 }
 
+/* editors full of draggable things: no text selection, no long-press callout —
+   a stray highlight on iOS swallows every tap after it */
+.no-touch-menus,
+.no-touch-menus * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 body {
   background: var(--color-cream);
   color: var(--color-ink);
