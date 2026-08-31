@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePortal, needsYouCount } from "@/lib/portal/store";
 import { Avatar, Chip, PageTitle, GhostBtn } from "@/components/portal/ui";
@@ -16,14 +17,26 @@ const KIND_META: Record<FeedEvent["kind"], { chip: string; tone: "mint" | "lav" 
 
 const isPast = (w: string) => w === "Yesterday" || w === "Tuesday" || w === "Last Sunday";
 
+const FILTERS: { key: "all" | FeedEvent["kind"]; label: string }[] = [
+  { key: "all", label: "Everything" },
+  { key: "cover", label: "Coverage" },
+  { key: "swap", label: "Swaps" },
+  { key: "clock", label: "Time clock" },
+  { key: "headsup", label: "Heads-ups" },
+  { key: "onboard", label: "New crew" },
+  { key: "rule", label: "House rules" },
+];
+
 export default function InboxPage() {
   const { state, dispatch } = usePortal();
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]["key"]>("all");
   const staffOf = (id: string | null) => state.staff.find((s) => s.id === id) ?? null;
   const unread = state.feed.filter((f) => f.fresh).length;
   const needs = needsYouCount(state);
 
-  const today = state.feed.filter((f) => !isPast(f.when));
-  const earlier = state.feed.filter((f) => isPast(f.when));
+  const shown = filter === "all" ? state.feed : state.feed.filter((f) => f.kind === filter);
+  const today = shown.filter((f) => !isPast(f.when));
+  const earlier = shown.filter((f) => isPast(f.when));
 
   const Row = ({ f }: { f: FeedEvent }) => {
     const meta = KIND_META[f.kind];
@@ -75,6 +88,28 @@ export default function InboxPage() {
         </Link>
       )}
 
+      {/* filter by type */}
+      <div className="no-scrollbar -mx-1 mb-4 flex gap-2 overflow-x-auto px-1">
+        {FILTERS.map((f) => {
+          const count = f.key === "all" ? state.feed.length : state.feed.filter((x) => x.kind === f.key).length;
+          if (f.key !== "all" && count === 0) return null;
+          return (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`shrink-0 rounded-full px-3.5 py-2 text-[13px] font-extrabold transition-colors ${
+                filter === f.key ? "bg-green-dark text-white" : "bg-white text-ink/50 shadow-pop hover:text-ink"
+              }`}
+            >
+              {f.label}
+              <span className={`ml-1.5 text-[11px] ${filter === f.key ? "text-white/60" : "text-ink/30"}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {today.length > 0 && (
         <>
           <h2 className="mb-2.5 text-[12px] font-extrabold uppercase tracking-[0.14em] text-ink/35">Today</h2>
@@ -99,10 +134,12 @@ export default function InboxPage() {
         </>
       )}
 
-      {state.feed.length === 0 && (
+      {shown.length === 0 && (
         <div className="rounded-3xl bg-white p-10 text-center shadow-pop">
           <p className="font-display text-[17px] font-extrabold text-ink">All quiet</p>
-          <p className="mt-1 text-[14px] text-ink/50">New activity appears here.</p>
+          <p className="mt-1 text-[14px] text-ink/50">
+            {filter === "all" ? "New activity appears here." : "Nothing in this category yet."}
+          </p>
         </div>
       )}
     </div>

@@ -237,7 +237,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 Close
               </button>
             </div>
-            <div className="max-h-[50vh] space-y-1 overflow-y-auto">
+            <div className="max-h-[60dvh] space-y-1 overflow-y-auto overscroll-contain">
               {state.feed.slice(0, 12).map((f) => {
                 const href =
                   f.kind === "clock" ? "/portal/hours"
@@ -357,7 +357,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               exit={{ y: 240 }}
               transition={{ type: "spring", stiffness: 380, damping: 34 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full rounded-t-[28px] bg-white p-5"
+              className="max-h-[85dvh] w-full overflow-y-auto overscroll-contain rounded-t-[28px] bg-white p-5"
               style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
             >
               <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-pine/15" />

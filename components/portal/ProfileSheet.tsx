@@ -41,7 +41,8 @@ export default function ProfileSheet({ person, onClose }: { person: Staff; onClo
         exit={{ y: 60, opacity: 0 }}
         transition={{ type: "spring", stiffness: 380, damping: 34 }}
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-[28px] bg-white p-6 shadow-lift sm:rounded-[28px]"
+        className="max-h-[85dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-[28px] bg-white p-6 shadow-lift sm:max-h-[calc(100dvh-2rem)] sm:rounded-[28px]"
+        style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
         role="dialog"
         aria-label={`${p.name}'s profile`}
       >

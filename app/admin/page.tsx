@@ -483,7 +483,8 @@ export default function AdminPage() {
               exit={{ x: 80, opacity: 0 }}
               transition={{ type: "spring", stiffness: 380, damping: 36 }}
               onClick={(e) => e.stopPropagation()}
-              className="h-full w-full max-w-md overflow-y-auto bg-white p-6"
+              className="h-full w-full max-w-md overflow-y-auto overscroll-contain bg-white p-6"
+              style={{ paddingBottom: "calc(1.5rem + env(safe-area-inset-bottom))" }}
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -577,7 +578,7 @@ export default function AdminPage() {
               animate={{ y: 0 }}
               exit={{ y: 24, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm rounded-[28px] bg-white p-6 shadow-lift"
+              className="max-h-[85dvh] w-full max-w-sm overflow-y-auto overscroll-contain rounded-[28px] bg-white p-6 shadow-lift"
             >
               <p className="font-display text-[20px] font-extrabold text-ink">Invite a teammate</p>
               <p className="mt-1 text-[12.5px] font-semibold text-ink/45">

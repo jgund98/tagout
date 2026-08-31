@@ -25,6 +25,16 @@ export default function TagAiPage() {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [msgs, thinking]);
 
+  // the chat is a fixed screen on mobile: the page behind it must not scroll
+  // or rubber-band while the keyboard opens and closes
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   const ask = (q: string) => {
     const question = q.trim();
     if (!question || thinking) return;
@@ -39,7 +49,7 @@ export default function TagAiPage() {
   };
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-104px)] max-w-3xl flex-col lg:h-[calc(100dvh-140px)]">
+    <div className="fixed inset-x-0 bottom-0 top-16 z-10 mx-auto flex w-full max-w-3xl flex-col px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-4 lg:static lg:inset-auto lg:h-[calc(100dvh-140px)] lg:px-0 lg:pb-0 lg:pt-0">
       {/* header */}
       <div className="flex items-center gap-3 pb-4">
         <Link
@@ -61,7 +71,7 @@ export default function TagAiPage() {
       </div>
 
       {/* thread */}
-      <div className="no-scrollbar flex-1 space-y-3 overflow-y-auto rounded-[28px] bg-white p-4 shadow-pop sm:p-5">
+      <div className="no-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain rounded-[28px] bg-white p-4 shadow-pop sm:p-5">
         <AnimatePresence initial={false}>
           {msgs.map((m, i) => (
             <motion.div

@@ -325,7 +325,7 @@ function InviteModal({ onClose }: { onClose: () => void }) {
         exit={{ y: 30, opacity: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 32 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-[28px] bg-white p-6 shadow-lift"
+        className="max-h-[85dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-[28px] bg-white p-6 shadow-lift"
         role="dialog"
         aria-label="Add someone to the crew"
       >

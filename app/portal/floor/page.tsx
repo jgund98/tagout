@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePortal, uid } from "@/lib/portal/store";
 import { Avatar, GreenBtn, PageTitle, LiveDot } from "@/components/portal/ui";
+import { NavIcon } from "@/components/portal/NavIcon";
 import { ROOMS, type Fixture, type FixtureKind, type Table } from "@/lib/portal/data";
 
 const SECTIONS = [
@@ -40,6 +41,16 @@ export default function FloorPage() {
   const [expanded, setExpanded] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
   const draggedRef = useRef(false);
+
+  // the full-screen editor owns the viewport: nothing scrolls behind it
+  useEffect(() => {
+    if (!expanded) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [expanded]);
 
   const tonight = state.shifts.filter((s) => s.day === 4 && s.role === "Server" && s.state !== "open");
   const staffOf = (id: string) => state.staff.find((p) => p.id === id) ?? null;
@@ -176,12 +187,12 @@ export default function FloorPage() {
         style={expanded ? { paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" } : undefined}
       >
       <div className={`flex items-center justify-between gap-2 ${expanded ? "" : "mt-5"}`}>
-        <div className="flex rounded-full bg-white p-1 shadow-pop">
+        <div className="no-scrollbar flex max-w-full overflow-x-auto rounded-full bg-white p-1 shadow-pop">
           {ROOMS.map((r) => (
             <button
               key={r}
               onClick={() => setRoom(r)}
-              className={`rounded-full px-4 py-2 text-[13px] font-extrabold transition-colors ${
+              className={`whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-extrabold transition-colors ${
                 room === r ? "bg-green-dark text-white" : "text-ink/45 hover:text-ink"
               }`}
             >
@@ -192,26 +203,20 @@ export default function FloorPage() {
             </button>
           ))}
         </div>
-        <div className="relative flex items-center gap-2">
+        {/* editing controls: desktop inline, mobile only inside the full-screen editor */}
+        <div className={`relative shrink-0 items-center gap-2 ${expanded ? "flex" : "hidden lg:flex"}`}>
           <button
             onClick={() => setAddOpen((v) => !v)}
-            className="rounded-full border-2 border-ink/12 px-4 py-2 text-[13px] font-extrabold text-ink/60 transition-colors hover:border-green hover:text-green-deep"
+            className="whitespace-nowrap rounded-full border-2 border-ink/12 px-4 py-2 text-[13px] font-extrabold text-ink/60 transition-colors hover:border-green hover:text-green-deep"
           >
             + Add
           </button>
-          {expanded ? (
+          {expanded && (
             <button
               onClick={() => setExpanded(false)}
               className="rounded-full bg-green-dark px-4 py-2 text-[13px] font-extrabold text-white"
             >
               Done
-            </button>
-          ) : (
-            <button
-              onClick={() => setExpanded(true)}
-              className="rounded-full border-2 border-ink/12 px-4 py-2 text-[13px] font-extrabold text-ink/60 lg:hidden"
-            >
-              Expand
             </button>
           )}
           <AnimatePresence>
@@ -264,12 +269,21 @@ export default function FloorPage() {
           backgroundImage: "radial-gradient(circle, rgb(15 21 18 / 0.045) 1px, transparent 1px)",
           backgroundSize: "26px 26px",
         }}
-        onClick={(e) => {
-          setAddOpen(false);
-          // tapping empty floor on a phone opens the full-screen editor
-          if (!expanded && e.target === e.currentTarget && window.innerWidth < 1024) setExpanded(true);
-        }}
+        onClick={() => setAddOpen(false)}
       >
+        {/* mobile: the inline plan is a preview — editing happens full-screen only */}
+        {!expanded && (
+          <button
+            onClick={() => setExpanded(true)}
+            className="absolute inset-0 z-30 flex items-center justify-center bg-paper/40 backdrop-blur-[1.5px] lg:hidden"
+            aria-label="Open the floor plan editor"
+          >
+            <span className="flex items-center gap-2 rounded-full bg-pine px-5 py-3 text-[14px] font-extrabold text-paper shadow-lift">
+              <NavIcon name="floor" size={16} />
+              Edit floor plan
+            </span>
+          </button>
+        )}
         {roomFixtures.map((f) => (
           <motion.div
             key={f.id}
@@ -352,7 +366,7 @@ export default function FloorPage() {
           );
         })}
       </div>
-      <p className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold text-ink/40">
+      <p className={`mt-2.5 flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold text-ink/40 ${expanded ? "flex" : "hidden lg:flex"}`}>
         <span>Drag to move · double-tap to edit</span>
         {SECTIONS.map((s) => (
           <span key={s.name} className="flex items-center gap-1.5">
@@ -379,7 +393,7 @@ export default function FloorPage() {
               exit={{ y: 30, opacity: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 32 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm rounded-[28px] bg-white p-6 shadow-lift"
+              className="max-h-[85dvh] w-full max-w-sm overflow-y-auto overscroll-contain rounded-[28px] bg-white p-6 shadow-lift"
               role="dialog"
               aria-label={`Edit table ${editing.label}`}
             >
@@ -506,7 +520,7 @@ export default function FloorPage() {
               exit={{ y: 30, opacity: 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 32 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm rounded-[28px] bg-white p-6 shadow-lift"
+              className="max-h-[85dvh] w-full max-w-sm overflow-y-auto overscroll-contain rounded-[28px] bg-white p-6 shadow-lift"
               role="dialog"
               aria-label={`Edit ${editingFx.kind}`}
             >

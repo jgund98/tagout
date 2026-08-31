@@ -114,7 +114,7 @@ export default function CoveragePage() {
                 <p className="text-[14px] font-bold text-paper">{pendingCards} timecard{pendingCards > 1 ? "s" : ""} to approve</p>
                 <p className="text-[12px] font-semibold text-paper/50">from today&apos;s clock-outs</p>
               </div>
-              <span className="text-paper/40">→</span>
+              <span className="shrink-0 text-[12px] font-bold text-paper/40">Review in Hours →</span>
             </Link>
           )}
           {pendingTimeOff > 0 && (
@@ -122,9 +122,14 @@ export default function CoveragePage() {
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-lav text-[16px]">🌴</span>
               <div className="flex-1">
                 <p className="text-[14px] font-bold text-paper">{pendingTimeOff} time-off request{pendingTimeOff > 1 ? "s" : ""} waiting</p>
-                <p className="text-[12px] font-semibold text-paper/50">Sasha&apos;s wedding weekend & Devon&apos;s DMV run</p>
+                <p className="truncate text-[12px] font-semibold text-paper/50">
+                  {state.timeOff
+                    .filter((t) => t.state === "pending")
+                    .map((t) => `${staffOf(t.staffId)?.first ?? "Someone"} (${t.range})`)
+                    .join(", ")}
+                </p>
               </div>
-              <span className="text-paper/40">→</span>
+              <span className="shrink-0 text-[12px] font-bold text-paper/40">Review in Team →</span>
             </Link>
           )}
           {needsYou === 0 && (
