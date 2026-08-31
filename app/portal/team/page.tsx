@@ -25,7 +25,7 @@ export default function TeamPage() {
     <div className="mx-auto max-w-6xl">
       <PageTitle
         title="Team"
-        sub="Everyone on your roster, how their week looks, and who's still onboarding."
+        sub="Roster, weekly hours, and onboarding status."
         right={
           <div className="flex items-center gap-2">
             <div className="flex rounded-full bg-white p-1 shadow-pop">
@@ -37,7 +37,7 @@ export default function TeamPage() {
                     sort === k ? "bg-green-dark text-white" : "text-ink/45"
                   }`}
                 >
-                  {k === "flex" ? "Most flexible" : "A to Z"}
+                  {k === "flex" ? "Coverage fit" : "A to Z"}
                 </button>
               ))}
             </div>
@@ -49,7 +49,7 @@ export default function TeamPage() {
       {/* time off requests: decisions first */}
       {pendingTimeOff.length > 0 && (
         <section className="mb-6 rounded-[28px] bg-lav/50 p-5">
-          <h2 className="font-display text-[17px] font-extrabold text-ink">Time off waiting on you</h2>
+          <h2 className="font-display text-[17px] font-extrabold text-ink">Pending time-off requests</h2>
           <div className="mt-3 space-y-2.5">
             {pendingTimeOff.map((t) => (
               <TimeOffCard key={t.id} t={t} person={staffOf(t.staffId)} dispatch={dispatch} />
@@ -116,7 +116,7 @@ function StaffCard({
             {p.role === "Manager" && <Chip tone="lav">Portal access</Chip>}
             {score > 0 && p.role !== "Manager" && (
               <Chip tone={score >= 70 ? "mint" : score >= 45 ? "lav" : "white"}>
-                {rank > 0 && rank <= 3 ? `#${rank} · ` : ""}Flexibility {score}
+                {rank > 0 && rank <= 3 ? `#${rank} · ` : ""}Coverage fit {score}
               </Chip>
             )}
             {p.status === "invited" && <Chip tone="butter">Invite sent</Chip>}
@@ -158,7 +158,7 @@ function StaffCard({
                 e.stopPropagation();
                 dispatch({
                   type: "FEED_PUSH",
-                  event: { id: uid("f"), kind: "onboard", who: p.id, text: `Invite re-sent to ${p.first}`, sub: "same text, fresh nudge", when: "Just now" },
+                  event: { id: uid("f"), kind: "onboard", who: p.id, text: `Invite re-sent to ${p.first}`, sub: "reminder sent by text", when: "Just now" },
                 });
               }}
               className="rounded-full bg-green-dark px-3.5 py-1.5 text-[12px] font-extrabold text-white"
@@ -172,7 +172,7 @@ function StaffCard({
               }}
               className="rounded-full border-2 border-ink/12 px-3.5 py-1.5 text-[12px] font-extrabold text-ink/60 hover:border-ink"
             >
-              Mark onboarded
+              Mark as onboarded
             </button>
             {p.status === "invited" && (
               <button
@@ -250,13 +250,13 @@ function TimeOffCard({
             onClick={() => setMode("approve")}
             className="flex-1 rounded-full bg-green px-4 py-2.5 text-[13px] font-extrabold text-ink hover:bg-green-deep hover:text-white"
           >
-            Approve…
+            Approve
           </button>
           <button
             onClick={() => setMode("decline")}
             className="flex-1 whitespace-nowrap rounded-full border-2 border-ink/12 px-4 py-2.5 text-[13px] font-extrabold text-ink/60 hover:border-ink"
           >
-            Decline…
+            Decline
           </button>
         </div>
       ) : (
@@ -391,8 +391,8 @@ function InviteModal({ onClose }: { onClose: () => void }) {
         ) : (
           <div className="py-8 text-center">
             <motion.p initial={{ scale: 0.6 }} animate={{ scale: 1 }} className="text-[40px]">📲</motion.p>
-            <p className="mt-2 font-display text-[19px] font-extrabold text-ink">Invite&apos;s out.</p>
-            <p className="text-[13.5px] font-medium text-ink/50">You&apos;ll see it in the feed when they reply YES.</p>
+            <p className="mt-2 font-display text-[19px] font-extrabold text-ink">Invite sent</p>
+            <p className="text-[13.5px] font-medium text-ink/50">Their reply will show in Activity.</p>
           </div>
         )}
       </motion.div>

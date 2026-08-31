@@ -32,10 +32,10 @@ function LaborWeek() {
   return (
     <section className="mt-6 rounded-3xl bg-white p-5 shadow-pop">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-display text-[17px] font-extrabold text-ink">This week&apos;s labor</h2>
+        <h2 className="font-display text-[17px] font-extrabold text-ink">This week&apos;s scheduled wages</h2>
         <p className="text-[14px] font-extrabold text-ink">
           ${Math.round(total).toLocaleString()}
-          <span className="ml-1.5 text-[12px] font-semibold text-ink/40">scheduled</span>
+          <span className="ml-1.5 text-[12px] font-semibold text-ink/40">wages only · POS adds sales %</span>
         </p>
       </div>
       <div className="mt-4 flex items-end gap-2 sm:gap-3" style={{ height: 110 }}>
@@ -98,7 +98,7 @@ function Suggestions() {
       id: "dana-pattern",
       icon: "📉",
       text: `Dana has dropped ${dana.drops90} shifts in 90 days, three of them Fridays`,
-      sub: "Kept off the group chat. A quick check-in usually turns this around",
+      sub: "Not visible to staff. Logged to her file",
       action: {
         label: "Remind me tomorrow",
         run: () => dispatch({ type: "NOTE_ADD", text: "Check in with Dana about Fridays." }),
@@ -208,14 +208,14 @@ export default function TonightPage() {
           </span>
           <span className="min-w-0 flex-1">
             <span className="block text-[14.5px] font-extrabold leading-snug text-ink">
-              {needs === 1 ? "One thing needs" : `${needs} things need`} your call
+              {needs === 1 ? "1 item needs" : `${needs} items need`} your review
             </span>
             <span className="block text-[12.5px] font-semibold text-ink/50">
-              approvals, timecards, time off · everything else is handled
+              approvals, timecards, time off
             </span>
           </span>
           <span className="shrink-0 rounded-full bg-green px-4 py-2 text-[13px] font-extrabold text-ink">
-            Start here →
+            Review →
           </span>
         </Link>
       )}
@@ -226,7 +226,7 @@ export default function TonightPage() {
             {greeting}, {state.gmFirst} 👋
           </h1>
           <p className="mt-1 text-[14.5px] font-medium text-ink/55">
-            Friday night at {state.houseName}. Tagout has the phones. Here&apos;s everything it&apos;s doing.
+            Friday night at {state.houseName} · live overview
           </p>
         </div>
         {liveRun ? (
@@ -234,7 +234,7 @@ export default function TonightPage() {
             href="/portal/coverage"
             className="flex items-center gap-2 rounded-full bg-pine px-5 py-3 text-[14px] font-extrabold text-paper transition-all hover:shadow-lift"
           >
-            <LiveDot /> 1 cover in motion →
+            <LiveDot /> 1 active cover →
           </Link>
         ) : (
           <Chip tone="mint">
@@ -312,7 +312,7 @@ export default function TonightPage() {
             {feed.length === 0 && (
               <div className="rounded-3xl bg-white p-8 text-center shadow-pop">
                 <p className="font-display text-[16px] font-extrabold text-ink">Nothing here yet</p>
-                <p className="mt-1 text-[13.5px] text-ink/50">This filter fills up as the night moves.</p>
+                <p className="mt-1 text-[13.5px] text-ink/50">No activity for this filter yet.</p>
               </div>
             )}
           </div>
@@ -320,40 +320,43 @@ export default function TonightPage() {
 
         {/* rail */}
         <div className="space-y-5">
-          {/* live cover card */}
+          {/* live coverage feed: every step, timestamped, newest at the bottom */}
           {liveRun && (
             <section className="rounded-3xl bg-pine p-5">
-              <p className="flex items-center gap-2 text-[11.5px] font-extrabold uppercase tracking-wide text-green">
-                <LiveDot /> Happening right now
-              </p>
-              <h3 className="mt-2 font-display text-[18px] font-extrabold leading-tight text-paper">
+              <div className="flex items-center justify-between">
+                <p className="flex items-center gap-2 text-[11.5px] font-extrabold uppercase tracking-wide text-green">
+                  <LiveDot /> Coverage · live
+                </p>
+                <p className="text-[11px] font-bold text-paper/40">{liveRun.when}</p>
+              </div>
+              <h3 className="mt-2 font-display text-[17px] font-extrabold leading-tight text-paper">
                 {liveRun.title}
               </h3>
-              <p className="mt-1 text-[13px] font-semibold text-paper/55">{liveRun.sub}</p>
-              {(() => {
-                const live = liveRun.steps.find((s) => s.state === "live");
-                const lastDone = [...liveRun.steps].reverse().find((s) => s.state === "done");
-                return (
-                  <div className="mt-4">
-                    {live && (
-                      <p className="flex items-start gap-2 text-[14.5px] font-extrabold leading-snug text-paper">
-                        <LiveDot className="mt-1.5" />
-                        <span>
-                          {live.label}
-                          {live.detail && (
-                            <span className="block text-[12px] font-medium text-paper/50">{live.detail}</span>
-                          )}
-                        </span>
+              <p className="mt-0.5 text-[12.5px] font-semibold text-paper/55">{liveRun.sub}</p>
+
+              <div className="mt-3.5 max-h-[240px] space-y-2.5 overflow-y-auto rounded-2xl bg-paper/6 p-3">
+                {liveRun.steps
+                  .filter((s) => s.state !== "todo")
+                  .map((s, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <span className="w-[52px] shrink-0 pt-0.5 text-right text-[10.5px] font-bold tabular-nums text-paper/40">
+                        {s.state === "live" ? "now" : s.at ?? ""}
+                      </span>
+                      {s.state === "live" ? <LiveDot className="mt-1.5" /> : <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-paper/25" />}
+                      <p className="min-w-0 text-[13px] font-bold leading-snug text-paper">
+                        {s.label}
+                        {s.detail && (
+                          <span className="block text-[11.5px] font-medium text-paper/50">{s.detail}</span>
+                        )}
                       </p>
-                    )}
-                    {lastDone && (
-                      <p className="mt-2.5 text-[12.5px] font-semibold text-paper/45">
-                        Last update: {lastDone.detail ?? lastDone.label}
-                      </p>
-                    )}
-                  </div>
-                );
-              })()}
+                    </div>
+                  ))}
+              </div>
+              {liveRun.steps.some((s) => s.state === "todo") && (
+                <p className="mt-2.5 text-[11.5px] font-semibold text-paper/40">
+                  Up next: {liveRun.steps.filter((s) => s.state === "todo").map((s) => s.label.toLowerCase()).join(" · ")}
+                </p>
+              )}
               {liveRun.outcome?.includes("needs your approval") && (
                 <GreenBtn
                   className="mt-4 w-full"
@@ -394,7 +397,7 @@ export default function TonightPage() {
                         {s.section ? ` · ${s.section}` : ""}
                       </p>
                     </div>
-                    {s.state === "covering" && <Chip tone="butter">Covering…</Chip>}
+                    {s.state === "covering" && <Chip tone="butter">Covering</Chip>}
                   </div>
                 );
               })}
@@ -411,24 +414,29 @@ export default function TonightPage() {
           <section className="rounded-3xl bg-white p-5 shadow-pop">
             <h3 className="font-display text-[17px] font-extrabold text-ink">Up next</h3>
             <ul className="mt-2.5 space-y-2">
-              <li className="flex items-start gap-2.5 rounded-2xl bg-lav/50 px-3.5 py-2.5">
-                <span aria-hidden>📌</span>
-                <p className="text-[13px] font-bold leading-snug text-ink">
-                  Tomorrow · 45-top at 7
-                  <span className="block text-[11.5px] font-semibold text-ink/45">
-                    rehearsal dinner, patio · staffed +2, all confirmed
-                  </span>
-                </p>
-              </li>
-              <li className="flex items-start gap-2.5 rounded-2xl bg-mint/60 px-3.5 py-2.5">
-                <span aria-hidden>🌅</span>
-                <p className="text-[13px] font-bold leading-snug text-ink">
-                  Sunday brunch · one server shift open
-                  <span className="block text-[11.5px] font-semibold text-ink/45">
-                    Tagout starts asking Saturday morning, quiet hours respected
-                  </span>
-                </p>
-              </li>
+              {state.events
+                .filter((e) => e.day > 4)
+                .map((e) => (
+                  <li key={e.id} className="flex items-start gap-2.5 rounded-2xl bg-lav/50 px-3.5 py-2.5">
+                    <span aria-hidden>📌</span>
+                    <p className="text-[13px] font-bold leading-snug text-ink">
+                      {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][e.day]} · {e.label}
+                      <span className="block text-[11.5px] font-semibold text-ink/45">{e.note}</span>
+                    </p>
+                  </li>
+                ))}
+              {state.shifts.some((s) => s.state === "open") && (
+                <li className="flex items-start gap-2.5 rounded-2xl bg-mint/60 px-3.5 py-2.5">
+                  <span aria-hidden>🌅</span>
+                  <p className="text-[13px] font-bold leading-snug text-ink">
+                    {state.shifts.filter((s) => s.state === "open").length} open shift
+                    {state.shifts.filter((s) => s.state === "open").length > 1 ? "s" : ""} on the board
+                    <span className="block text-[11.5px] font-semibold text-ink/45">
+                      outreach starts inside quiet-hour rules
+                    </span>
+                  </p>
+                </li>
+              )}
               {state.timeOff.filter((t) => t.state === "approved").map((t) => {
                 const p = state.staff.find((s) => s.id === t.staffId);
                 return (
@@ -461,7 +469,7 @@ export default function TonightPage() {
               <input
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Note for tomorrow's shift…"
+                placeholder="Note for tomorrow's shift"
                 className="min-w-0 flex-1 rounded-full border-2 border-ink/10 px-4 py-2 text-[13.5px] font-semibold text-ink outline-none focus:border-green"
               />
               <button

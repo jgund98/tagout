@@ -41,7 +41,7 @@ export default function CoveragePage() {
       <Burst show={burst} />
       <PageTitle
         title="Coverage"
-        sub="Every dropped shift, who Tagout asked, what they said, and where you come in."
+        sub="Open shifts, outreach status, and full message history."
         right={
           <div className="flex items-center gap-2">
             <span className={`hidden text-[12.5px] font-extrabold sm:inline ${state.paused ? "text-coral" : "text-ink/45"}`}>
@@ -76,7 +76,7 @@ export default function CoveragePage() {
         <div className="mb-5 flex items-center gap-3 rounded-3xl bg-blush/60 p-4">
           <span className="text-[18px]">⏸️</span>
           <p className="text-[13.5px] font-bold text-ink">
-            Paused: Tagout won&apos;t text anyone until you resume. The live cover below is holding its place in line.
+            Outreach is paused. Active coverage holds its place until you resume.
           </p>
         </div>
       )}
@@ -85,12 +85,12 @@ export default function CoveragePage() {
       <section className="rounded-[28px] bg-pine p-5 sm:p-6">
         <div className="flex items-center justify-between">
           <h2 className="flex items-center gap-2.5 font-display text-[19px] font-extrabold text-paper">
-            Needs you
+            Needs attention
             <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-green px-2 font-display text-[14px] text-ink">
               {needsYou}
             </span>
           </h2>
-          <p className="text-[12px] font-bold text-paper/40">Swamped all shift? Start here.</p>
+
         </div>
         <div className="mt-4 space-y-2.5">
           {needsApproval && liveRun && (
@@ -129,8 +129,8 @@ export default function CoveragePage() {
           )}
           {needsYou === 0 && (
             <div className="rounded-2xl bg-paper/8 p-4 text-center">
-              <p className="text-[14px] font-bold text-paper">You&apos;re all caught up 🤙</p>
-              <p className="text-[12px] font-semibold text-paper/50">Tagout will tap you here the moment something needs a human.</p>
+              <p className="text-[14px] font-bold text-paper">All caught up</p>
+              <p className="text-[12px] font-semibold text-paper/50">New items appear here when they need a decision.</p>
             </div>
           )}
         </div>
@@ -138,9 +138,9 @@ export default function CoveragePage() {
 
       {/* autopilot dial */}
       <section className="mt-6 rounded-[28px] bg-white p-5 shadow-pop sm:p-6">
-        <h2 className="font-display text-[18px] font-extrabold text-ink">How much should Tagout handle?</h2>
+        <h2 className="font-display text-[18px] font-extrabold text-ink">Automation level</h2>
         <p className="mt-1 text-[13px] font-medium text-ink/50">
-          Change it any time. It applies from the next text on.
+          Applies from the next message on.
         </p>
         <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
           {MODES.map((m) => {

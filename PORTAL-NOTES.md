@@ -57,3 +57,10 @@ week" = history.
 - Owner/multi-location rollup view; platform-owner internal admin.
 - New-restaurant onboarding wizard (the demo seeds one house).
 - Real notification prefs per person; message-history browser per staffer.
+
+## POV surfaces (added Aug 30)
+- **/me** — staff app (server POV). Session role "staff" + personId. Tabs: My week / Pickups / Requests / Profile. The live offer renders the actual SMS thread (run.thread tag bubbles) with I'll-take-it / Pass; claims, drops (SHIFT_UPSERT → open), and TIMEOFF_REQUEST all feed the GM's world through the shared store.
+- **/welcome** — the onboarding link a new hire opens. 3 steps: name → availability → SMS consent. Finishes with STAFF_PATCH (status active) and lands in /me.
+- **/admin** — Tagout HQ (internal). Client list w/ health, onboarding pipeline, support queue, team. Local demo seed, separate from restaurant state.
+- **PovSwitch** (components/portal/PovSwitch.tsx) — temp until launch. GM/Server/Admin chips in the GM topbar, the mobile More sheet, /me header, /admin header. switchDemoRole() rewrites only the session key so the world state survives the hop.
+- Login routing: DEMO_PHONES → /portal; (561) 555-0184 (Marisa) / 0139 (Sasha) → /me; (561) 555-0102 (Tyler) → /welcome. Same silent-zeros OTP.

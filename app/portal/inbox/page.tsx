@@ -53,7 +53,7 @@ export default function InboxPage() {
     <div className="mx-auto max-w-3xl">
       <PageTitle
         title="Inbox"
-        sub="Everything that's happened, newest first. If you missed a night, catch up here."
+        sub="All activity, newest first."
         right={
           unread > 0 ? (
             <GhostBtn onClick={() => dispatch({ type: "FEED_READ_ALL" })}>Mark all read</GhostBtn>
@@ -67,7 +67,7 @@ export default function InboxPage() {
           className="mb-5 flex items-center justify-between gap-3 rounded-2xl border-2 border-coral/25 bg-white px-4 py-3.5 shadow-pop"
         >
           <span className="text-[14.5px] font-extrabold text-ink">
-            {needs === 1 ? "1 item needs" : `${needs} items need`} your call
+            {needs === 1 ? "1 item needs" : `${needs} items need`} your review
           </span>
           <span className="rounded-full bg-coral px-3.5 py-1.5 text-[12.5px] font-extrabold text-white">
             Open queue →
@@ -102,7 +102,7 @@ export default function InboxPage() {
       {state.feed.length === 0 && (
         <div className="rounded-3xl bg-white p-10 text-center shadow-pop">
           <p className="font-display text-[17px] font-extrabold text-ink">All quiet</p>
-          <p className="mt-1 text-[14px] text-ink/50">New activity lands here the moment it happens.</p>
+          <p className="mt-1 text-[14px] text-ink/50">New activity appears here.</p>
         </div>
       )}
     </div>

@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePortal, uid } from "@/lib/portal/store";
 import { Avatar, GreenBtn, PageTitle, LiveDot } from "@/components/portal/ui";
-import { ROOMS, type Table } from "@/lib/portal/data";
+import { ROOMS, type Fixture, type FixtureKind, type Table } from "@/lib/portal/data";
 
 const SECTIONS = [
   { name: "Main", fill: "#0ecf7f", soft: "#dcf8ea", text: "#056443" },
@@ -12,20 +12,33 @@ const SECTIONS = [
   { name: "Bar side", fill: "#6d5bff", soft: "#ebe7ff", text: "#4b3ad9" },
 ];
 
-/** table footprint by seats, in % of room width */
-function sizeFor(seats: number): number {
-  if (seats <= 2) return 9;
-  if (seats <= 4) return 12;
-  if (seats <= 6) return 15;
-  return 19;
+const TABLE_KINDS: { label: string; shape: Table["shape"]; seats: number }[] = [
+  { label: "Round table", shape: "round", seats: 4 },
+  { label: "Square table", shape: "square", seats: 4 },
+  { label: "Booth", shape: "booth", seats: 4 },
+  { label: "High-top", shape: "hightop", seats: 2 },
+];
+
+const FIXTURE_KINDS: FixtureKind[] = ["Kitchen", "Bar counter", "Entry", "Restrooms", "Host stand"];
+
+function sizeFor(t: Table): { w: number; ratio: number } {
+  if (t.shape === "booth") return { w: 16, ratio: 1.6 };
+  if (t.shape === "hightop") return { w: 7.5, ratio: 1 };
+  if (t.seats <= 2) return { w: 9, ratio: 1 };
+  if (t.seats <= 4) return { w: 12, ratio: 1 };
+  if (t.seats <= 6) return { w: 15, ratio: 1 };
+  return { w: t.shape === "square" ? 22 : 19, ratio: t.shape === "square" ? 1.8 : 1 };
 }
 
 export default function FloorPage() {
   const { state, dispatch } = usePortal();
   const [room, setRoom] = useState(ROOMS[0]);
   const [editing, setEditing] = useState<Table | null>(null);
+  const [editingFx, setEditingFx] = useState<Fixture | null>(null);
   const [assigning, setAssigning] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const draggedRef = useRef(false);
 
   const tonight = state.shifts.filter((s) => s.day === 4 && s.role === "Server" && s.state !== "open");
   const staffOf = (id: string) => state.staff.find((p) => p.id === id) ?? null;
@@ -40,19 +53,13 @@ export default function FloorPage() {
   const light = SECTIONS[counts.indexOf(Math.min(...counts))].name;
 
   const roomTables = state.tables.filter((t) => t.room === room);
+  const roomFixtures = state.fixtures.filter((f) => f.room === room);
 
   const balance = () => {
     dispatch({ type: "FLOOR_BALANCE", sections: SECTIONS.map((s) => s.name) });
     dispatch({
       type: "FEED_PUSH",
-      event: {
-        id: uid("f"),
-        kind: "rule",
-        who: null,
-        text: "Sections evened out",
-        sub: `${heavy} was ${spread} seats heavier than ${light} before the shuffle`,
-        when: "Just now",
-      },
+      event: { id: uid("f"), kind: "rule", who: null, text: "Sections evened out", sub: `${heavy} was ${spread} seats heavier than ${light}`, when: "Just now" },
     });
   };
 
@@ -62,25 +69,26 @@ export default function FloorPage() {
     dispatch({ type: "SECTION_SET", shiftId, section });
     dispatch({
       type: "FEED_PUSH",
-      event: { id: uid("f"), kind: "rule", who: null, text: `${first} is running ${section} tonight`, sub: "they got the section change by text", when: "Just now" },
+      event: { id: uid("f"), kind: "rule", who: null, text: `${first} is running ${section} tonight`, sub: "section change sent by text", when: "Just now" },
     });
     setAssigning(null);
   };
 
-  const onDragEnd = (t: Table, info: { point: { x: number; y: number } }) => {
+  const dropAt = (info: { point: { x: number; y: number } }) => {
     const el = canvasRef.current;
-    if (!el) return;
+    if (!el) return null;
     const r = el.getBoundingClientRect();
-    const x = Math.min(96, Math.max(4, ((info.point.x - r.left) / r.width) * 100));
-    const y = Math.min(94, Math.max(6, ((info.point.y - r.top) / r.height) * 100));
-    dispatch({ type: "TABLE_PATCH", id: t.id, patch: { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 } });
+    return {
+      x: Math.round(Math.min(96, Math.max(4, ((info.point.x - r.left) / r.width) * 100)) * 10) / 10,
+      y: Math.round(Math.min(94, Math.max(6, ((info.point.y - r.top) / r.height) * 100)) * 10) / 10,
+    };
   };
 
   return (
     <div className="mx-auto max-w-5xl">
       <PageTitle
         title="Floor plan"
-        sub="Drag tables where they actually sit. Tap one to change it. Assignments text out instantly."
+        sub="Drag to arrange tables and fixtures, double-tap to edit one. Section changes notify staff by text."
         right={
           <GreenBtn onClick={balance} disabled={state.floorBalanced || spread <= 4}>
             {state.floorBalanced ? "Evened out ✓" : "Even out sections"}
@@ -138,14 +146,12 @@ export default function FloorPage() {
                           <button
                             key={s.id}
                             onClick={() => !here && assign(sec.name, s.id, sp?.first ?? "They")}
-                            className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left ${
-                              here ? "bg-mint/60" : "hover:bg-cream"
-                            }`}
+                            className={`flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left ${here ? "bg-mint/60" : "hover:bg-cream"}`}
                           >
                             <Avatar person={sp} size={26} />
                             <span className="flex-1 text-[13.5px] font-bold text-ink">{sp?.first}</span>
                             <span className="text-[11.5px] font-semibold text-ink/40">
-                              {here ? "here now" : s.section ? `on ${s.section}` : "unassigned"}
+                              {here ? "assigned" : s.section ? `on ${s.section}` : "unassigned"}
                             </span>
                           </button>
                         );
@@ -159,7 +165,7 @@ export default function FloorPage() {
         })}
       </div>
 
-      {/* room tabs */}
+      {/* room tabs + add */}
       <div className="mt-5 flex items-center justify-between">
         <div className="flex rounded-full bg-white p-1 shadow-pop">
           {ROOMS.map((r) => (
@@ -177,12 +183,51 @@ export default function FloorPage() {
             </button>
           ))}
         </div>
-        <button
-          onClick={() => dispatch({ type: "TABLE_ADD", seats: 4, section: light, shape: "round", room })}
-          className="rounded-full border-2 border-ink/12 px-4 py-2 text-[13px] font-extrabold text-ink/60 transition-colors hover:border-green hover:text-green-deep"
-        >
-          + Table
-        </button>
+        <div className="relative">
+          <button
+            onClick={() => setAddOpen((v) => !v)}
+            className="rounded-full border-2 border-ink/12 px-4 py-2 text-[13px] font-extrabold text-ink/60 transition-colors hover:border-green hover:text-green-deep"
+          >
+            + Add
+          </button>
+          <AnimatePresence>
+            {addOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                className="absolute right-0 top-11 z-40 w-48 rounded-2xl bg-white p-2 shadow-lift"
+              >
+                <p className="px-2.5 pb-1 pt-1.5 text-[10.5px] font-extrabold uppercase tracking-wide text-ink/35">Tables</p>
+                {TABLE_KINDS.map((k) => (
+                  <button
+                    key={k.label}
+                    onClick={() => {
+                      dispatch({ type: "TABLE_ADD", seats: k.seats, section: light, shape: k.shape, room });
+                      setAddOpen(false);
+                    }}
+                    className="block w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-bold text-ink hover:bg-cream"
+                  >
+                    {k.label}
+                  </button>
+                ))}
+                <p className="px-2.5 pb-1 pt-2 text-[10.5px] font-extrabold uppercase tracking-wide text-ink/35">Fixtures</p>
+                {FIXTURE_KINDS.map((k) => (
+                  <button
+                    key={k}
+                    onClick={() => {
+                      dispatch({ type: "FIXTURE_ADD", room, kind: k });
+                      setAddOpen(false);
+                    }}
+                    className="block w-full rounded-xl px-2.5 py-2 text-left text-[13.5px] font-bold text-ink hover:bg-cream"
+                  >
+                    {k}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* the room canvas */}
@@ -190,77 +235,95 @@ export default function FloorPage() {
         ref={canvasRef}
         className="relative mt-3 aspect-[16/10] w-full touch-none select-none overflow-hidden rounded-[28px] border border-ink/8 bg-white shadow-pop sm:aspect-[16/9]"
         style={{
-          backgroundImage:
-            "radial-gradient(circle, rgb(15 21 18 / 0.045) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle, rgb(15 21 18 / 0.045) 1px, transparent 1px)",
           backgroundSize: "26px 26px",
         }}
+        onClick={() => setAddOpen(false)}
       >
-        {/* architecture, per room */}
-        {room === "Dining room" && (
-          <>
-            <div className="absolute right-0 top-0 flex h-[26%] w-[24%] items-center justify-center rounded-bl-3xl bg-ink/[0.05]">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-ink/35">Kitchen</span>
-            </div>
-            <div className="absolute bottom-0 left-[24%] h-2 w-[16%] rounded-t-md bg-ink/15" />
-            <span className="absolute bottom-3 left-[25%] text-[10px] font-extrabold uppercase tracking-wider text-ink/30">
-              Entry
+        {roomFixtures.map((f) => (
+          <motion.div
+            key={f.id}
+            drag
+            dragMomentum={false}
+            dragElastic={0.06}
+            onDragStart={() => (draggedRef.current = true)}
+            onDragEnd={(_, info) => {
+              const p = dropAt(info);
+              if (p) dispatch({ type: "FIXTURE_PATCH", id: f.id, patch: p });
+              setTimeout(() => (draggedRef.current = false), 50);
+            }}
+            onDoubleClick={() => !draggedRef.current && setEditingFx(f)}
+            whileDrag={{ scale: 1.03, zIndex: 25 }}
+            className={`absolute flex cursor-grab items-center justify-center rounded-2xl border ${
+              f.kind === "Bar counter" ? "border-pine bg-pine/90" : "border-ink/10 bg-ink/[0.05]"
+            }`}
+            style={{
+              width: `${f.w}%`,
+              height: `${f.h}%`,
+              left: `${f.x}%`,
+              top: `${f.y}%`,
+              transform: "translate(-50%, -50%)",
+            }}
+            title={`${f.kind} · drag to move, double-tap to edit`}
+          >
+            <span
+              className={`px-1 text-center text-[10px] font-extrabold uppercase tracking-wider ${
+                f.kind === "Bar counter" ? "text-paper/80" : "text-ink/35"
+              }`}
+            >
+              {f.kind}
             </span>
-            <div className="absolute left-0 top-0 h-full w-1.5 bg-ink/8" />
-          </>
-        )}
-        {room === "Patio" && (
-          <>
-            <div className="absolute inset-y-0 left-0 flex w-2 items-center bg-ink/8" />
-            <span className="absolute left-4 top-3 text-[10px] font-extrabold uppercase tracking-wider text-ink/30">
-              To dining room
-            </span>
-            <div className="absolute inset-0 rounded-[28px] border-2 border-dashed border-ink/8" />
-          </>
-        )}
-        {room === "Bar" && (
-          <div className="absolute left-[8%] right-[8%] top-[10%] flex h-[22%] items-center justify-center rounded-2xl bg-pine/90">
-            <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-paper/80">Bar</span>
-          </div>
-        )}
+          </motion.div>
+        ))}
 
-        {/* tables: drag anywhere, positions persist */}
         {roomTables.map((t) => {
           const sec = SECTIONS.find((s) => s.name === t.section) ?? SECTIONS[0];
-          const w = sizeFor(t.seats);
+          const { w, ratio } = sizeFor(t);
           return (
             <motion.button
               key={t.id}
               drag
               dragMomentum={false}
               dragElastic={0.06}
-              onDragEnd={(_, info) => onDragEnd(t, info)}
-              onClick={() => setEditing(t)}
+              onDragStart={() => (draggedRef.current = true)}
+              onDragEnd={(_, info) => {
+                const p = dropAt(info);
+                if (p) dispatch({ type: "TABLE_PATCH", id: t.id, patch: p });
+                setTimeout(() => (draggedRef.current = false), 50);
+              }}
+              onDoubleClick={() => !draggedRef.current && setEditing(t)}
               whileDrag={{ scale: 1.06, zIndex: 30 }}
-              className={`absolute flex flex-col items-center justify-center border-2 border-white shadow-[0_2px_10px_rgb(15_21_18/0.14)] ${
-                t.shape === "round" ? "rounded-full" : t.seats >= 8 ? "rounded-xl" : "rounded-lg"
+              className={`absolute flex cursor-grab flex-col items-center justify-center border-2 border-white shadow-[0_2px_10px_rgb(15_21_18/0.14)] ${
+                t.shape === "round" || t.shape === "hightop" ? "rounded-full" : t.shape === "booth" ? "rounded-xl" : "rounded-lg"
               }`}
               style={{
-                width: `${t.seats >= 8 && t.shape === "square" ? w * 1.4 : w}%`,
-                aspectRatio: t.seats >= 8 && t.shape === "square" ? "1.8" : "1",
+                width: `${w}%`,
+                aspectRatio: String(ratio),
                 left: `${t.x}%`,
                 top: `${t.y}%`,
                 transform: "translate(-50%, -50%)",
                 background: sec.soft,
+                ...(t.shape === "hightop" ? { boxShadow: `0 0 0 3px ${sec.fill}44, 0 2px 10px rgb(15 21 18 / 0.14)` } : {}),
               }}
-              title={`Table ${t.label} · ${t.seats} seats · ${t.section}`}
+              title={`Table ${t.label} · ${t.seats} seats · ${t.section} · drag to move, double-tap to edit`}
             >
-              <span className="font-display text-[13px] font-extrabold leading-none sm:text-[15px]" style={{ color: sec.text }}>
+              {t.shape === "booth" && (
+                <span className="absolute inset-x-1.5 top-1 h-1.5 rounded-full" style={{ background: sec.fill, opacity: 0.45 }} />
+              )}
+              <span className="font-display text-[12px] font-extrabold leading-none sm:text-[14px]" style={{ color: sec.text }}>
                 {t.label}
               </span>
-              <span className="mt-0.5 text-[9px] font-bold sm:text-[10px]" style={{ color: sec.text, opacity: 0.65 }}>
-                {t.seats}
-              </span>
+              {t.shape !== "hightop" && (
+                <span className="mt-0.5 text-[9px] font-bold sm:text-[10px]" style={{ color: sec.text, opacity: 0.65 }}>
+                  {t.seats}
+                </span>
+              )}
             </motion.button>
           );
         })}
       </div>
       <p className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold text-ink/40">
-        <span>Drag to rearrange · tap to edit</span>
+        <span>Drag to move · double-tap to edit</span>
         {SECTIONS.map((s) => (
           <span key={s.name} className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full" style={{ background: s.fill }} />
@@ -293,52 +356,51 @@ export default function FloorPage() {
                 <p className="font-display text-[20px] font-extrabold text-ink">Table {editing.label}</p>
                 <span className="text-[12px] font-bold text-ink/40">{editing.room}</span>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Seats</p>
-                  <div className="mt-1.5 flex items-center gap-2.5">
+              <div className="mt-4">
+                <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Type</p>
+                <div className="mt-1.5 flex flex-wrap gap-2">
+                  {TABLE_KINDS.map((k) => (
                     <button
+                      key={k.shape}
                       onClick={() => {
-                        if (editing.seats <= 2) return;
-                        dispatch({ type: "TABLE_PATCH", id: editing.id, patch: { seats: editing.seats - 1 } });
-                        setEditing({ ...editing, seats: editing.seats - 1 });
+                        dispatch({ type: "TABLE_PATCH", id: editing.id, patch: { shape: k.shape } });
+                        setEditing({ ...editing, shape: k.shape });
                       }}
-                      className="flex h-10 w-10 items-center justify-center rounded-full bg-cream font-display text-[18px] font-extrabold text-ink"
+                      className={`rounded-full px-3.5 py-2 text-[12.5px] font-extrabold transition-colors ${
+                        editing.shape === k.shape ? "bg-green-dark text-white" : "bg-cream text-ink/55"
+                      }`}
                     >
-                      −
+                      {k.label}
                     </button>
-                    <span className="w-8 text-center font-display text-[22px] font-extrabold text-ink">{editing.seats}</span>
-                    <button
-                      onClick={() => {
-                        if (editing.seats >= 12) return;
-                        dispatch({ type: "TABLE_PATCH", id: editing.id, patch: { seats: editing.seats + 1 } });
-                        setEditing({ ...editing, seats: editing.seats + 1 });
-                      }}
-                      className="flex h-10 w-10 items-center justify-center rounded-full bg-cream font-display text-[18px] font-extrabold text-ink"
-                    >
-                      +
-                    </button>
-                  </div>
+                  ))}
                 </div>
-                <div>
-                  <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Shape</p>
-                  <div className="mt-1.5 flex gap-2">
-                    {(["round", "square"] as const).map((sh) => (
-                      <button
-                        key={sh}
-                        onClick={() => {
-                          dispatch({ type: "TABLE_PATCH", id: editing.id, patch: { shape: sh } });
-                          setEditing({ ...editing, shape: sh });
-                        }}
-                        className={`flex h-10 w-10 items-center justify-center bg-cream ${
-                          sh === "round" ? "rounded-full" : "rounded-lg"
-                        } ${editing.shape === sh ? "ring-2 ring-green" : ""}`}
-                        aria-label={sh}
-                      >
-                        <span className={`h-4 w-4 border-2 border-ink/50 ${sh === "round" ? "rounded-full" : "rounded-[3px]"}`} />
-                      </button>
-                    ))}
-                  </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Seats</p>
+                <div className="mt-1.5 flex items-center gap-2.5">
+                  <button
+                    onClick={() => {
+                      if (editing.seats <= 2) return;
+                      dispatch({ type: "TABLE_PATCH", id: editing.id, patch: { seats: editing.seats - 1 } });
+                      setEditing({ ...editing, seats: editing.seats - 1 });
+                    }}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-cream font-display text-[18px] font-extrabold text-ink"
+                    aria-label="Fewer seats"
+                  >
+                    −
+                  </button>
+                  <span className="w-8 text-center font-display text-[22px] font-extrabold text-ink">{editing.seats}</span>
+                  <button
+                    onClick={() => {
+                      if (editing.seats >= 12) return;
+                      dispatch({ type: "TABLE_PATCH", id: editing.id, patch: { seats: editing.seats + 1 } });
+                      setEditing({ ...editing, seats: editing.seats + 1 });
+                    }}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-cream font-display text-[18px] font-extrabold text-ink"
+                    aria-label="More seats"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
               <div className="mt-4">
@@ -391,6 +453,86 @@ export default function FloorPage() {
                   Remove table
                 </button>
                 <GreenBtn onClick={() => setEditing(null)}>Done</GreenBtn>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* fixture editor */}
+      <AnimatePresence>
+        {editingFx && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 backdrop-blur-sm sm:items-center"
+            onClick={() => setEditingFx(null)}
+          >
+            <motion.div
+              initial={{ y: 30 }}
+              animate={{ y: 0 }}
+              exit={{ y: 30, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm rounded-[28px] bg-white p-6 shadow-lift"
+              role="dialog"
+              aria-label={`Edit ${editingFx.kind}`}
+            >
+              <div className="flex items-center justify-between">
+                <p className="font-display text-[20px] font-extrabold text-ink">{editingFx.kind}</p>
+                <span className="text-[12px] font-bold text-ink/40">{editingFx.room}</span>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                {(
+                  [
+                    ["Width", "w", 6, 90],
+                    ["Depth", "h", 6, 60],
+                  ] as const
+                ).map(([label, key, min, max]) => (
+                  <div key={key}>
+                    <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">{label}</p>
+                    <div className="mt-1.5 flex items-center gap-2.5">
+                      <button
+                        onClick={() => {
+                          const v = Math.max(min, editingFx[key] - 4);
+                          dispatch({ type: "FIXTURE_PATCH", id: editingFx.id, patch: { [key]: v } });
+                          setEditingFx({ ...editingFx, [key]: v });
+                        }}
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-cream font-display text-[18px] font-extrabold text-ink"
+                        aria-label={`Smaller ${label.toLowerCase()}`}
+                      >
+                        −
+                      </button>
+                      <span className="w-10 text-center font-display text-[16px] font-extrabold text-ink">
+                        {editingFx[key]}%
+                      </span>
+                      <button
+                        onClick={() => {
+                          const v = Math.min(max, editingFx[key] + 4);
+                          dispatch({ type: "FIXTURE_PATCH", id: editingFx.id, patch: { [key]: v } });
+                          setEditingFx({ ...editingFx, [key]: v });
+                        }}
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-cream font-display text-[18px] font-extrabold text-ink"
+                        aria-label={`Larger ${label.toLowerCase()}`}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 flex items-center justify-between">
+                <button
+                  onClick={() => {
+                    dispatch({ type: "FIXTURE_REMOVE", id: editingFx.id });
+                    setEditingFx(null);
+                  }}
+                  className="text-[13.5px] font-extrabold text-coral/80 hover:text-coral"
+                >
+                  Remove
+                </button>
+                <GreenBtn onClick={() => setEditingFx(null)}>Done</GreenBtn>
               </div>
             </motion.div>
           </motion.div>

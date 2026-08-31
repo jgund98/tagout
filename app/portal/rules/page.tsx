@@ -45,7 +45,7 @@ export default function RulesPage() {
     <div className="mx-auto max-w-4xl">
       <PageTitle
         title="House rules"
-        sub="Set them once, change them any week. Tagout enforces every one on every offer, text, and swap."
+        sub="Enforced automatically on every offer, message, and swap."
       />
 
       {GROUPS.map((g) => (

@@ -9,16 +9,36 @@ import {
   type Dispatch,
   type ReactNode,
 } from "react";
-import { makeSeed, type PortalState, type FeedEvent, type Shift, type Bubble } from "./data";
+import { makeSeed, SEED_VERSION, type PortalState, type FeedEvent, type Shift, type Bubble } from "./data";
 
 /* ---------- session helpers (demo mode: fresh seed on every login) ---------- */
 
 const STATE_KEY = "tagout-demo-state";
 const SESSION_KEY = "tagout-portal-session";
 
-export function startDemoSession() {
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ at: new Date().toISOString() }));
+export type SessionRole = "gm" | "staff" | "onboard" | "admin";
+export type Session = { at: string; role: SessionRole; personId?: string };
+
+export function startDemoSession(role: SessionRole = "gm", personId?: string) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ at: new Date().toISOString(), role, personId }));
   sessionStorage.setItem(STATE_KEY, JSON.stringify(makeSeed()));
+}
+
+export function switchDemoRole(role: SessionRole, personId?: string) {
+  const cur = getSession();
+  sessionStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify({ at: cur?.at ?? new Date().toISOString(), role, personId })
+  );
+}
+
+export function getSession(): Session | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    return raw ? (JSON.parse(raw) as Session) : null;
+  } catch {
+    return null;
+  }
 }
 
 export function endDemoSession() {
@@ -140,13 +160,20 @@ type Action =
   | { type: "SECTION_SET"; shiftId: string; section: string }
   | { type: "PAUSE_TOGGLE" }
   | { type: "TABLE_CYCLE"; id: string; sections: string[] }
-  | { type: "TABLE_ADD"; seats: number; section: string; shape: "round" | "square"; room: string }
+  | { type: "TABLE_ADD"; seats: number; section: string; shape: "round" | "square" | "booth" | "hightop"; room: string }
   | { type: "TABLE_REMOVE"; id: string }
   | { type: "TABLE_PATCH"; id: string; patch: Partial<import("./data").Table> }
   | { type: "FLOOR_BALANCE"; sections: string[] }
   | { type: "ROTATION_SET"; mode: import("./data").RotationMode }
   | { type: "STAFF_REMOVE"; id: string }
   | { type: "SUGGEST_DISMISS"; id: string }
+  | { type: "FIXTURE_ADD"; room: string; kind: import("./data").FixtureKind }
+  | { type: "FIXTURE_PATCH"; id: string; patch: Partial<import("./data").Fixture> }
+  | { type: "FIXTURE_REMOVE"; id: string }
+  | { type: "EVENT_ADD"; day: number; label: string; note: string }
+  | { type: "EVENT_REMOVE"; id: string }
+  | { type: "TIMEOFF_REQUEST"; staffId: string; range: string; reason: string }
+  | { type: "SHIFT_CLAIM"; shiftId: string; staffId: string }
   | { type: "APPROVE_LIVE_COVER" };
 
 function reducer(state: PortalState, a: Action): PortalState {
@@ -294,6 +321,38 @@ function reducer(state: PortalState, a: Action): PortalState {
       return { ...state, staff: state.staff.filter((s) => s.id !== a.id) };
     case "SUGGEST_DISMISS":
       return { ...state, dismissed: [...state.dismissed, a.id] };
+    case "FIXTURE_ADD": {
+      const defaults: Record<string, { w: number; h: number }> = {
+        Kitchen: { w: 24, h: 26 },
+        "Bar counter": { w: 60, h: 18 },
+        Entry: { w: 16, h: 8 },
+        Restrooms: { w: 18, h: 16 },
+        "Host stand": { w: 10, h: 10 },
+      };
+      const d = defaults[a.kind] ?? { w: 16, h: 14 };
+      return {
+        ...state,
+        fixtures: [...state.fixtures, { id: uid("fx"), room: a.room, kind: a.kind, x: 50, y: 30, w: d.w, h: d.h }],
+      };
+    }
+    case "FIXTURE_PATCH":
+      return { ...state, fixtures: state.fixtures.map((f) => (f.id === a.id ? { ...f, ...a.patch } : f)) };
+    case "FIXTURE_REMOVE":
+      return { ...state, fixtures: state.fixtures.filter((f) => f.id !== a.id) };
+    case "EVENT_ADD":
+      return { ...state, events: [...state.events, { id: uid("e"), day: a.day, label: a.label, note: a.note }] };
+    case "EVENT_REMOVE":
+      return { ...state, events: state.events.filter((e) => e.id !== a.id) };
+    case "TIMEOFF_REQUEST":
+      return {
+        ...state,
+        timeOff: [...state.timeOff, { id: uid("t"), staffId: a.staffId, range: a.range, reason: a.reason, state: "pending" }],
+      };
+    case "SHIFT_CLAIM":
+      return {
+        ...state,
+        shifts: state.shifts.map((s) => (s.id === a.shiftId ? { ...s, staffId: a.staffId, state: "published" } : s)),
+      };
     case "APPROVE_LIVE_COVER": {
       // Sasha takes Dana's Friday close; the board updates in front of you.
       return {
@@ -351,7 +410,7 @@ function buildTimeline(): Cue[] {
       run: (d) => {
         d({ type: "RUN_STEP", runId: "r-live", stepIndex: 2, state: "done", detail: "Marisa passed (dentist)" });
         d({ type: "RUN_STEP", runId: "r-live", stepIndex: 3, state: "live", detail: "texting Sasha now · 30 hrs, free tonight" });
-        d({ type: "RUN_BUBBLE", runId: "r-live", bubble: { from: "tag", text: "All good, feel better! (Now texting Sasha…)" } });
+        d({ type: "RUN_BUBBLE", runId: "r-live", bubble: { from: "tag", text: "All good, feel better! (Now texting Sasha)" } });
         d(F({ kind: "cover", who: "sasha", text: "Tagout moved to Sasha, 2nd of 6 on the list", sub: "asked in order, one at a time", when: "Just now" }));
       },
     },
@@ -403,7 +462,10 @@ export function PortalProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") {
       try {
         const raw = sessionStorage.getItem(STATE_KEY);
-        if (raw) return JSON.parse(raw) as PortalState;
+        if (raw) {
+          const parsed = JSON.parse(raw) as PortalState;
+          if (parsed.v === SEED_VERSION) return parsed; // older schema: fall through and reseed
+        }
       } catch {}
     }
     return makeSeed();

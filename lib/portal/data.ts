@@ -49,7 +49,7 @@ export type Punch = {
   approved: boolean;
 };
 
-export type RunStep = { label: string; detail?: string; state: "done" | "live" | "todo" };
+export type RunStep = { label: string; detail?: string; state: "done" | "live" | "todo"; at?: string };
 export type Bubble = { from: "tag" | "them"; who?: string; text: string };
 export type CoverageRun = {
   id: string;
@@ -99,7 +99,7 @@ export type Table = {
   id: string;
   label: string;
   section: string;
-  shape: "round" | "square";
+  shape: "round" | "square" | "booth" | "hightop";
   seats: number;
   room: string; // Dining room | Patio | Bar
   x: number; // percent of room width, table center
@@ -107,14 +107,29 @@ export type Table = {
 };
 
 export const ROOMS = ["Dining room", "Patio", "Bar"];
+
+export type FixtureKind = "Kitchen" | "Bar counter" | "Entry" | "Restrooms" | "Host stand";
+export type Fixture = {
+  id: string;
+  room: string;
+  kind: FixtureKind;
+  x: number; // percent, center
+  y: number;
+  w: number; // percent of room width
+  h: number; // percent of room height
+};
 export type RotationMode = "even" | "seniority" | "training";
 
+export const SEED_VERSION = 4;
+
 export type PortalState = {
+  v: number;
   houseName: string;
   gmFirst: string;
   autopilot: "suggest" | "ask-first" | "full";
   paused: boolean; // GM hit the big red switch: Tagout stops texting until turned back on
   tables: Table[];
+  fixtures: Fixture[];
   rotation: RotationMode;
   floorBalanced: boolean;
   staff: Staff[];
@@ -220,9 +235,9 @@ export function makeSeed(): PortalState {
       state: "live",
       when: "Started 4:41 PM",
       steps: [
-        { label: "Dana dropped Friday close", detail: "4:41 PM · reason: sitter fell through", state: "done" },
-        { label: "Ranked everyone eligible", detail: "6 can work it · sorted by hours, availability, yes-rate", state: "done" },
-        { label: "Texting Marisa", detail: "she's 1st: 31 hrs, says yes 9 times out of 10", state: "live" },
+        { label: "Dana dropped Friday close", detail: "reason: sitter fell through", state: "done", at: "4:41 PM" },
+        { label: "Ranked everyone eligible", detail: "6 can work it · sorted by hours, availability, yes-rate", state: "done", at: "4:41 PM" },
+        { label: "Texting Marisa", detail: "she's 1st: 31 hrs, says yes 9 times out of 10", state: "live", at: "4:43 PM" },
         { label: "Then Sasha, then Jake", detail: "asked in order, one at a time", state: "todo" },
         { label: "You approve, board updates", state: "todo" },
       ],
@@ -315,7 +330,7 @@ export function makeSeed(): PortalState {
     { id: "quiet", group: "How Tagout asks", name: "Quiet hours", plain: "No texts during quiet hours unless it's a same-morning emergency.", on: true, value: "9:30 PM to 7 AM", options: ["9 PM to 8 AM", "9:30 PM to 7 AM", "10 PM to 6 AM"], lastUsed: "Aug 24 · 3 messages held until 7:00 AM" },
     { id: "spacing", group: "How Tagout asks", name: "Time per person", plain: "How long each person gets to answer before Tagout moves down the list.", on: true, value: "15 min each", options: ["10 min each", "15 min each", "30 min each"], lastUsed: "Aug 30, 4:56 PM · advanced to next person at 15 min" },
     { id: "escalate", group: "How Tagout asks", name: "When you get the dial list", plain: "Tagout always asks everyone eligible. This sets how early you also get names and numbers to dial yourself.", on: true, value: "1 hr before shift", options: ["2 hrs before shift", "1 hr before shift", "Only if the list runs dry"], lastUsed: "Aug 24, 8:12 AM · call list sent to GM" },
-    { id: "fair", group: "How Tagout asks", name: "Who gets asked first", plain: "The order Tagout works the list. People flagged as wanting hours always jump the line.", on: true, value: "Best yes-rate first", options: ["Most flexible first", "Fewest hours first", "Best yes-rate first", "Even rotation"], lastUsed: "Aug 26 · first ask to Devon K. (requested hours)" },
+    { id: "fair", group: "How Tagout asks", name: "Who gets asked first", plain: "The order Tagout works the list. People flagged as wanting hours always jump the line.", on: true, value: "Best yes-rate first", options: ["Best coverage fit first", "Fewest hours first", "Best yes-rate first", "Even rotation"], lastUsed: "Aug 26 · first ask to Devon K. (requested hours)" },
     { id: "urgent", group: "How Tagout asks", name: "Last-minute mode", plain: "When a call-out lands this close to the shift, Tagout shortens the wait per person and warns you sooner.", on: true, value: "Inside 3 hrs", options: ["Inside 2 hrs", "Inside 3 hrs", "Inside 4 hrs"], lastUsed: "Aug 30, 6:04 AM · shortened waits (call-out inside window)" },
     // Approvals
     { id: "swaps", group: "Approvals", name: "Swaps that pass every rule", plain: "When a swap clears hours, roles, and rest rules, Tagout can finish it alone or still bring it to you.", on: true, value: "Still ask me", options: ["Auto-approve", "Still ask me"], lastUsed: "Aug 29 · swap sent for approval" },
@@ -342,17 +357,26 @@ export function makeSeed(): PortalState {
   ];
 
   return {
+    v: SEED_VERSION,
     houseName: "Harbor & Vine",
     gmFirst: "Jordan",
     autopilot: "ask-first",
     paused: false,
     rotation: "even",
+    fixtures: [
+      { id: "fx1", room: "Dining room", kind: "Kitchen", x: 87, y: 14, w: 26, h: 28 },
+      { id: "fx2", room: "Dining room", kind: "Entry", x: 32, y: 96, w: 18, h: 8 },
+      { id: "fx3", room: "Dining room", kind: "Host stand", x: 32, y: 86, w: 10, h: 10 },
+      { id: "fx4", room: "Dining room", kind: "Restrooms", x: 90, y: 88, w: 18, h: 16 },
+      { id: "fx5", room: "Bar", kind: "Bar counter", x: 50, y: 20, w: 84, h: 22 },
+      { id: "fx6", room: "Patio", kind: "Entry", x: 4, y: 50, w: 6, h: 30 },
+    ],
     floorBalanced: false,
     tables: [
       // Dining room: booths along the left wall, window two-tops up top, floor in the middle
-      { id: "t1", label: "1", section: "Main", shape: "square", seats: 4, room: "Dining room", x: 12, y: 22 },
-      { id: "t2", label: "2", section: "Main", shape: "square", seats: 4, room: "Dining room", x: 12, y: 50 },
-      { id: "t3", label: "3", section: "Main", shape: "square", seats: 4, room: "Dining room", x: 12, y: 78 },
+      { id: "t1", label: "1", section: "Main", shape: "booth", seats: 4, room: "Dining room", x: 12, y: 22 },
+      { id: "t2", label: "2", section: "Main", shape: "booth", seats: 4, room: "Dining room", x: 12, y: 50 },
+      { id: "t3", label: "3", section: "Main", shape: "booth", seats: 4, room: "Dining room", x: 12, y: 78 },
       { id: "t4", label: "4", section: "Main", shape: "round", seats: 2, room: "Dining room", x: 38, y: 16 },
       { id: "t5", label: "5", section: "Main", shape: "round", seats: 2, room: "Dining room", x: 58, y: 16 },
       { id: "t6", label: "6", section: "Main", shape: "round", seats: 6, room: "Dining room", x: 42, y: 52 },
@@ -366,9 +390,9 @@ export function makeSeed(): PortalState {
       { id: "t13", label: "13", section: "Patio", shape: "round", seats: 4, room: "Patio", x: 45, y: 70 },
       { id: "t14", label: "14", section: "Patio", shape: "square", seats: 8, room: "Patio", x: 78, y: 50 },
       // Bar: high-tops along the rail
-      { id: "t15", label: "15", section: "Bar side", shape: "square", seats: 2, room: "Bar", x: 20, y: 66 },
-      { id: "t16", label: "16", section: "Bar side", shape: "square", seats: 2, room: "Bar", x: 45, y: 66 },
-      { id: "t17", label: "17", section: "Bar side", shape: "square", seats: 2, room: "Bar", x: 70, y: 66 },
+      { id: "t15", label: "15", section: "Bar side", shape: "hightop", seats: 2, room: "Bar", x: 20, y: 66 },
+      { id: "t16", label: "16", section: "Bar side", shape: "hightop", seats: 2, room: "Bar", x: 45, y: 66 },
+      { id: "t17", label: "17", section: "Bar side", shape: "hightop", seats: 2, room: "Bar", x: 70, y: 66 },
     ],
     staff,
     shifts,

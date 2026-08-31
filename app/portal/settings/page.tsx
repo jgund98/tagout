@@ -17,7 +17,7 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <PageTitle title="Settings" sub="The house, the plan, and what's wired up." />
+      <PageTitle title="Settings" sub="Profile, billing, locations, and integrations." />
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* house */}

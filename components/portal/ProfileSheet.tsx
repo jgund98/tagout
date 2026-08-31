@@ -74,7 +74,7 @@ export default function ProfileSheet({ person, onClose }: { person: Staff; onClo
         {/* what Tagout has learned */}
         <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <div className="rounded-2xl bg-mint/70 p-3 text-center">
-            <p className="text-[11px] font-extrabold uppercase tracking-wide text-green-dark/70">Flexibility</p>
+            <p className="text-[11px] font-extrabold uppercase tracking-wide text-green-dark/70">Coverage fit</p>
             <p className="mt-0.5 font-display text-[18px] font-extrabold text-ink">
               {flexScore(p) > 0 ? flexScore(p) : "new"}
             </p>
@@ -105,13 +105,13 @@ export default function ProfileSheet({ person, onClose }: { person: Staff; onClo
               ))}
             </ul>
             <p className="mt-2 text-[11.5px] font-semibold text-ink/40">
-              Updates as they reply. Sets the ask order when the rule is on.
+              Updates automatically. Used for ask order when that rule is enabled.
             </p>
           </div>
         )}
         {p.drops90 >= 3 && (
           <p className="mt-2 rounded-2xl rounded-bl-md bg-blush/50 px-3.5 py-2 text-[12.5px] font-bold text-ink">
-            Pattern: {p.drops90} drops in 90 days, three of them Fridays. Kept private, worth a conversation.
+            Pattern: {p.drops90} drops in 90 days, three on Fridays. Not visible to staff.
           </p>
         )}
 

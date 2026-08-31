@@ -132,7 +132,7 @@ export function StatTile({
         {live && <LiveDot />}
         <span className="truncate">{label}</span>
       </p>
-      <p className="mt-1.5 truncate font-display text-[26px] font-extrabold leading-[1.2] tracking-tight text-ink sm:text-[32px]">
+      <p className="mt-1.5 overflow-x-clip overflow-y-visible whitespace-nowrap font-display text-[26px] font-extrabold leading-[1.25] tracking-tight text-ink sm:text-[32px]">
         {value}
       </p>
       {sub && <p className="mt-1.5 truncate text-[12.5px] font-semibold text-ink/50 sm:text-[13px]">{sub}</p>}

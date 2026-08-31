@@ -1,23 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { BubbleMark } from "@/components/Wordmark";
 import { usePortal, endDemoSession, needsYouCount } from "@/lib/portal/store";
 import { Avatar, LiveDot } from "./ui";
+import { NavIcon } from "./NavIcon";
+import { PovSwitch } from "./PovSwitch";
 
 const NAV = [
-  { href: "/portal", label: "Today", icon: "🏠" },
-  { href: "/portal/coverage", label: "Coverage", icon: "💬" },
-  { href: "/portal/schedule", label: "Schedule", icon: "🗓️" },
-  { href: "/portal/team", label: "Team", icon: "👥" },
-  { href: "/portal/hours", label: "Hours", icon: "⏱️" },
-  { href: "/portal/inbox", label: "Inbox", icon: "🔔" },
-  { href: "/portal/floor", label: "Floor plan", icon: "🍽️" },
-  { href: "/portal/rules", label: "House rules", icon: "🛡️" },
-  { href: "/portal/settings", label: "Settings", icon: "⚙️" },
+  { href: "/portal", label: "Today", icon: "home" },
+  { href: "/portal/tagai", label: "TagAI", icon: "spark" },
+  { href: "/portal/coverage", label: "Coverage", icon: "chat" },
+  { href: "/portal/schedule", label: "Schedule", icon: "calendar" },
+  { href: "/portal/team", label: "Team", icon: "people" },
+  { href: "/portal/hours", label: "Hours", icon: "clock" },
+  { href: "/portal/inbox", label: "Inbox", icon: "inbox" },
+  { href: "/portal/floor", label: "Floor plan", icon: "floor" },
+  { href: "/portal/rules", label: "House rules", icon: "shield" },
+  { href: "/portal/settings", label: "Settings", icon: "gear" },
 ];
 
 export default function Shell({ children }: { children: React.ReactNode }) {
@@ -29,6 +32,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const unread = state.feed.filter((f) => f.fresh).length;
   const needs = needsYouCount(state);
   const staffOf = (id: string | null) => state.staff.find((s) => s.id === id) ?? null;
+
+  // every tab starts at the top, always
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   const logout = () => {
     endDemoSession();
@@ -49,7 +57,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
           <nav className="mt-7 flex-1" aria-label="Portal">
             {[
-              { label: null, hrefs: ["/portal", "/portal/inbox"] },
+              { label: null, hrefs: ["/portal", "/portal/tagai", "/portal/inbox"] },
               { label: "Operate", hrefs: ["/portal/coverage", "/portal/schedule", "/portal/hours"] },
               { label: "The house", hrefs: ["/portal/team", "/portal/floor", "/portal/rules"] },
             ].map((group, gi) => (
@@ -71,7 +79,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                           active ? "bg-green text-ink" : "text-paper/65 hover:bg-paper/8 hover:text-paper"
                         }`}
                       >
-                        <span aria-hidden className="text-[16px]">{n.icon}</span>
+                        <NavIcon name={n.icon} />
                         {n.label}
                         {href === "/portal/coverage" && needs > 0 && (
                           <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-coral px-1.5 text-[11px] font-extrabold text-white">
@@ -103,14 +111,14 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                   : "text-paper/65 hover:bg-paper/8 hover:text-paper"
               }`}
             >
-              <span aria-hidden className="text-[16px]">⚙️</span>
+              <NavIcon name="gear" />
               Settings
             </Link>
             <button
               onClick={logout}
               className="flex w-full items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left text-[15px] font-bold text-paper/50 transition-colors hover:bg-paper/8 hover:text-paper"
             >
-              <span aria-hidden className="text-[16px]">👋</span>
+              <NavIcon name="logout" />
               Log out
             </button>
           </div>
@@ -131,12 +139,13 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <span className="rounded-lg rounded-bl-[4px] bg-mint px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-green-dark">
               Demo mode
             </span>
+            <PovSwitch current="gm" />
             {needs > 0 && (
               <Link
                 href="/portal/coverage"
                 className="ml-1 flex items-center gap-1.5 rounded-full bg-coral px-3 py-1 text-[12px] font-extrabold text-white transition-transform hover:scale-[1.03]"
               >
-                Needs you · {needs}
+                Needs attention · {needs}
               </Link>
             )}
           </div>
@@ -182,7 +191,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             className="fixed right-4 top-[72px] z-50 w-[min(380px,calc(100vw-2rem))] rounded-3xl bg-white p-3 shadow-lift"
           >
             <div className="flex items-center justify-between px-2 pb-2 pt-1">
-              <p className="font-display text-[15px] font-extrabold text-ink">What&apos;s been happening</p>
+              <p className="font-display text-[15px] font-extrabold text-ink">Notifications</p>
               <button onClick={() => setNotifOpen(false)} className="text-[13px] font-bold text-ink/40 hover:text-ink">
                 Close
               </button>
@@ -215,7 +224,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               onClick={() => setNotifOpen(false)}
               className="mt-1 block rounded-2xl bg-green-dark py-2.5 text-center text-[13px] font-extrabold text-paper"
             >
-              Open the full inbox →
+              View all in Inbox →
             </Link>
           </motion.div>
         )}
@@ -245,7 +254,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <Link
               key={n.href}
               href={n.href}
-              className={`relative flex flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 text-[11px] font-extrabold ${
+              className={`relative flex flex-col items-center gap-1 rounded-2xl px-3 py-1.5 text-[11px] font-extrabold ${
                 active ? "text-ink" : "text-paper/60"
               }`}
             >
@@ -256,7 +265,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                   className="absolute inset-0 rounded-2xl bg-green"
                 />
               )}
-              <span className="relative text-[16px]" aria-hidden>{n.icon}</span>
+              <span className="relative"><NavIcon name={n.icon} size={17} /></span>
               <span className="relative">{n.label}</span>
               {n.href === "/portal/coverage" && needs > 0 && (
                 <span className="absolute -top-1 right-1 z-10 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-white">
@@ -268,13 +277,13 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         })}
         <button
           onClick={() => setMoreOpen(true)}
-          className={`flex flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 text-[11px] font-extrabold ${
+          className={`flex flex-col items-center gap-1 rounded-2xl px-3 py-1.5 text-[11px] font-extrabold ${
             pathname.startsWith("/portal/rules") || pathname.startsWith("/portal/settings") || pathname.startsWith("/portal/floor")
               ? "bg-green text-ink"
               : "text-paper/60"
           }`}
         >
-          <span className="text-[16px]" aria-hidden>⋯</span>
+          <NavIcon name="more" size={17} />
           More
         </button>
       </nav>
@@ -307,14 +316,18 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     onClick={() => setMoreOpen(false)}
                     className="flex flex-col items-center gap-1.5 rounded-2xl bg-cream py-4 text-[12.5px] font-extrabold text-ink"
                   >
-                    <span className="text-[22px]" aria-hidden>{n.icon}</span>
+                    <NavIcon name={n.icon} size={20} />
                     {n.label}
                   </Link>
                 ))}
               </div>
+              <div className="mt-3 flex items-center justify-between rounded-2xl bg-cream px-4 py-3">
+                <span className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Demo POV</span>
+                <PovSwitch current="gm" />
+              </div>
               <button
                 onClick={logout}
-                className="mt-3 w-full rounded-2xl border-2 border-ink/10 py-3 text-[13.5px] font-extrabold text-ink/55"
+                className="mt-2 w-full rounded-2xl border-2 border-ink/10 py-3 text-[13.5px] font-extrabold text-ink/55"
               >
                 Log out
               </button>

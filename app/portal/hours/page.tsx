@@ -55,7 +55,7 @@ export default function HoursPage() {
     <div className="mx-auto max-w-5xl">
       <PageTitle
         title="Time clock"
-        sub="The time clock runs itself over text: crew texts IN and OUT, you just approve."
+        sub="Clock-ins and outs arrive by text. Review and approve here."
         right={<GreenBtn onClick={exportCsv}>Export for payroll (CSV)</GreenBtn>}
       />
 
@@ -200,7 +200,7 @@ export default function HoursPage() {
         </div>
         {doneToday.some((p) => p.outMins! - p.inMins > 360 && p.breakMins < 30) && (
           <p className="mt-2.5 text-[12.5px] font-semibold text-ink/45">
-            ⚠︎ Over 6 hours with a short break. Some states require 30 minutes, so give it a look before approving.
+            ⚠︎ Over 6 hours with a break under 30 minutes. Review before approving.
           </p>
         )}
       </section>
@@ -232,7 +232,7 @@ export default function HoursPage() {
             })}
         </div>
         <p className="mt-3 text-[12.5px] font-semibold text-ink/45">
-          Anyone in amber is close to 40. Tagout already won&apos;t offer them overtime. That&apos;s the house rule doing its job.
+          Amber is within 2 hours of the overtime cap. These staff are excluded from extra-shift offers.
         </p>
       </section>
     </div>

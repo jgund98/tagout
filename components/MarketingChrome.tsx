@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 /** Marketing header/footer/dock hide inside the app surfaces. */
-const APP_PREFIXES = ["/portal", "/login", "/admin", "/onboarding"];
+const APP_PREFIXES = ["/portal", "/login", "/admin", "/onboarding", "/me", "/welcome"];
 
 export default function MarketingChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();

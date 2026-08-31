@@ -18,12 +18,16 @@ const ROLE_TONES: Record<Role, string> = {
 };
 
 type Editing = { staffId: string; day: number; shift?: Shift };
+type EventEdit = { day: number; id?: string; label: string; note: string };
 
 export default function SchedulePage() {
   const { state, dispatch } = usePortal();
   const [editing, setEditing] = useState<Editing | null>(null);
   const [toast, setToast] = useState("");
   const [burst, setBurst] = useState(false);
+  const [eventEdit, setEventEdit] = useState<EventEdit | null>(null);
+  const [view, setView] = useState<"board" | "coverage" | "day">("board");
+  const [dayView, setDayView] = useState(4);
 
   const active = state.staff.filter((s) => s.status === "active" || s.status === "pending");
   const shiftsFor = (staffId: string, day: number) =>
@@ -84,12 +88,12 @@ export default function SchedulePage() {
         id: uid("f"),
         kind: "rule",
         who: null,
-        text: "Week published. Everyone just got their schedule by text",
-        sub: "sent to everyone on this week",
+        text: "Schedule published",
+        sub: "sent by text to everyone on the week",
         when: "Just now",
       },
     });
-    setToast("Published. The whole crew got their week by text.");
+    setToast("Published. Schedules sent by text.");
     setTimeout(() => setToast(""), 3500);
   };
 
@@ -131,11 +135,36 @@ export default function SchedulePage() {
           onEdit={(e) => setEditing(e)}
           events={state.events}
           staff={state.staff}
+          onEvent={(e) => setEventEdit(e)}
         />
       </div>
 
+      {/* desktop controls: view switcher + board state */}
+      <div className="mb-3 hidden items-center justify-between lg:flex">
+        <div className="flex items-center gap-0.5 rounded-full bg-white p-1 shadow-pop">
+          {([
+            ["board", "Board"],
+            ["coverage", "Coverage"],
+            ["day", "Day"],
+          ] as const).map(([k, label]) => (
+            <button
+              key={k}
+              onClick={() => setView(k)}
+              className={`rounded-full px-4 py-1.5 text-[13px] font-extrabold transition-colors ${
+                view === k ? "bg-pine text-paper" : "text-ink/45 hover:text-ink"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {draftCount > 0 && (
+          <Chip tone="butter">{draftCount} draft{draftCount === 1 ? "" : "s"} unpublished</Chip>
+        )}
+      </div>
+
       {/* desktop: the full board */}
-      <div className="hidden overflow-x-auto rounded-[28px] bg-white p-3 shadow-pop lg:block">
+      <div className={`overflow-x-auto rounded-[28px] bg-white p-3 shadow-pop ${view === "board" ? "hidden lg:block" : "hidden"}`}>
         <table className="w-full min-w-[880px] border-collapse">
           <thead>
             <tr>
@@ -149,10 +178,22 @@ export default function SchedulePage() {
                     {i === 4 && " · tonight"}
                   </span>
                   {state.events.filter((e) => e.day === i).map((e) => (
-                    <span key={e.id} title={e.note} className="ml-1.5 rounded-md bg-lav px-1.5 py-0.5 text-[10px] font-extrabold text-violet-mid">
+                    <button
+                      key={e.id}
+                      title={e.note}
+                      onClick={() => setEventEdit({ day: i, id: e.id, label: e.label, note: e.note })}
+                      className="ml-1.5 rounded-md bg-lav px-1.5 py-0.5 text-[10px] font-extrabold text-violet-mid hover:bg-violet/25"
+                    >
                       {e.label}
-                    </span>
+                    </button>
                   ))}
+                  <button
+                    onClick={() => setEventEdit({ day: i, label: "", note: "" })}
+                    aria-label={`Add event on ${d}`}
+                    className="ml-1 rounded-md px-1 text-[11px] font-extrabold text-ink/20 hover:text-green-deep"
+                  >
+                    +
+                  </button>
                 </th>
               ))}
             </tr>
@@ -239,11 +280,145 @@ export default function SchedulePage() {
         </table>
       </div>
 
-      <p className="mt-3 hidden flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold text-ink/40 lg:flex">
-        <span className="flex items-center gap-1.5"><LiveDot /> Tagout is covering it live</span>
-        <span>Dashed = draft, goes out when you publish</span>
-        <span>Tap any block to change it · tap an empty day to add a shift</span>
-      </p>
+      {/* coverage view: staffing depth per role per day, one glance */}
+      {view === "coverage" && (
+        <div className="hidden overflow-x-auto rounded-[28px] bg-white p-3 shadow-pop lg:block">
+          <table className="w-full min-w-[880px] border-collapse">
+            <thead>
+              <tr>
+                <th className="w-[160px] px-3 py-2.5 text-left text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">
+                  Role
+                </th>
+                {DAYS.map((d, i) => (
+                  <th key={d} className={`px-1.5 py-2.5 text-left text-[11.5px] font-extrabold uppercase tracking-wide ${i === 4 ? "text-green-deep" : "text-ink/40"}`}>
+                    {d}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from(new Set(state.shifts.filter((s) => s.state !== "open").map((s) => s.role))).map((role) => (
+                <tr key={role} className="border-t border-ink/5">
+                  <td className="px-3 py-2.5">
+                    <span className={`rounded-lg px-2 py-1 text-[12px] font-extrabold ${ROLE_TONES[role]}`}>{role}</span>
+                  </td>
+                  {DAYS.map((_, day) => {
+                    const cell = state.shifts.filter((s) => s.day === day && s.role === role && s.state !== "open");
+                    const hrs = cell.reduce((h, s) => h + shiftHours(s), 0);
+                    return (
+                      <td key={day} className={`px-1.5 py-2 ${day === 4 ? "bg-mint/25" : ""}`}>
+                        <div className={`rounded-xl px-2.5 py-2 ${cell.length === 0 ? "bg-cream/60" : cell.length === 1 ? "bg-amber/30" : "bg-mint/60"}`}>
+                          <p className="text-[13.5px] font-extrabold text-ink">{cell.length === 0 ? "—" : cell.length}</p>
+                          <p className="text-[10.5px] font-bold text-ink/40">{cell.length ? `${Math.round(hrs)} hrs` : "nobody on"}</p>
+                        </div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+              <tr className="border-t-2 border-ink/8">
+                <td className="px-3 py-2.5 text-[11.5px] font-extrabold uppercase tracking-wide text-ink/40">On the floor</td>
+                {DAYS.map((_, day) => {
+                  const n = state.shifts.filter((s) => s.day === day && s.state !== "open").length;
+                  const open = state.shifts.filter((s) => s.day === day && s.state === "open").length;
+                  return (
+                    <td key={day} className={`px-1.5 py-2.5 ${day === 4 ? "bg-mint/25" : ""}`}>
+                      <p className="text-[12.5px] font-extrabold text-ink">{n} shifts</p>
+                      {open > 0 && <p className="text-[11px] font-bold text-coral">{open} open</p>}
+                    </td>
+                  );
+                })}
+              </tr>
+            </tbody>
+          </table>
+          <p className="px-3 pb-1 pt-2 text-[12px] font-semibold text-ink/40">
+            Single coverage shows amber. An empty cell means that role isn&apos;t scheduled that day.
+          </p>
+        </div>
+      )}
+
+      {/* day view: everyone's bars on one timeline */}
+      {view === "day" && (
+        <div className="hidden rounded-[28px] bg-white p-5 shadow-pop lg:block">
+          <div className="flex items-center gap-1.5">
+            {DAYS.map((d, i) => (
+              <button
+                key={d}
+                onClick={() => setDayView(i)}
+                className={`rounded-full px-3.5 py-1.5 text-[12.5px] font-extrabold transition-colors ${
+                  dayView === i ? "bg-green-dark text-white" : "bg-cream text-ink/50 hover:text-ink"
+                }`}
+              >
+                {d}
+              </button>
+            ))}
+          </div>
+          {(() => {
+            const AXIS_START = 8 * 60;
+            const AXIS_SPAN = 16 * 60;
+            const dayShifts = state.shifts
+              .filter((s) => s.day === dayView && s.state !== "open")
+              .sort((a, b) => toMins(a.start) - toMins(b.start));
+            return (
+              <div className="mt-5">
+                <div className="relative mb-2 ml-[150px] h-4">
+                  {["8a", "10a", "12p", "2p", "4p", "6p", "8p", "10p", "12a"].map((t, i) => (
+                    <span
+                      key={t}
+                      className="absolute -translate-x-1/2 text-[10.5px] font-bold text-ink/35"
+                      style={{ left: `${(i / 8) * 100}%` }}
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <div className="space-y-1.5">
+                  {dayShifts.map((s) => {
+                    const p = state.staff.find((x) => x.id === s.staffId);
+                    const left = Math.max(0, ((toMins(s.start) - AXIS_START) / AXIS_SPAN) * 100);
+                    const width = Math.min(100 - left, ((toMins(s.end) - toMins(s.start)) / AXIS_SPAN) * 100);
+                    return (
+                      <div key={s.id} className="flex items-center">
+                        <div className="flex w-[150px] shrink-0 items-center gap-2 pr-3">
+                          <Avatar person={p ?? null} size={26} />
+                          <p className="truncate text-[12.5px] font-extrabold text-ink">{p?.first}</p>
+                        </div>
+                        <div className="relative h-9 flex-1 rounded-lg bg-cream/60">
+                          {[...Array(9)].map((_, i) => (
+                            <span key={i} className="absolute inset-y-0 w-px bg-ink/4" style={{ left: `${(i / 8) * 100}%` }} />
+                          ))}
+                          <div
+                            className={`absolute inset-y-1 flex items-center rounded-lg px-2.5 ${ROLE_TONES[s.role]}`}
+                            style={{ left: `${left}%`, width: `${width}%` }}
+                          >
+                            <span className="truncate text-[11px] font-extrabold">
+                              {s.start.replace(":00", "")}–{s.end.replace(":00", "")}
+                              {s.section ? ` · ${s.section}` : ""}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {dayShifts.length === 0 && (
+                    <p className="rounded-2xl bg-cream/60 px-4 py-6 text-center text-[13px] font-semibold text-ink/45">
+                      Nothing scheduled {DAYS[dayView]}.
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
+      {view === "board" && (
+        <p className="mt-3 hidden flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold text-ink/40 lg:flex">
+          <span className="flex items-center gap-1.5"><LiveDot /> Tagout is covering it live</span>
+          <span>Dashed = draft, goes out when you publish</span>
+          <span>Tap any block to change it · tap an empty day to add a shift</span>
+        </p>
+      )}
 
       {/* editor */}
       <AnimatePresence>
@@ -278,6 +453,74 @@ export default function SchedulePage() {
         )}
       </AnimatePresence>
 
+      {/* event editor */}
+      <AnimatePresence>
+        {eventEdit && (
+          <motion.div
+            key="event-editor"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 backdrop-blur-sm sm:items-center"
+            onClick={() => setEventEdit(null)}
+          >
+            <motion.div
+              initial={{ y: 30 }}
+              animate={{ y: 0 }}
+              exit={{ y: 30, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 32 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm rounded-[28px] bg-white p-6 shadow-lift"
+              role="dialog"
+              aria-label="Event"
+            >
+              <p className="font-display text-[20px] font-extrabold text-ink">
+                {DAYS[eventEdit.day]} event
+              </p>
+              <input
+                value={eventEdit.label}
+                onChange={(e) => setEventEdit({ ...eventEdit, label: e.target.value })}
+                placeholder="45-top at 7, live music, buyout"
+                className="mt-4 w-full rounded-xl border-2 border-ink/10 px-3.5 py-2.5 text-[14.5px] font-bold text-ink outline-none focus:border-green"
+              />
+              <input
+                value={eventEdit.note}
+                onChange={(e) => setEventEdit({ ...eventEdit, note: e.target.value })}
+                placeholder="Note for the crew (optional)"
+                className="mt-2.5 w-full rounded-xl border-2 border-ink/10 px-3.5 py-2.5 text-[14px] font-semibold text-ink outline-none focus:border-green"
+              />
+              <div className="mt-4 flex items-center gap-2">
+                <GreenBtn
+                  className="flex-1"
+                  disabled={!eventEdit.label.trim()}
+                  onClick={() => {
+                    if (eventEdit.id) dispatch({ type: "EVENT_REMOVE", id: eventEdit.id });
+                    dispatch({ type: "EVENT_ADD", day: eventEdit.day, label: eventEdit.label.trim(), note: eventEdit.note.trim() });
+                    setEventEdit(null);
+                  }}
+                >
+                  Save event
+                </GreenBtn>
+                {eventEdit.id && (
+                  <button
+                    onClick={() => {
+                      dispatch({ type: "EVENT_REMOVE", id: eventEdit.id! });
+                      setEventEdit(null);
+                    }}
+                    className="rounded-full border-2 border-blush px-4 py-2.5 text-[13.5px] font-extrabold text-coral hover:bg-blush/40"
+                  >
+                    Remove
+                  </button>
+                )}
+                <button onClick={() => setEventEdit(null)} className="px-2 text-[13.5px] font-bold text-ink/45">
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* toast */}
       <AnimatePresence>
         {toast && (
@@ -301,12 +544,14 @@ function MobileDayView({
   onEdit,
   events,
   staff,
+  onEvent,
 }: {
   active: Staff[];
   shiftsFor: (staffId: string, day: number) => Shift[];
   onEdit: (e: Editing) => void;
   events: { id: string; day: number; label: string; note: string }[];
   staff: Staff[];
+  onEvent: (e: EventEdit) => void;
 }) {
   const [day, setDay] = useState(4); // tonight
   const [mode, setMode] = useState<"day" | "person">("day");
@@ -407,10 +652,20 @@ function MobileDayView({
       </div>
       <p className="mt-2.5 text-[13px] font-bold text-ink/45">{summary}</p>
       {events.filter((e) => e.day === day).map((e) => (
-        <p key={e.id} className="mt-3 rounded-2xl rounded-bl-md bg-lav/60 px-4 py-2.5 text-[13px] font-bold text-violet-mid">
+        <button
+          key={e.id}
+          onClick={() => onEvent({ day, id: e.id, label: e.label, note: e.note })}
+          className="mt-3 block w-full rounded-2xl rounded-bl-md bg-lav/60 px-4 py-2.5 text-left text-[13px] font-bold text-violet-mid"
+        >
           📌 {e.label} · {e.note}
-        </p>
+        </button>
       ))}
+      <button
+        onClick={() => onEvent({ day, label: "", note: "" })}
+        className="mt-2 text-[12.5px] font-bold text-ink/40 hover:text-ink"
+      >
+        + Add event
+      </button>
       <div className="mt-3 space-y-2">
         {active.map((p) => {
           const cell = shiftsFor(p.id, day);
@@ -589,7 +844,7 @@ function ShiftEditor({
           <input
             value={shiftNote}
             onChange={(e) => setShiftNote(e.target.value)}
-            placeholder="training with Marisa, big party at 7…"
+            placeholder="training with Marisa, big party at 7"
             className="mt-1 w-full rounded-xl border-2 border-ink/10 px-3 py-2.5 text-[14px] font-bold text-ink outline-none focus:border-green"
           />
         </label>
@@ -619,7 +874,7 @@ function ShiftEditor({
               onClick={() => setDropping(true)}
               className="rounded-full border-2 border-blush px-4 py-2.5 text-[13.5px] font-extrabold text-coral transition-colors hover:bg-blush/40"
             >
-              Drop…
+              Drop
             </button>
           )}
           <button onClick={onClose} className="px-2 text-[13.5px] font-bold text-ink/45 hover:text-ink">
@@ -634,19 +889,19 @@ function ShiftEditor({
                 onClick={() => onDropCover(editing.shift!.id)}
                 className="rounded-xl bg-green px-4 py-2.5 text-left text-[13px] font-extrabold text-ink hover:bg-green-deep hover:text-white"
               >
-                Find coverage → Tagout starts texting the eligible list
+                Find coverage · Tagout texts the eligible list
               </button>
               <button
                 onClick={() => onDelete(editing.shift!.id)}
                 className="rounded-xl border-2 border-ink/12 bg-white px-4 py-2.5 text-left text-[13px] font-extrabold text-ink/70 hover:border-ink"
               >
-                Just remove it → the night runs one lighter
+                Remove only · no outreach
               </button>
             </div>
           </div>
         )}
         <p className="mt-3 text-[11.5px] font-semibold text-ink/40">
-          Changes go out as drafts. Nobody gets texted until you hit Publish.
+          Saved as drafts. Nothing is sent until you publish.
         </p>
       </motion.div>
     </motion.div>

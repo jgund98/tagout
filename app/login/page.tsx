@@ -13,6 +13,9 @@ import { startDemoSession } from "@/lib/portal/store";
  * gets a visible bypass code of all zeros.
  */
 const DEMO_PHONES = ["5613249522", "7209996287"];
+// seeded staff numbers get the staff panel; an invited number gets onboarding
+const STAFF_PHONES: Record<string, string> = { "5615550184": "marisa", "5615550139": "sasha" };
+const ONBOARD_PHONES: Record<string, string> = { "5615550102": "tyler" };
 const OTP_LEN = 6;
 
 const digitsOnly = (v: string) => v.replace(/\D/g, "");
@@ -40,7 +43,7 @@ export default function LoginPage() {
       return;
     }
     setErr("");
-    setStep(DEMO_PHONES.includes(d) ? "otp" : "waitlist");
+    setStep(DEMO_PHONES.includes(d) || STAFF_PHONES[d] || ONBOARD_PHONES[d] ? "otp" : "waitlist");
   };
 
   const setDigit = (i: number, v: string) => {
@@ -51,8 +54,17 @@ export default function LoginPage() {
     if (d && i < OTP_LEN - 1) boxes.current[i + 1]?.focus();
     if (next.every((x) => x !== "")) {
       if (next.join("") === "0".repeat(OTP_LEN)) {
-        startDemoSession();
-        router.push("/portal");
+        const d = digitsOnly(phone);
+        if (STAFF_PHONES[d]) {
+          startDemoSession("staff", STAFF_PHONES[d]);
+          router.push("/me");
+        } else if (ONBOARD_PHONES[d]) {
+          startDemoSession("onboard", ONBOARD_PHONES[d]);
+          router.push("/welcome");
+        } else {
+          startDemoSession("gm");
+          router.push("/portal");
+        }
       } else {
         setErr("That code didn't match. Check the text or resend.");
         setOtp(Array(OTP_LEN).fill(""));
