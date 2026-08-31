@@ -37,6 +37,7 @@ export default function FloorPage() {
   const [editingFx, setEditingFx] = useState<Fixture | null>(null);
   const [assigning, setAssigning] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
   const draggedRef = useRef(false);
 
@@ -165,8 +166,16 @@ export default function FloorPage() {
         })}
       </div>
 
-      {/* room tabs + add */}
-      <div className="mt-5 flex items-center justify-between">
+      {/* room tabs + add — expands to a full-screen editor on tap */}
+      <div
+        className={
+          expanded
+            ? "fixed inset-0 z-50 flex flex-col overflow-hidden bg-cream px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]"
+            : ""
+        }
+        style={expanded ? { paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" } : undefined}
+      >
+      <div className={`flex items-center justify-between gap-2 ${expanded ? "" : "mt-5"}`}>
         <div className="flex rounded-full bg-white p-1 shadow-pop">
           {ROOMS.map((r) => (
             <button
@@ -183,13 +192,28 @@ export default function FloorPage() {
             </button>
           ))}
         </div>
-        <div className="relative">
+        <div className="relative flex items-center gap-2">
           <button
             onClick={() => setAddOpen((v) => !v)}
             className="rounded-full border-2 border-ink/12 px-4 py-2 text-[13px] font-extrabold text-ink/60 transition-colors hover:border-green hover:text-green-deep"
           >
             + Add
           </button>
+          {expanded ? (
+            <button
+              onClick={() => setExpanded(false)}
+              className="rounded-full bg-green-dark px-4 py-2 text-[13px] font-extrabold text-white"
+            >
+              Done
+            </button>
+          ) : (
+            <button
+              onClick={() => setExpanded(true)}
+              className="rounded-full border-2 border-ink/12 px-4 py-2 text-[13px] font-extrabold text-ink/60 lg:hidden"
+            >
+              Expand
+            </button>
+          )}
           <AnimatePresence>
             {addOpen && (
               <motion.div
@@ -233,12 +257,18 @@ export default function FloorPage() {
       {/* the room canvas */}
       <div
         ref={canvasRef}
-        className="relative mt-3 aspect-[16/10] w-full touch-none select-none overflow-hidden rounded-[28px] border border-ink/8 bg-white shadow-pop sm:aspect-[16/9]"
+        className={`relative mt-3 w-full touch-none select-none overflow-hidden rounded-[28px] border border-ink/8 bg-white shadow-pop ${
+          expanded ? "min-h-0 flex-1" : "aspect-[16/10] sm:aspect-[16/9]"
+        }`}
         style={{
           backgroundImage: "radial-gradient(circle, rgb(15 21 18 / 0.045) 1px, transparent 1px)",
           backgroundSize: "26px 26px",
         }}
-        onClick={() => setAddOpen(false)}
+        onClick={(e) => {
+          setAddOpen(false);
+          // tapping empty floor on a phone opens the full-screen editor
+          if (!expanded && e.target === e.currentTarget && window.innerWidth < 1024) setExpanded(true);
+        }}
       >
         {roomFixtures.map((f) => (
           <motion.div
@@ -331,6 +361,7 @@ export default function FloorPage() {
           </span>
         ))}
       </p>
+      </div>
 
       {/* table editor */}
       <AnimatePresence>

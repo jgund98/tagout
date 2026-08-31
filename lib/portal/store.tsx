@@ -170,7 +170,7 @@ type Action =
   | { type: "FIXTURE_ADD"; room: string; kind: import("./data").FixtureKind }
   | { type: "FIXTURE_PATCH"; id: string; patch: Partial<import("./data").Fixture> }
   | { type: "FIXTURE_REMOVE"; id: string }
-  | { type: "EVENT_ADD"; day: number; label: string; note: string }
+  | { type: "EVENT_ADD"; event: Omit<import("./data").HouseEvent, "id"> }
   | { type: "EVENT_REMOVE"; id: string }
   | { type: "TIMEOFF_REQUEST"; staffId: string; range: string; reason: string }
   | { type: "SHIFT_CLAIM"; shiftId: string; staffId: string }
@@ -340,7 +340,7 @@ function reducer(state: PortalState, a: Action): PortalState {
     case "FIXTURE_REMOVE":
       return { ...state, fixtures: state.fixtures.filter((f) => f.id !== a.id) };
     case "EVENT_ADD":
-      return { ...state, events: [...state.events, { id: uid("e"), day: a.day, label: a.label, note: a.note }] };
+      return { ...state, events: [...state.events, { id: uid("e"), ...a.event }] };
     case "EVENT_REMOVE":
       return { ...state, events: state.events.filter((e) => e.id !== a.id) };
     case "TIMEOFF_REQUEST":

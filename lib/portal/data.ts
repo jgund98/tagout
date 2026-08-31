@@ -91,7 +91,17 @@ export type TimeOff = {
   state: "pending" | "approved" | "denied";
 };
 
-export type HouseEvent = { id: string; day: number; label: string; note: string };
+export type EventKind = "Large party" | "Live music" | "Buyout" | "Holiday" | "Other";
+export type HouseEvent = {
+  id: string;
+  day: number; // 0=Mon
+  kind: EventKind;
+  time: string; // "7:00 PM"
+  size: number | null; // party size, for Large party
+  room: string | null; // Dining room | Patio | Bar
+  label: string; // derived display line, e.g. "45-top · 7 PM"
+  note: string; // free text for the crew, display only
+};
 
 export type Note = { id: string; text: string; when: string };
 
@@ -120,7 +130,7 @@ export type Fixture = {
 };
 export type RotationMode = "even" | "seniority" | "training";
 
-export const SEED_VERSION = 4;
+export const SEED_VERSION = 5;
 
 export type PortalState = {
   v: number;
@@ -347,8 +357,8 @@ export function makeSeed(): PortalState {
   ];
 
   const events: HouseEvent[] = [
-    { id: "e1", day: 4, label: "45-top · 7 PM", note: "Rehearsal dinner, patio. Tagout staffed +2 servers." },
-    { id: "e2", day: 5, label: "Live music", note: "Bar side runs heavy after 8." },
+    { id: "e1", day: 4, kind: "Large party", time: "7:00 PM", size: 45, room: "Patio", label: "45-top · 7 PM", note: "Rehearsal dinner. Tagout staffed +2 servers." },
+    { id: "e2", day: 5, kind: "Live music", time: "8:00 PM", size: null, room: "Bar", label: "Live music · 8 PM", note: "Bar side runs heavy after 8." },
   ];
 
   const notes: Note[] = [

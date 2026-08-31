@@ -2,13 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Chip, GreenBtn } from "@/components/portal/ui";
+import { Chip, GreenBtn, PageTitle, StatTile } from "@/components/portal/ui";
+import { NavIcon } from "@/components/portal/NavIcon";
 import { PovSwitch } from "@/components/portal/PovSwitch";
 import { BubbleMark } from "@/components/Wordmark";
 
 /**
  * Tagout HQ: the internal panel we use to run the business — onboard
- * restaurants, watch account health, and work support. Demo-seeded.
+ * restaurants, watch account health, and work support. Demo-seeded, and
+ * built on the exact same shell language as the GM portal.
  */
 
 type ClientStatus = "live" | "onboarding" | "trial" | "at-risk";
@@ -90,7 +92,18 @@ const STATUS_META: Record<ClientStatus, { label: string; tone: "mint" | "butter"
   "at-risk": { label: "At risk", tone: "blush" },
 };
 
+type Tab = "overview" | "clients" | "onboarding" | "support" | "team";
+
+const TABS: { key: Tab; label: string; icon: string }[] = [
+  { key: "overview", label: "Overview", icon: "home" },
+  { key: "clients", label: "Clients", icon: "people" },
+  { key: "onboarding", label: "Onboarding", icon: "swap" },
+  { key: "support", label: "Support", icon: "chat" },
+  { key: "team", label: "Team", icon: "shield" },
+];
+
 export default function AdminPage() {
+  const [tab, setTab] = useState<Tab>("overview");
   const [clients, setClients] = useState(SEED_CLIENTS);
   const [pipeline, setPipeline] = useState(SEED_PIPELINE);
   const [tickets, setTickets] = useState(SEED_TICKETS);
@@ -109,196 +122,350 @@ export default function AdminPage() {
   };
 
   const kpis = useMemo(() => {
-    const live = clients.filter((c) => c.status === "live" || c.status === "at-risk");
+    const paying = clients.filter((c) => c.mrr > 0);
     return {
       mrr: clients.reduce((n, c) => n + c.mrr, 0),
-      houses: live.length,
+      houses: paying.length,
       seats: clients.reduce((n, c) => n + c.seats, 0),
       covers: clients.reduce((n, c) => n + c.covers30, 0),
       sms: clients.reduce((n, c) => n + c.smsMonth, 0),
     };
   }, [clients]);
 
-  return (
-    <div className="min-h-screen bg-cream pb-16">
-      {/* topbar */}
-      <header className="sticky top-0 z-30 border-b border-ink/6 bg-cream/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-pine">
-              <BubbleMark size={18} className="text-green" />
-            </span>
-            <div className="leading-tight">
-              <p className="font-display text-[17px] font-extrabold text-ink">Tagout HQ</p>
-              <p className="text-[10.5px] font-bold uppercase tracking-wide text-ink/40">Internal · client operations</p>
+  const openTickets = tickets.filter((t) => t.state === "open").length;
+  const atRisk = clients.filter((c) => c.status === "at-risk");
+
+  const go = (t: Tab) => {
+    setTab(t);
+    window.scrollTo(0, 0);
+  };
+
+  /* ---- sections ---- */
+
+  const ClientList = (
+    <section className="rounded-3xl bg-white p-5 shadow-pop">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-[18px] font-extrabold text-ink">All clients</h2>
+        <button
+          onClick={() => say("Onboarding link copied. Send it to the GM.")}
+          className="rounded-full bg-green px-4 py-2 text-[13px] font-extrabold text-ink transition-transform hover:scale-[1.02]"
+        >
+          + New restaurant
+        </button>
+      </div>
+      <div className="mt-4 space-y-2">
+        {clients.map((c) => (
+          <button
+            key={c.id}
+            onClick={() => setOpenClient(c)}
+            className="flex w-full flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl bg-cream/70 px-4 py-3 text-left transition-colors hover:bg-cream"
+          >
+            <div className="min-w-[160px] flex-1">
+              <p className="text-[14.5px] font-extrabold text-ink">{c.name}</p>
+              <p className="text-[12px] font-semibold text-ink/45">{c.city} · GM {c.gm}</p>
+            </div>
+            <div className="hidden text-right sm:block">
+              <p className="text-[13px] font-extrabold text-ink">{c.seats} seats</p>
+              <p className="text-[11.5px] font-semibold text-ink/40">${c.mrr}/mo</p>
+            </div>
+            <div className="hidden text-right md:block">
+              <p className="text-[13px] font-extrabold text-ink">{c.covers30} cover{c.covers30 === 1 ? "" : "s"} · 30d</p>
+              <p className="text-[11.5px] font-semibold text-ink/40">
+                {c.successRate !== null ? `${Math.round(c.successRate * 100)}% covered by Tagout` : "no runs yet"}
+              </p>
+            </div>
+            <div className="hidden text-right lg:block">
+              <p className="text-[12px] font-semibold text-ink/40">active {c.lastActive}</p>
+            </div>
+            <Chip tone={STATUS_META[c.status].tone}>{STATUS_META[c.status].label}</Chip>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+
+  const Pipeline = (
+    <section className="rounded-3xl bg-white p-5 shadow-pop">
+      <h2 className="font-display text-[18px] font-extrabold text-ink">Onboarding pipeline</h2>
+      <p className="mt-0.5 text-[12px] font-semibold text-ink/40">
+        Signed → number → roster → rules → first live cover
+      </p>
+      <div className="mt-4 space-y-3">
+        {pipeline.map((p) => (
+          <div key={p.id} className="rounded-2xl bg-cream/70 p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-[14.5px] font-extrabold text-ink">{p.name}</p>
+              <p className="text-[11.5px] font-bold text-ink/40">{p.owner}</p>
+            </div>
+            <div className="mt-2.5 flex items-center gap-1">
+              {ONBOARD_STEPS.map((s, i) => (
+                <span
+                  key={s}
+                  title={s}
+                  className={`h-1.5 flex-1 rounded-full ${i < p.step ? "bg-green" : i === p.step ? "bg-amber" : "bg-ink/8"}`}
+                />
+              ))}
+            </div>
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <p className="text-[12px] font-semibold text-ink/45">
+                {p.step >= ONBOARD_STEPS.length ? "Done" : `Now: ${ONBOARD_STEPS[p.step]}`} · {p.note}
+              </p>
+              {p.step < ONBOARD_STEPS.length && (
+                <button
+                  onClick={() => {
+                    setPipeline((prev) => prev.map((x) => (x.id === p.id ? { ...x, step: x.step + 1 } : x)));
+                    say(`${p.name}: ${ONBOARD_STEPS[p.step]} marked done.`);
+                  }}
+                  className="shrink-0 rounded-full bg-green-dark px-3 py-1.5 text-[11.5px] font-extrabold text-white"
+                >
+                  Mark step done
+                </button>
+              )}
             </div>
           </div>
-          <PovSwitch current="admin" />
+        ))}
+      </div>
+    </section>
+  );
+
+  const Support = (
+    <section className="rounded-3xl bg-white p-5 shadow-pop">
+      <h2 className="font-display text-[18px] font-extrabold text-ink">Support queue</h2>
+      <p className="mt-0.5 text-[12px] font-semibold text-ink/40">{openTickets} open</p>
+      <div className="mt-4 space-y-2.5">
+        {tickets.map((t) => (
+          <div key={t.id} className={`rounded-2xl p-4 ${t.state === "done" ? "bg-cream/50 opacity-60" : "bg-cream/70"}`}>
+            <div className="flex items-center justify-between">
+              <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">{t.client}</p>
+              <p className="text-[11.5px] font-bold text-ink/35">{t.when}</p>
+            </div>
+            <p className="mt-1 text-[13.5px] font-bold leading-snug text-ink">{t.text}</p>
+            <div className="mt-2.5 flex items-center justify-between">
+              <p className="text-[11.5px] font-bold text-ink/40">Assigned · {t.owner}</p>
+              {t.state === "open" ? (
+                <button
+                  onClick={() => {
+                    setTickets((prev) => prev.map((x) => (x.id === t.id ? { ...x, state: "done" as const } : x)));
+                    say("Ticket closed.");
+                  }}
+                  className="rounded-full border-2 border-ink/10 px-3 py-1 text-[11.5px] font-extrabold text-ink/55 hover:border-green hover:text-green-deep"
+                >
+                  Resolve
+                </button>
+              ) : (
+                <Chip tone="mint">Done</Chip>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+
+  const Team = (
+    <section className="rounded-3xl bg-white p-5 shadow-pop">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-[18px] font-extrabold text-ink">Tagout team</h2>
+        <button
+          onClick={() => setInviteOpen(true)}
+          className="rounded-full border-2 border-ink/10 px-4 py-2 text-[13px] font-extrabold text-ink/55 hover:border-green hover:text-green-deep"
+        >
+          + Invite teammate
+        </button>
+      </div>
+      <div className="mt-3 space-y-2">
+        {team.map((m) => (
+          <div key={m.name} className="flex items-center justify-between rounded-2xl bg-cream/70 px-4 py-3">
+            <div>
+              <p className="text-[14px] font-extrabold text-ink">{m.name}</p>
+              <p className="text-[12px] font-semibold text-ink/45">{m.scope}</p>
+            </div>
+            <Chip tone={m.role === "Owner" ? "ink" : "lav"}>{m.role}</Chip>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+
+  return (
+    <div className="min-h-screen bg-cream">
+      {/* sidebar (desktop): same pine rail as the portal */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[264px] flex-col p-4 lg:flex">
+        <div className="flex h-full flex-col rounded-[28px] bg-pine px-4 pb-4 pt-5">
+          <div className="flex items-center gap-2.5 px-2">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-green">
+              <BubbleMark size={20} className="text-white" />
+            </span>
+            <div className="leading-tight">
+              <span className="block font-display text-[22px] font-extrabold text-paper">tagout</span>
+              <span className="block text-[10px] font-extrabold uppercase tracking-[0.16em] text-paper/40">HQ</span>
+            </div>
+          </div>
+
+          <nav className="mt-7 flex-1 space-y-1" aria-label="Admin">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => go(t.key)}
+                className={`flex w-full items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left text-[15px] font-bold transition-colors ${
+                  tab === t.key ? "bg-green text-ink" : "text-paper/65 hover:bg-paper/8 hover:text-paper"
+                }`}
+              >
+                <NavIcon name={t.icon} />
+                {t.label}
+                {t.key === "support" && openTickets > 0 && (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-coral px-1.5 text-[11px] font-extrabold text-white">
+                    {openTickets}
+                  </span>
+                )}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </aside>
+
+      {/* topbar: same anatomy as the portal */}
+      <header className="sticky top-0 z-30 border-b border-ink/6 bg-cream/85 backdrop-blur-xl lg:pl-[264px]">
+        <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
+          <div className="flex items-center gap-2 lg:hidden">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green">
+              <BubbleMark size={16} className="text-white" />
+            </span>
+            <span className="font-display text-[18px] font-extrabold text-ink">tagout</span>
+            <span className="rounded-lg rounded-bl-[4px] bg-pine px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-paper">
+              HQ
+            </span>
+          </div>
+          <div className="hidden items-center gap-2 lg:flex">
+            <p className="font-display text-[15px] font-extrabold text-ink">Tagout HQ</p>
+            <span className="rounded-lg rounded-bl-[4px] bg-pine px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-paper">
+              Internal
+            </span>
+            <PovSwitch current="admin" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="lg:hidden"><PovSwitch current="admin" /></span>
+            <div className="flex items-center gap-2.5 rounded-full bg-white py-1.5 pl-1.5 pr-4 shadow-pop">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-dark font-display text-[13px] font-extrabold text-paper">
+                J
+              </span>
+              <div className="hidden leading-tight sm:block">
+                <p className="text-[13px] font-extrabold text-ink">Jordan</p>
+                <p className="text-[10.5px] font-bold text-ink/40">Owner · Tagout</p>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl space-y-6 px-4 pt-6 sm:px-6">
-        {/* KPIs */}
-        <section className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          {[
-            [`$${kpis.mrr.toLocaleString()}`, "MRR"],
-            [String(kpis.houses), "Paying houses"],
-            [String(kpis.seats), "Seats on platform"],
-            [String(kpis.covers), "Covers · 30d"],
-            [kpis.sms.toLocaleString(), "Texts · 30d"],
-          ].map(([v, l]) => (
-            <div key={l} className="rounded-3xl bg-white p-4 shadow-pop">
-              <p className="font-display text-[24px] font-extrabold leading-none text-ink">{v}</p>
-              <p className="mt-1.5 text-[11px] font-extrabold uppercase tracking-wide text-ink/40">{l}</p>
-            </div>
-          ))}
-        </section>
+      <main className="px-4 pb-28 pt-6 sm:px-6 lg:pb-10 lg:pl-[288px] lg:pr-8">
+        <motion.div
+          key={tab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className="mx-auto max-w-5xl"
+        >
+          {tab === "overview" && (
+            <>
+              <PageTitle title="Overview" sub="How the book looks today" />
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+                <StatTile label="MRR" value={`$${kpis.mrr.toLocaleString()}`} sub={`${kpis.houses} paying houses`} tone="mint" />
+                <StatTile label="Seats" value={kpis.seats} sub="across all houses" />
+                <StatTile label="Covers" value={kpis.covers} sub="last 30 days" />
+                <StatTile label="Texts" value={kpis.sms.toLocaleString()} sub="last 30 days" />
+                <StatTile label="Open tickets" value={openTickets} sub={openTickets ? "in the queue" : "queue is clear"} tone={openTickets ? "butter" : "white"} />
+              </div>
 
-        {/* clients */}
-        <section className="rounded-3xl bg-white p-5 shadow-pop">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-[18px] font-extrabold text-ink">Clients</h2>
-            <button
-              onClick={() => say("Onboarding link copied. Send it to the GM.")}
-              className="rounded-full bg-green px-4 py-2 text-[13px] font-extrabold text-ink transition-transform hover:scale-[1.02]"
-            >
-              + New restaurant
-            </button>
-          </div>
-          <div className="mt-4 space-y-2">
-            {clients.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => setOpenClient(c)}
-                className="flex w-full flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl bg-cream/70 px-4 py-3 text-left transition-colors hover:bg-cream"
-              >
-                <div className="min-w-[160px] flex-1">
-                  <p className="text-[14.5px] font-extrabold text-ink">{c.name}</p>
-                  <p className="text-[12px] font-semibold text-ink/45">{c.city} · GM {c.gm}</p>
-                </div>
-                <div className="hidden text-right sm:block">
-                  <p className="text-[13px] font-extrabold text-ink">{c.seats} seats</p>
-                  <p className="text-[11.5px] font-semibold text-ink/40">${c.mrr}/mo</p>
-                </div>
-                <div className="hidden text-right md:block">
-                  <p className="text-[13px] font-extrabold text-ink">{c.covers30} cover{c.covers30 === 1 ? "" : "s"} · 30d</p>
-                  <p className="text-[11.5px] font-semibold text-ink/40">
-                    {c.successRate !== null ? `${Math.round(c.successRate * 100)}% covered by Tagout` : "no runs yet"}
-                  </p>
-                </div>
-                <div className="hidden text-right lg:block">
-                  <p className="text-[12px] font-semibold text-ink/40">active {c.lastActive}</p>
-                </div>
-                <Chip tone={STATUS_META[c.status].tone}>{STATUS_META[c.status].label}</Chip>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* onboarding pipeline */}
-          <section className="rounded-3xl bg-white p-5 shadow-pop">
-            <h2 className="font-display text-[18px] font-extrabold text-ink">Onboarding</h2>
-            <p className="mt-0.5 text-[12px] font-semibold text-ink/40">
-              Signed → number → roster → rules → first live cover
-            </p>
-            <div className="mt-4 space-y-3">
-              {pipeline.map((p) => (
-                <div key={p.id} className="rounded-2xl bg-cream/70 p-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[14.5px] font-extrabold text-ink">{p.name}</p>
-                    <p className="text-[11.5px] font-bold text-ink/40">{p.owner}</p>
-                  </div>
-                  <div className="mt-2.5 flex items-center gap-1">
-                    {ONBOARD_STEPS.map((s, i) => (
-                      <span
-                        key={s}
-                        title={s}
-                        className={`h-1.5 flex-1 rounded-full ${i < p.step ? "bg-green" : i === p.step ? "bg-amber" : "bg-ink/8"}`}
-                      />
+              {atRisk.length > 0 && (
+                <section className="mt-5 rounded-3xl border-2 border-coral/25 bg-white p-5">
+                  <h2 className="font-display text-[16px] font-extrabold text-ink">Needs a check-in</h2>
+                  <div className="mt-3 space-y-2">
+                    {atRisk.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => setOpenClient(c)}
+                        className="flex w-full items-center justify-between rounded-2xl bg-cream/70 px-4 py-3 text-left"
+                      >
+                        <div>
+                          <p className="text-[14px] font-extrabold text-ink">{c.name}</p>
+                          <p className="text-[12px] font-semibold text-ink/45">{c.notes[0]}</p>
+                        </div>
+                        <Chip tone="blush">active {c.lastActive}</Chip>
+                      </button>
                     ))}
                   </div>
-                  <div className="mt-2 flex items-center justify-between gap-2">
-                    <p className="text-[12px] font-semibold text-ink/45">
-                      {p.step >= ONBOARD_STEPS.length ? "Done" : `Now: ${ONBOARD_STEPS[p.step]}`} · {p.note}
-                    </p>
-                    {p.step < ONBOARD_STEPS.length && (
-                      <button
-                        onClick={() => {
-                          setPipeline((prev) => prev.map((x) => (x.id === p.id ? { ...x, step: x.step + 1 } : x)));
-                          say(`${p.name}: ${ONBOARD_STEPS[p.step]} marked done.`);
-                        }}
-                        className="shrink-0 rounded-full bg-green-dark px-3 py-1.5 text-[11.5px] font-extrabold text-white"
-                      >
-                        Mark step done
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+                </section>
+              )}
 
-          {/* support queue */}
-          <section className="rounded-3xl bg-white p-5 shadow-pop">
-            <h2 className="font-display text-[18px] font-extrabold text-ink">Support queue</h2>
-            <p className="mt-0.5 text-[12px] font-semibold text-ink/40">
-              {tickets.filter((t) => t.state === "open").length} open
-            </p>
-            <div className="mt-4 space-y-2.5">
-              {tickets.map((t) => (
-                <div key={t.id} className={`rounded-2xl p-4 ${t.state === "done" ? "bg-cream/50 opacity-60" : "bg-cream/70"}`}>
-                  <div className="flex items-center justify-between">
-                    <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">{t.client}</p>
-                    <p className="text-[11.5px] font-bold text-ink/35">{t.when}</p>
-                  </div>
-                  <p className="mt-1 text-[13.5px] font-bold leading-snug text-ink">{t.text}</p>
-                  <div className="mt-2.5 flex items-center justify-between">
-                    <p className="text-[11.5px] font-bold text-ink/40">Assigned · {t.owner}</p>
-                    {t.state === "open" ? (
-                      <button
-                        onClick={() => {
-                          setTickets((prev) => prev.map((x) => (x.id === t.id ? { ...x, state: "done" as const } : x)));
-                          say("Ticket closed.");
-                        }}
-                        className="rounded-full border-2 border-ink/10 px-3 py-1 text-[11.5px] font-extrabold text-ink/55 hover:border-green hover:text-green-deep"
-                      >
-                        Resolve
-                      </button>
-                    ) : (
-                      <Chip tone="mint">Done</Chip>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
-
-        {/* internal team */}
-        <section className="rounded-3xl bg-white p-5 shadow-pop">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-[18px] font-extrabold text-ink">Tagout team</h2>
-            <button
-              onClick={() => setInviteOpen(true)}
-              className="rounded-full border-2 border-ink/10 px-4 py-2 text-[13px] font-extrabold text-ink/55 hover:border-green hover:text-green-deep"
-            >
-              + Invite teammate
-            </button>
-          </div>
-          <div className="mt-3 space-y-2">
-            {team.map((m) => (
-              <div key={m.name} className="flex items-center justify-between rounded-2xl bg-cream/70 px-4 py-3">
-                <div>
-                  <p className="text-[14px] font-extrabold text-ink">{m.name}</p>
-                  <p className="text-[12px] font-semibold text-ink/45">{m.scope}</p>
-                </div>
-                <Chip tone={m.role === "Owner" ? "ink" : "lav"}>{m.role}</Chip>
+              <div className="mt-5 grid gap-5 lg:grid-cols-2">
+                {Pipeline}
+                {Support}
               </div>
-            ))}
-          </div>
-        </section>
+            </>
+          )}
+
+          {tab === "clients" && (
+            <>
+              <PageTitle title="Clients" sub={`${clients.length} restaurants on the platform`} />
+              {ClientList}
+            </>
+          )}
+
+          {tab === "onboarding" && (
+            <>
+              <PageTitle title="Onboarding" sub="Every house between signed and live" />
+              {Pipeline}
+            </>
+          )}
+
+          {tab === "support" && (
+            <>
+              <PageTitle title="Support" sub="Escalations from client houses" />
+              {Support}
+            </>
+          )}
+
+          {tab === "team" && (
+            <>
+              <PageTitle title="Team" sub="Who can touch client accounts" />
+              {Team}
+            </>
+          )}
+        </motion.div>
       </main>
+
+      {/* mobile bottom nav: same pine bar as the portal */}
+      <nav
+        aria-label="Admin mobile"
+        style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
+        className="fixed inset-x-3 z-40 flex justify-between rounded-[24px] bg-pine px-2 py-2 lg:hidden"
+      >
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => go(t.key)}
+            className={`relative flex flex-col items-center gap-1 rounded-2xl px-3 py-1.5 text-[11px] font-extrabold ${
+              tab === t.key ? "text-ink" : "text-paper/60"
+            }`}
+          >
+            {tab === t.key && (
+              <motion.span
+                layoutId="admin-tab-pill"
+                transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                className="absolute inset-0 rounded-2xl bg-green"
+              />
+            )}
+            <span className="relative"><NavIcon name={t.icon} size={17} /></span>
+            <span className="relative">{t.label}</span>
+            {t.key === "support" && openTickets > 0 && (
+              <span className="absolute -top-1 right-1 z-10 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-white">
+                {openTickets}
+              </span>
+            )}
+          </button>
+        ))}
+      </nav>
 
       {/* client drawer */}
       <AnimatePresence>
@@ -329,7 +496,7 @@ export default function AdminPage() {
               <div className="mt-5 grid grid-cols-2 gap-2">
                 {[
                   [`$${openClient.mrr}/mo`, `${openClient.seats} seats · $29 each`],
-                  [openClient.covers30 + " covers", "last 30 days"],
+                  [`${openClient.covers30} cover${openClient.covers30 === 1 ? "" : "s"}`, "last 30 days"],
                   [openClient.smsMonth.toLocaleString() + " texts", "last 30 days"],
                   [openClient.successRate !== null ? `${Math.round(openClient.successRate * 100)}%` : "—", "covered without the GM"],
                 ].map(([v, l]) => (
@@ -361,7 +528,7 @@ export default function AdminPage() {
                   Copy GM onboarding link
                 </GreenBtn>
                 <button
-                  onClick={() => say(`Logged in as ${openClient.gm} is disabled in the demo.`)}
+                  onClick={() => say(`Logging in as ${openClient.gm} is off in the demo.`)}
                   className="w-full rounded-full border-2 border-ink/10 py-2.5 text-[13.5px] font-extrabold text-ink/55"
                 >
                   Open their portal

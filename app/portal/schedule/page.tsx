@@ -5,7 +5,17 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { usePortal, shiftHours, toMins, uid, to24h, from24h } from "@/lib/portal/store";
 import { Avatar, Burst, Chip, GreenBtn, GhostBtn, PageTitle, LiveDot } from "@/components/portal/ui";
-import { DAYS, type Role, type Shift, type Staff } from "@/lib/portal/data";
+import { DAYS, type Role, type Shift, type Staff, type HouseEvent, type EventKind } from "@/lib/portal/data";
+
+const EVENT_KINDS: EventKind[] = ["Large party", "Live music", "Buyout", "Holiday", "Other"];
+
+/** the display line every surface renders, derived from the structured fields */
+function eventLabel(kind: EventKind, size: number, time24: string, other: string): string {
+  const t = from24h(time24).replace(":00 ", " ");
+  if (kind === "Large party") return `${size}-top · ${t}`;
+  if (kind === "Other") return `${other.trim() || "Event"} · ${t}`;
+  return `${kind} · ${t}`;
+}
 
 const ROLE_TONES: Record<Role, string> = {
   Manager: "bg-pine text-paper",
@@ -18,7 +28,37 @@ const ROLE_TONES: Record<Role, string> = {
 };
 
 type Editing = { staffId: string; day: number; shift?: Shift };
-type EventEdit = { day: number; id?: string; label: string; note: string };
+type EventEdit = {
+  id?: string;
+  day: number;
+  kind: EventKind;
+  time24: string;
+  size: number;
+  room: string | null;
+  other: string;
+  note: string;
+};
+
+const blankEvent = (day: number): EventEdit => ({
+  day,
+  kind: "Large party",
+  time24: "19:00",
+  size: 20,
+  room: null,
+  other: "",
+  note: "",
+});
+
+const editEvent = (e: HouseEvent): EventEdit => ({
+  id: e.id,
+  day: e.day,
+  kind: e.kind,
+  time24: to24h(e.time),
+  size: e.size ?? 20,
+  room: e.room,
+  other: e.kind === "Other" ? e.label.split("·")[0].trim() : "",
+  note: e.note,
+});
 
 export default function SchedulePage() {
   const { state, dispatch } = usePortal();
@@ -181,14 +221,14 @@ export default function SchedulePage() {
                     <button
                       key={e.id}
                       title={e.note}
-                      onClick={() => setEventEdit({ day: i, id: e.id, label: e.label, note: e.note })}
+                      onClick={() => setEventEdit(editEvent(e))}
                       className="ml-1.5 rounded-md bg-lav px-1.5 py-0.5 text-[10px] font-extrabold text-violet-mid hover:bg-violet/25"
                     >
                       {e.label}
                     </button>
                   ))}
                   <button
-                    onClick={() => setEventEdit({ day: i, label: "", note: "" })}
+                    onClick={() => setEventEdit(blankEvent(i))}
                     aria-label={`Add event on ${d}`}
                     className="ml-1 rounded-md px-1 text-[11px] font-extrabold text-ink/20 hover:text-green-deep"
                   >
@@ -475,27 +515,121 @@ export default function SchedulePage() {
               aria-label="Event"
             >
               <p className="font-display text-[20px] font-extrabold text-ink">
-                {DAYS[eventEdit.day]} event
+                {eventEdit.id ? "Edit event" : "New event"}
               </p>
-              <input
-                value={eventEdit.label}
-                onChange={(e) => setEventEdit({ ...eventEdit, label: e.target.value })}
-                placeholder="45-top at 7, live music, buyout"
-                className="mt-4 w-full rounded-xl border-2 border-ink/10 px-3.5 py-2.5 text-[14.5px] font-bold text-ink outline-none focus:border-green"
-              />
+
+              <p className="mt-4 text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Day</p>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {DAYS.map((d, i) => (
+                  <button
+                    key={d}
+                    onClick={() => setEventEdit({ ...eventEdit, day: i })}
+                    className={`rounded-full px-3 py-1.5 text-[12.5px] font-extrabold transition-colors ${
+                      eventEdit.day === i ? "bg-green-dark text-white" : "bg-cream text-ink/55"
+                    }`}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+
+              <p className="mt-3.5 text-[12px] font-extrabold uppercase tracking-wide text-ink/40">What is it</p>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {EVENT_KINDS.map((k) => (
+                  <button
+                    key={k}
+                    onClick={() => setEventEdit({ ...eventEdit, kind: k })}
+                    className={`rounded-full px-3 py-1.5 text-[12.5px] font-extrabold transition-colors ${
+                      eventEdit.kind === k ? "bg-green-dark text-white" : "bg-cream text-ink/55"
+                    }`}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+              {eventEdit.kind === "Other" && (
+                <input
+                  value={eventEdit.other}
+                  onChange={(e) => setEventEdit({ ...eventEdit, other: e.target.value })}
+                  placeholder="Name it, like Wine dinner"
+                  className="mt-2 w-full rounded-xl border-2 border-ink/10 px-3.5 py-2.5 text-[14.5px] font-bold text-ink outline-none focus:border-green"
+                />
+              )}
+
+              <div className="mt-3.5 grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Starts</p>
+                  <input
+                    type="time"
+                    value={eventEdit.time24}
+                    onChange={(e) => setEventEdit({ ...eventEdit, time24: e.target.value })}
+                    className="mt-1.5 h-11 w-full min-w-0 appearance-none rounded-xl border-2 border-ink/10 bg-white px-3 text-[15px] font-bold text-ink outline-none focus:border-green [&::-webkit-date-and-time-value]:text-left"
+                  />
+                </div>
+                {eventEdit.kind === "Large party" && (
+                  <div>
+                    <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Party size</p>
+                    <div className="mt-1.5 flex h-11 items-center justify-between rounded-xl border-2 border-ink/10 px-2">
+                      <button
+                        onClick={() => setEventEdit({ ...eventEdit, size: Math.max(6, eventEdit.size - 5) })}
+                        className="h-8 w-8 rounded-lg bg-cream text-[16px] font-extrabold text-ink"
+                        aria-label="Smaller party"
+                      >
+                        −
+                      </button>
+                      <span className="text-[15px] font-extrabold text-ink">{eventEdit.size}</span>
+                      <button
+                        onClick={() => setEventEdit({ ...eventEdit, size: Math.min(200, eventEdit.size + 5) })}
+                        className="h-8 w-8 rounded-lg bg-cream text-[16px] font-extrabold text-ink"
+                        aria-label="Bigger party"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <p className="mt-3.5 text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Where</p>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {["Dining room", "Patio", "Bar"].map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setEventEdit({ ...eventEdit, room: eventEdit.room === r ? null : r })}
+                    className={`rounded-full px-3 py-1.5 text-[12.5px] font-extrabold transition-colors ${
+                      eventEdit.room === r ? "bg-green-dark text-white" : "bg-cream text-ink/55"
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+
               <input
                 value={eventEdit.note}
                 onChange={(e) => setEventEdit({ ...eventEdit, note: e.target.value })}
                 placeholder="Note for the crew (optional)"
-                className="mt-2.5 w-full rounded-xl border-2 border-ink/10 px-3.5 py-2.5 text-[14px] font-semibold text-ink outline-none focus:border-green"
+                className="mt-3.5 w-full rounded-xl border-2 border-ink/10 px-3.5 py-2.5 text-[14px] font-semibold text-ink outline-none focus:border-green"
               />
+
               <div className="mt-4 flex items-center gap-2">
                 <GreenBtn
                   className="flex-1"
-                  disabled={!eventEdit.label.trim()}
+                  disabled={eventEdit.kind === "Other" && !eventEdit.other.trim()}
                   onClick={() => {
                     if (eventEdit.id) dispatch({ type: "EVENT_REMOVE", id: eventEdit.id });
-                    dispatch({ type: "EVENT_ADD", day: eventEdit.day, label: eventEdit.label.trim(), note: eventEdit.note.trim() });
+                    dispatch({
+                      type: "EVENT_ADD",
+                      event: {
+                        day: eventEdit.day,
+                        kind: eventEdit.kind,
+                        time: from24h(eventEdit.time24),
+                        size: eventEdit.kind === "Large party" ? eventEdit.size : null,
+                        room: eventEdit.room,
+                        label: eventLabel(eventEdit.kind, eventEdit.size, eventEdit.time24, eventEdit.other),
+                        note: eventEdit.note.trim(),
+                      },
+                    });
                     setEventEdit(null);
                   }}
                 >
@@ -549,7 +683,7 @@ function MobileDayView({
   active: Staff[];
   shiftsFor: (staffId: string, day: number) => Shift[];
   onEdit: (e: Editing) => void;
-  events: { id: string; day: number; label: string; note: string }[];
+  events: HouseEvent[];
   staff: Staff[];
   onEvent: (e: EventEdit) => void;
 }) {
@@ -654,14 +788,14 @@ function MobileDayView({
       {events.filter((e) => e.day === day).map((e) => (
         <button
           key={e.id}
-          onClick={() => onEvent({ day, id: e.id, label: e.label, note: e.note })}
+          onClick={() => onEvent(editEvent(e))}
           className="mt-3 block w-full rounded-2xl rounded-bl-md bg-lav/60 px-4 py-2.5 text-left text-[13px] font-bold text-violet-mid"
         >
           📌 {e.label} · {e.note}
         </button>
       ))}
       <button
-        onClick={() => onEvent({ day, label: "", note: "" })}
+        onClick={() => onEvent(blankEvent(day))}
         className="mt-2 text-[12.5px] font-bold text-ink/40 hover:text-ink"
       >
         + Add event

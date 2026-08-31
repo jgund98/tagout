@@ -53,6 +53,20 @@ html {
   [class*="overflow-x-auto"] {
     touch-action: pan-y;
   }
+
+  /* iOS Safari zooms the page when a focused input is under 16px.
+     Every app-surface input holds 16px on touch so focus never zooms. */
+  .portal-font input:not([type="checkbox"]):not([type="radio"]),
+  .portal-font textarea,
+  .portal-font select {
+    font-size: 16px;
+  }
+
+  /* kill double-tap zoom everywhere; the viewport meta blocks pinch */
+  html,
+  body {
+    touch-action: manipulation;
+  }
 }
 
 body {

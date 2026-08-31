@@ -20,6 +20,16 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+// locked viewport: the app surfaces must behave like a native iOS app in
+// Safari — no pinch zoom, no double-tap zoom, no stuck zoom states
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover" as const,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {

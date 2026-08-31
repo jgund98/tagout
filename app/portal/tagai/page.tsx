@@ -39,9 +39,18 @@ export default function TagAiPage() {
   };
 
   return (
-    <div className="mx-auto flex h-[calc(100dvh-190px)] max-w-3xl flex-col lg:h-[calc(100dvh-140px)]">
+    <div className="mx-auto flex h-[calc(100dvh-104px)] max-w-3xl flex-col lg:h-[calc(100dvh-140px)]">
       {/* header */}
       <div className="flex items-center gap-3 pb-4">
+        <Link
+          href="/portal"
+          aria-label="Back to Today"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-ink shadow-pop lg:hidden"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+            <path d="M10 3 5 8l5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Link>
         <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-green shadow-[0_0_28px_rgb(14_207_127/0.45)]">
           <BubbleMark size={22} className="text-white" />
         </span>
@@ -136,7 +145,8 @@ export default function TagAiPage() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about tonight, the schedule, anyone on the team"
-          className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-[14.5px] font-semibold text-ink outline-none placeholder:text-ink/35"
+          enterKeyHint="send"
+          className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-[16px] font-semibold text-ink outline-none placeholder:text-ink/35 lg:text-[14.5px]"
         />
         <button
           type="submit"

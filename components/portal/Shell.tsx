@@ -29,9 +29,16 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [notifOpen, setNotifOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const unread = state.feed.filter((f) => f.fresh).length;
   const needs = needsYouCount(state);
   const staffOf = (id: string | null) => state.staff.find((s) => s.id === id) ?? null;
+
+  // TagAI is special on mobile: a floating bubble, not a tab. The chat page
+  // itself goes full-bleed (no bottom bar) so the composer can pin above the keyboard.
+  const onTagai = pathname.startsWith("/portal/tagai");
+  const mobileTabs = NAV.filter((n) => n.href !== "/portal/tagai").slice(0, 5);
+  const moreItems = NAV.filter((n) => n.href !== "/portal/tagai" && !mobileTabs.includes(n));
 
   // every tab starts at the top, always
   useEffect(() => {
@@ -168,14 +175,48 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 </span>
               )}
             </button>
-            <div className="flex items-center gap-2.5 rounded-full bg-white py-1.5 pl-1.5 pr-4 shadow-pop">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-dark font-display text-[13px] font-extrabold text-paper">
-                J
-              </span>
-              <div className="leading-tight">
-                <p className="text-[13px] font-extrabold text-ink">{state.gmFirst}</p>
-                <p className="text-[10.5px] font-bold text-ink/40">GM · {state.houseName}</p>
-              </div>
+            <div className="relative">
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                className="flex items-center gap-2.5 rounded-full bg-white py-1.5 pl-1.5 pr-4 shadow-pop"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-dark font-display text-[13px] font-extrabold text-paper">
+                  J
+                </span>
+                <div className="leading-tight text-left">
+                  <p className="text-[13px] font-extrabold text-ink">{state.gmFirst}</p>
+                  <p className="text-[10.5px] font-bold text-ink/40">GM · {state.houseName}</p>
+                </div>
+              </button>
+              <AnimatePresence>
+                {menuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    role="menu"
+                    className="absolute right-0 top-[52px] z-50 w-48 rounded-2xl bg-white p-1.5 shadow-lift"
+                  >
+                    <Link
+                      href="/portal/settings"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[13.5px] font-bold text-ink transition-colors hover:bg-cream"
+                    >
+                      <NavIcon name="gear" size={15} />
+                      Settings
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-[13.5px] font-bold text-ink/60 transition-colors hover:bg-cream"
+                    >
+                      <NavIcon name="logout" size={15} />
+                      Log out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -231,7 +272,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
 
       {/* content: each screen slides in like an app */}
-      <main className="px-4 pb-28 pt-6 sm:px-6 lg:pb-10 lg:pl-[288px] lg:pr-8">
+      <main className={`px-4 pt-6 sm:px-6 lg:pb-10 lg:pl-[288px] lg:pr-8 ${onTagai ? "pb-4" : "pb-28"}`}>
         <motion.div
           key={pathname}
           initial={{ opacity: 0, y: 10 }}
@@ -242,13 +283,26 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </motion.div>
       </main>
 
+      {/* TagAI floating bubble (mobile): always one thumb away */}
+      {!onTagai && (
+        <Link
+          href="/portal/tagai"
+          aria-label="Ask TagAI"
+          style={{ bottom: "calc(5.25rem + env(safe-area-inset-bottom))" }}
+          className="fixed right-4 z-40 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-green text-ink shadow-[0_4px_24px_rgb(14_207_127/0.55)] lg:hidden"
+        >
+          <NavIcon name="spark" size={24} />
+        </Link>
+      )}
+
       {/* mobile bottom nav */}
+      {!onTagai && (
       <nav
         aria-label="Portal mobile"
         style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
         className="fixed inset-x-3 z-40 flex justify-between rounded-[24px] bg-pine px-2 py-2 lg:hidden"
       >
-        {NAV.slice(0, 5).map((n) => {
+        {mobileTabs.map((n) => {
           const active = n.href === "/portal" ? pathname === "/portal" : pathname.startsWith(n.href);
           return (
             <Link
@@ -278,15 +332,14 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <button
           onClick={() => setMoreOpen(true)}
           className={`flex flex-col items-center gap-1 rounded-2xl px-3 py-1.5 text-[11px] font-extrabold ${
-            pathname.startsWith("/portal/rules") || pathname.startsWith("/portal/settings") || pathname.startsWith("/portal/floor")
-              ? "bg-green text-ink"
-              : "text-paper/60"
+            moreItems.some((n) => pathname.startsWith(n.href)) ? "bg-green text-ink" : "text-paper/60"
           }`}
         >
           <NavIcon name="more" size={17} />
           More
         </button>
       </nav>
+      )}
 
       {/* the More sheet: the rest of the app, one thumb away */}
       <AnimatePresence>
@@ -309,7 +362,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             >
               <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-pine/15" />
               <div className="grid grid-cols-2 gap-3">
-                {NAV.slice(5).map((n) => (
+                {moreItems.map((n) => (
                   <Link
                     key={n.href}
                     href={n.href}
