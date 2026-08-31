@@ -71,6 +71,8 @@ export type FeedEvent = {
   sub?: string;
   when: string;
   fresh?: boolean;
+  // when set, the notification is actionable in place (drawer + inbox)
+  action?: { kind: "timeoff" | "claim" | "cover"; id: string };
 };
 
 export type Rule = {
@@ -131,7 +133,7 @@ export type Fixture = {
 };
 export type RotationMode = "even" | "seniority" | "training";
 
-export const SEED_VERSION = 6;
+export const SEED_VERSION = 7;
 
 export type PortalState = {
   v: number;
@@ -319,6 +321,8 @@ export function makeSeed(): PortalState {
     { id: "f1", kind: "cover", who: "marisa", text: "Tagout is texting Marisa about Dana's Friday close", sub: "1st of 6 eligible · asked at 4:41 PM", when: "4:41 PM" },
     { id: "f2", kind: "clock", who: "erin", text: "Erin clocked in for host, 4:58 PM", sub: "2 min early", when: "4:58 PM" },
     { id: "f3", kind: "rule", who: "katie", text: "Blocked a swap that would clopen Katie", sub: "close Sat + open Sun · asked her first instead", when: "3:22 PM" },
+    { id: "f3b", kind: "swap", who: "sasha", text: "Sasha requested Sep 12–14 off", sub: "sister's wedding", when: "1:12 PM", action: { kind: "timeoff", id: "t1" } },
+    { id: "f3c", kind: "swap", who: "devon", text: "Devon requested Sep 3 off", sub: "DMV appointment", when: "11:05 AM", action: { kind: "timeoff", id: "t2" } },
     { id: "f4", kind: "onboard", who: "tyler", text: "Invite texted to Tyler James", sub: "he replies YES, he's on the roster", when: "2:14 PM" },
     { id: "f5", kind: "swap", who: "erin", text: "Erin ↔ Katie Sunday swap approved", sub: "you tapped Approve · both confirmed by text", when: "Yesterday" },
     { id: "f6", kind: "headsup", who: "dana", text: "Heads-up: Dana has dropped 3 straight Fridays", sub: "kept private · pattern + history in her file", when: "Yesterday" },

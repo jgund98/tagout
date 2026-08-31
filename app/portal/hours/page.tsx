@@ -59,8 +59,10 @@ export default function HoursPage() {
         right={<GreenBtn onClick={exportCsv}>Export for payroll (CSV)</GreenBtn>}
       />
 
+      {/* on mobile, finished cards wait on the GM — they come first, like a notification */}
+      <div className="flex flex-col gap-6">
       {/* on the clock */}
-      <section className="rounded-[28px] bg-white p-5 shadow-pop sm:p-6">
+      <section className="order-2 rounded-[28px] bg-white p-5 shadow-pop sm:order-1 sm:p-6">
         <h2 className="flex items-center gap-2 font-display text-[17px] font-extrabold text-ink">
           <LiveDot /> On the clock right now · {onClock.length}
         </h2>
@@ -85,7 +87,7 @@ export default function HoursPage() {
       </section>
 
       {/* today's timecards */}
-      <section className="mt-6 rounded-[28px] bg-white p-5 shadow-pop sm:p-6">
+      <section className="order-1 rounded-[28px] bg-white p-5 shadow-pop sm:order-2 sm:p-6">
         <h2 className="font-display text-[17px] font-extrabold text-ink">Today&apos;s finished timecards</h2>
 
         {/* mobile: cards, thumb-sized */}
@@ -204,6 +206,7 @@ export default function HoursPage() {
           </p>
         )}
       </section>
+      </div>
 
       {/* week so far */}
       <section className="mt-6 rounded-[28px] bg-white p-5 shadow-pop sm:p-6">

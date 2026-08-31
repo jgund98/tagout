@@ -172,7 +172,7 @@ type Action =
   | { type: "FIXTURE_REMOVE"; id: string }
   | { type: "EVENT_ADD"; event: Omit<import("./data").HouseEvent, "id"> }
   | { type: "EVENT_REMOVE"; id: string }
-  | { type: "TIMEOFF_REQUEST"; staffId: string; range: string; reason: string }
+  | { type: "TIMEOFF_REQUEST"; staffId: string; range: string; reason: string; id?: string }
   | { type: "SHIFT_CLAIM"; shiftId: string; staffId: string }
   | { type: "CLAIM_REQUEST"; shiftId: string; staffId: string }
   | { type: "CLAIM_CANCEL"; shiftId: string; staffId: string }
@@ -349,7 +349,7 @@ function reducer(state: PortalState, a: Action): PortalState {
     case "TIMEOFF_REQUEST":
       return {
         ...state,
-        timeOff: [...state.timeOff, { id: uid("t"), staffId: a.staffId, range: a.range, reason: a.reason, state: "pending" }],
+        timeOff: [...state.timeOff, { id: a.id ?? uid("t"), staffId: a.staffId, range: a.range, reason: a.reason, state: "pending" }],
       };
     case "CLAIM_REQUEST":
       return state.claims.some((c) => c.shiftId === a.shiftId && c.staffId === a.staffId)
@@ -442,7 +442,7 @@ function buildTimeline(): Cue[] {
           d({ type: "RUN_STEP", runId: "r-live", stepIndex: 3, state: "done", detail: "Sasha said yes" });
           d({ type: "RUN_STEP", runId: "r-live", stepIndex: 4, state: "live", detail: "waiting on your one tap" });
           d({ type: "RUN_SET", runId: "r-live", patch: { state: "live", outcome: "Sasha said yes · needs your approval" } });
-          d(F({ kind: "cover", who: "sasha", text: "Sasha said yes to Friday close", sub: "one tap to approve, then everyone gets confirmed", when: "Just now" }));
+          d(F({ kind: "cover", who: "sasha", text: "Sasha said yes to Friday close", sub: "one tap to approve, then everyone gets confirmed", when: "Just now", action: { kind: "cover", id: "r-live" } }));
         }
       },
     },

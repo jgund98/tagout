@@ -521,7 +521,7 @@ export default function MePage() {
                                 celebrate();
                                 dispatch({
                                   type: "FEED_PUSH",
-                                  event: { id: uid("f"), kind: "cover", who: me.id, text: `${me.first} wants the open ${DAY_FULL[s.day]} ${s.role.toLowerCase()} shift`, sub: "tap to approve · first request wins", when: "Just now" },
+                                  event: { id: uid("f"), kind: "cover", who: me.id, text: `${me.first} wants the open ${DAY_FULL[s.day]} ${s.role.toLowerCase()} shift`, sub: "first request wins", when: "Just now", action: { kind: "claim", id: s.id } },
                                 });
                               }}
                               className="rounded-full bg-green px-4 py-2 text-[13px] font-extrabold text-ink transition-transform hover:scale-[1.03]"
@@ -627,10 +627,11 @@ export default function MePage() {
                       workDays={workDays}
                       onCancel={() => setOffForm(false)}
                       onSubmit={(range, reason, days) => {
-                        dispatch({ type: "TIMEOFF_REQUEST", staffId: me.id, range, reason });
+                        const tid = uid("t");
+                        dispatch({ type: "TIMEOFF_REQUEST", staffId: me.id, range, reason, id: tid });
                         dispatch({
                           type: "FEED_PUSH",
-                          event: { id: uid("f"), kind: "swap", who: me.id, text: `${me.first} requested ${range} off`, sub: `${days} day${days === 1 ? "" : "s"} · ${reason.toLowerCase()}`, when: "Just now" },
+                          event: { id: uid("f"), kind: "swap", who: me.id, text: `${me.first} requested ${range} off`, sub: `${days} day${days === 1 ? "" : "s"} · ${reason.toLowerCase()}`, when: "Just now", action: { kind: "timeoff", id: tid } },
                         });
                         setOffForm(false);
                         celebrate();

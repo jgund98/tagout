@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePortal, needsYouCount } from "@/lib/portal/store";
 import { Avatar, Chip, PageTitle, GhostBtn } from "@/components/portal/ui";
+import { NotifActions } from "@/components/portal/NotifActions";
 import type { FeedEvent } from "@/lib/portal/data";
 
 const KIND_META: Record<FeedEvent["kind"], { chip: string; tone: "mint" | "lav" | "butter" | "blush"; href: string }> = {
@@ -56,6 +57,7 @@ export default function InboxPage() {
           </div>
           <p className="mt-1 text-[15px] font-bold leading-snug text-ink">{f.text}</p>
           {f.sub && <p className="mt-0.5 text-[13px] font-medium text-ink/50">{f.sub}</p>}
+          <NotifActions f={f} />
         </div>
         <span className="mt-1 shrink-0 text-ink/25">→</span>
       </Link>

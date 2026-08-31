@@ -9,6 +9,7 @@ import { usePortal, endDemoSession, needsYouCount } from "@/lib/portal/store";
 import { Avatar, LiveDot } from "./ui";
 import { NavIcon } from "./NavIcon";
 import { PovSwitch } from "./PovSwitch";
+import { NotifActions } from "./NotifActions";
 
 const NAV = [
   { href: "/portal", label: "Today", icon: "home" },
@@ -255,6 +256,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     <div className="min-w-0">
                       <p className="text-[13px] font-bold leading-snug text-ink">{f.text}</p>
                       <p className="text-[11.5px] font-semibold text-ink/40">{f.when}</p>
+                      <NotifActions f={f} />
                     </div>
                   </Link>
                 );
