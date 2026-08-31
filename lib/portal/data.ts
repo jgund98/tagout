@@ -36,6 +36,7 @@ export type Shift = {
   state: "published" | "draft" | "open" | "covering";
   section?: string;
   note?: string;
+  droppedBy?: string; // staff id, when the person gave the shift up themselves
 };
 
 export type Punch = {
@@ -130,7 +131,7 @@ export type Fixture = {
 };
 export type RotationMode = "even" | "seniority" | "training";
 
-export const SEED_VERSION = 5;
+export const SEED_VERSION = 6;
 
 export type PortalState = {
   v: number;
@@ -150,6 +151,7 @@ export type PortalState = {
   rules: Rule[];
   timeOff: TimeOff[];
   events: HouseEvent[];
+  claims: { shiftId: string; staffId: string }[]; // open-shift pickup requests waiting on the GM
   notes: Note[];
   weekPublished: boolean;
   dismissed: string[]; // suggestion ids the GM has handled
@@ -412,6 +414,7 @@ export function makeSeed(): PortalState {
     rules,
     timeOff,
     events,
+    claims: [],
     notes,
     weekPublished: true,
     dismissed: [],

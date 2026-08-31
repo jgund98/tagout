@@ -345,7 +345,7 @@ export default function AdminPage() {
           </div>
           <div className="flex items-center gap-2">
             <span className="lg:hidden"><PovSwitch current="admin" /></span>
-            <div className="flex items-center gap-2.5 rounded-full bg-white py-1.5 pl-1.5 pr-4 shadow-pop">
+            <div className="flex items-center rounded-full bg-white p-1.5 shadow-pop sm:gap-2.5 sm:pr-4">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green-dark font-display text-[13px] font-extrabold text-paper">
                 J
               </span>

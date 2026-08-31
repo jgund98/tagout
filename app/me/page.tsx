@@ -223,6 +223,16 @@ export default function MePage() {
   const openShifts = state.shifts.filter((s) => s.state === "open");
   const myTimeOff = state.timeOff.filter((t) => t.staffId === me.id);
   const myFeed = state.feed.filter((f) => f.who === me.id);
+
+  // everything of mine still waiting on an answer, straight from the store
+  const pendingOff = myTimeOff.filter((t) => t.state === "pending");
+  const settledOff = myTimeOff.filter((t) => t.state !== "pending");
+  const myClaims = state.claims
+    .filter((c) => c.staffId === me.id)
+    .map((c) => state.shifts.find((s) => s.id === c.shiftId))
+    .filter((s): s is Shift => !!s);
+  const myDrops = state.shifts.filter((s) => s.droppedBy === me.id && s.state === "open");
+  const pendingCount = pendingOff.length + myClaims.length + myDrops.length;
   const workDays = useMemo(() => [...new Set(myShifts.map((s) => s.day))], [myShifts]);
 
   const liveRun = state.runs.find((r) => r.state === "live");
@@ -230,7 +240,6 @@ export default function MePage() {
   const askedMe = !!liveStep && liveStep.label.toLowerCase().includes(me.first.toLowerCase());
   const [offerState, setOfferState] = useState<"open" | "yes" | "pass">("open");
 
-  const [claimed, setClaimed] = useState<string[]>([]);
   const [dropTarget, setDropTarget] = useState<Shift | null>(null);
   const [offForm, setOffForm] = useState(false);
   const [pickupTexts, setPickupTexts] = useState(true);
@@ -272,7 +281,7 @@ export default function MePage() {
                 onClick={() => setMenuOpen((v) => !v)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
-                className="flex items-center gap-2 rounded-full bg-white py-1.5 pl-1.5 pr-3 shadow-pop"
+                className="flex items-center rounded-full bg-white p-1.5 shadow-pop min-[420px]:gap-2 min-[420px]:pr-3"
               >
                 <Avatar person={me} size={32} />
                 <div className="hidden leading-tight text-left min-[420px]:block">
@@ -491,7 +500,7 @@ export default function MePage() {
                   </p>
                   <div className="mt-3 space-y-2">
                     {openShifts.map((s) => {
-                      const mine = claimed.includes(s.id);
+                      const mine = state.claims.some((c) => c.shiftId === s.id && c.staffId === me.id);
                       return (
                         <div key={s.id} className="flex items-center justify-between rounded-2xl bg-cream/70 px-3.5 py-3">
                           <div>
@@ -508,7 +517,7 @@ export default function MePage() {
                           ) : (
                             <button
                               onClick={() => {
-                                setClaimed((c) => [...c, s.id]);
+                                dispatch({ type: "CLAIM_REQUEST", shiftId: s.id, staffId: me.id });
                                 celebrate();
                                 dispatch({
                                   type: "FEED_PUSH",
@@ -543,6 +552,63 @@ export default function MePage() {
                   </p>
                 </div>
 
+                {/* everything still waiting on an answer */}
+                {pendingCount > 0 && (
+                  <section className="rounded-3xl border-2 border-coral/25 bg-white p-5">
+                    <h2 className="font-display text-[16px] font-extrabold text-ink">Waiting on an answer</h2>
+                    <div className="mt-3 space-y-2">
+                      {pendingOff.map((t) => (
+                        <div key={t.id} className="flex items-center justify-between gap-2 rounded-2xl bg-cream/70 px-3.5 py-2.5">
+                          <div className="min-w-0">
+                            <p className="text-[14px] font-extrabold text-ink">Time off · {t.range}</p>
+                            <p className="text-[12px] font-semibold text-ink/45">with the GM now</p>
+                          </div>
+                          <button
+                            onClick={() => dispatch({ type: "TIMEOFF_CANCEL", id: t.id })}
+                            className="shrink-0 text-[12px] font-bold text-ink/35 hover:text-coral"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ))}
+                      {myClaims.map((s) => (
+                        <div key={s.id} className="flex items-center justify-between gap-2 rounded-2xl bg-cream/70 px-3.5 py-2.5">
+                          <div className="min-w-0">
+                            <p className="text-[14px] font-extrabold text-ink">
+                              Pickup · {DAY_FULL[s.day]} {s.start}–{s.end}
+                            </p>
+                            <p className="text-[12px] font-semibold text-ink/45">waiting on GM approval · first request wins</p>
+                          </div>
+                          <button
+                            onClick={() => dispatch({ type: "CLAIM_CANCEL", shiftId: s.id, staffId: me.id })}
+                            className="shrink-0 text-[12px] font-bold text-ink/35 hover:text-coral"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ))}
+                      {myDrops.map((s) => (
+                        <div key={s.id} className="flex items-center justify-between gap-2 rounded-2xl bg-cream/70 px-3.5 py-2.5">
+                          <div className="min-w-0">
+                            <p className="text-[14px] font-extrabold text-ink">
+                              Drop · {DAY_FULL[s.day]} {s.start}–{s.end}
+                            </p>
+                            <p className="text-[12px] font-semibold text-ink/45">Tagout is texting the eligible list</p>
+                          </div>
+                          <button
+                            onClick={() =>
+                              dispatch({ type: "SHIFT_UPSERT", shift: { ...s, state: "published", droppedBy: undefined } })
+                            }
+                            className="shrink-0 text-[12px] font-bold text-ink/35 hover:text-green-deep"
+                          >
+                            Keep it
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
                 {/* time off */}
                 <section className="rounded-3xl bg-white p-5 shadow-pop">
                   <div className="flex items-center justify-between">
@@ -572,14 +638,14 @@ export default function MePage() {
                     />
                   )}
                   <div className="mt-3 space-y-2">
-                    {myTimeOff.map((t) => (
+                    {settledOff.map((t) => (
                       <div key={t.id} className="flex items-center justify-between rounded-2xl bg-cream/70 px-3.5 py-2.5">
                         <div>
                           <p className="text-[14px] font-extrabold text-ink">{t.range}</p>
                           <p className="text-[12px] font-semibold text-ink/45">{t.reason}</p>
                         </div>
-                        <Chip tone={t.state === "approved" ? "mint" : t.state === "denied" ? "blush" : "butter"}>
-                          {t.state === "approved" ? "Approved" : t.state === "denied" ? "Declined" : "Pending"}
+                        <Chip tone={t.state === "approved" ? "mint" : "blush"}>
+                          {t.state === "approved" ? "Approved" : "Declined"}
                         </Chip>
                       </div>
                     ))}
@@ -619,7 +685,7 @@ export default function MePage() {
                     <div className="mt-3 flex gap-2">
                       <button
                         onClick={() => {
-                          dispatch({ type: "SHIFT_UPSERT", shift: { ...dropTarget, state: "open" } });
+                          dispatch({ type: "SHIFT_UPSERT", shift: { ...dropTarget, state: "open", droppedBy: me.id } });
                           dispatch({
                             type: "FEED_PUSH",
                             event: { id: uid("f"), kind: "cover", who: me.id, text: `${me.first} dropped ${DAY_FULL[dropTarget.day]} ${dropTarget.start}–${dropTarget.end}`, sub: "Tagout is texting the eligible list", when: "Just now" },
@@ -765,6 +831,11 @@ export default function MePage() {
             <span className="relative">{t.label}</span>
             {t.key === "board" && askedMe && offerState === "open" && (
               <span className="absolute -top-1 right-1 z-10 h-2.5 w-2.5 rounded-full bg-coral" />
+            )}
+            {t.key === "requests" && pendingCount > 0 && (
+              <span className="absolute -top-1 right-1 z-10 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-coral px-1 text-[10px] font-extrabold text-white">
+                {pendingCount}
+              </span>
             )}
           </button>
         ))}

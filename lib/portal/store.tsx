@@ -174,6 +174,9 @@ type Action =
   | { type: "EVENT_REMOVE"; id: string }
   | { type: "TIMEOFF_REQUEST"; staffId: string; range: string; reason: string }
   | { type: "SHIFT_CLAIM"; shiftId: string; staffId: string }
+  | { type: "CLAIM_REQUEST"; shiftId: string; staffId: string }
+  | { type: "CLAIM_CANCEL"; shiftId: string; staffId: string }
+  | { type: "TIMEOFF_CANCEL"; id: string }
   | { type: "APPROVE_LIVE_COVER" };
 
 function reducer(state: PortalState, a: Action): PortalState {
@@ -348,6 +351,14 @@ function reducer(state: PortalState, a: Action): PortalState {
         ...state,
         timeOff: [...state.timeOff, { id: uid("t"), staffId: a.staffId, range: a.range, reason: a.reason, state: "pending" }],
       };
+    case "CLAIM_REQUEST":
+      return state.claims.some((c) => c.shiftId === a.shiftId && c.staffId === a.staffId)
+        ? state
+        : { ...state, claims: [...state.claims, { shiftId: a.shiftId, staffId: a.staffId }] };
+    case "CLAIM_CANCEL":
+      return { ...state, claims: state.claims.filter((c) => !(c.shiftId === a.shiftId && c.staffId === a.staffId)) };
+    case "TIMEOFF_CANCEL":
+      return { ...state, timeOff: state.timeOff.filter((t) => t.id !== a.id) };
     case "SHIFT_CLAIM":
       return {
         ...state,
