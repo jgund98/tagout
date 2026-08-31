@@ -700,21 +700,21 @@ function PhotoBand() {
           {[
             {
               src: "/photos/band-floor.webp",
-              alt: "Server carrying a tray of drinks through a busy, warmly lit dining room",
+              alt: "Two cooks working the line at a classic American diner, breakfast table set in the foreground",
               cap: "Friday, fully staffed",
-              pos: "50% 50%",
+              pos: "50% 40%",
             },
             {
               src: "/photos/band-counter.webp",
-              alt: "Smiling barista handing a coffee across the counter to a customer",
+              alt: "Smiling barista pouring a drink behind the counter of a warm coffeehouse",
               cap: "Counter covered, line moving",
-              pos: "50% 50%",
+              pos: "50% 45%",
             },
             {
               src: "/photos/band-happy.webp",
-              alt: "Waitress laughing with a guest at a bright, plant-filled café",
+              alt: "Server in a denim apron smiling while resetting a table in a bright dining room",
               cap: "Nobody working a double they didn't ask for",
-              pos: "50% 50%",
+              pos: "50% 40%",
             },
           ].map((p) => (
             <Item key={p.cap} className="min-w-[78%] snap-center sm:min-w-0">
