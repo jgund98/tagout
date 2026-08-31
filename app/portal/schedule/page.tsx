@@ -251,6 +251,13 @@ export default function SchedulePage() {
                         <p className={`text-[11px] font-bold ${h > 40 && otRule ? "text-coral" : "text-ink/40"}`}>
                           {Math.round(h)} / 40 hrs
                         </p>
+                        {state.timeOff
+                          .filter((t) => t.staffId === p.id && t.state === "approved")
+                          .map((t) => (
+                            <p key={t.id} className="text-[10.5px] font-bold text-green-deep">
+                              🌴 Off {t.range}
+                            </p>
+                          ))}
                       </div>
                     </div>
                   </td>

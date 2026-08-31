@@ -402,6 +402,22 @@ export default function TonightPage() {
                     </p>
                   </li>
                 ))}
+              {state.timeOff
+                .filter((t) => t.state === "approved")
+                .map((t) => {
+                  const p = staffOf(t.staffId);
+                  return (
+                    <li key={t.id} className="flex items-start gap-2.5 rounded-2xl bg-cream/80 px-3.5 py-2.5">
+                      <span aria-hidden>🌴</span>
+                      <p className="text-[13px] font-bold leading-snug text-ink">
+                        {p?.first} off {t.range}
+                        <span className="block text-[11.5px] font-semibold text-ink/45">
+                          approved · no offers those days
+                        </span>
+                      </p>
+                    </li>
+                  );
+                })}
               {state.shifts.some((s) => s.state === "open") && (
                 <li className="flex items-start gap-2.5 rounded-2xl bg-mint/60 px-3.5 py-2.5">
                   <span aria-hidden>🌅</span>

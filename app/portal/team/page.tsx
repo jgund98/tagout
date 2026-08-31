@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { usePortal, uid, flexScore } from "@/lib/portal/store";
+import { usePortal, uid, flexScore, timeOffConflictDays } from "@/lib/portal/store";
 import { Avatar, Chip, GreenBtn, GhostBtn, PageTitle, TagBubble } from "@/components/portal/ui";
 import ProfileSheet from "@/components/portal/ProfileSheet";
 import type { Role, Staff } from "@/lib/portal/data";
@@ -65,14 +65,32 @@ export default function TeamPage() {
         ))}
       </div>
 
-      {/* decided time off, quiet history */}
+      {/* time-off log: every decided request, on the record */}
       {decided.length > 0 && (
-        <p className="mt-6 text-[12.5px] font-semibold text-ink/40">
-          Recent:{" "}
-          {decided
-            .map((t) => `${staffOf(t.staffId)?.first} · ${t.range} · ${t.state === "approved" ? "approved" : "declined"}`)
-            .join("  ·  ")}
-        </p>
+        <section className="mt-6 rounded-3xl bg-white p-5 shadow-pop">
+          <h2 className="font-display text-[16px] font-extrabold text-ink">Time-off log</h2>
+          <div className="mt-3 space-y-2">
+            {decided.map((t) => {
+              const p = staffOf(t.staffId);
+              return (
+                <div key={t.id} className="flex items-center justify-between gap-3 rounded-2xl bg-cream/70 px-3.5 py-2.5">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <Avatar person={p ?? null} size={30} />
+                    <div className="min-w-0">
+                      <p className="truncate text-[13.5px] font-extrabold text-ink">
+                        {p?.first} · {t.range}
+                      </p>
+                      <p className="truncate text-[12px] font-semibold text-ink/45">{t.reason}</p>
+                    </div>
+                  </div>
+                  <Chip tone={t.state === "approved" ? "mint" : "blush"}>
+                    {t.state === "approved" ? "Approved" : "Declined"}
+                  </Chip>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       <AnimatePresence>
@@ -209,6 +227,8 @@ function TimeOffCard({
   const [mode, setMode] = useState<null | "approve" | "decline">(null);
   const [noteText, setNoteText] = useState("");
   const first = person?.first ?? "them";
+  const { state: portal } = usePortal();
+  const conflicts = timeOffConflictDays(portal, t.staffId, t.range);
 
   const send = () => {
     const state = mode === "approve" ? ("approved" as const) : ("denied" as const);
@@ -244,6 +264,11 @@ function TimeOffCard({
           <p className="truncate text-[12.5px] font-semibold text-ink/50">{t.reason}</p>
         </div>
       </div>
+      {conflicts.length > 0 && (
+        <p className="mt-2.5 rounded-xl bg-butter/70 px-3 py-2 text-[12px] font-bold text-ink/70">
+          Covers {conflicts.join(" & ")} shifts {first} usually works. Approving opens them for coverage.
+        </p>
+      )}
       {mode === null ? (
         <div className="mt-3 flex gap-2">
           <button

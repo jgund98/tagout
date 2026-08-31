@@ -116,6 +116,39 @@ export function flexParts(s: import("./data").Staff): { label: string; delta: st
   return parts;
 }
 
+/** Parse a time-off range like "Sep 12–14", "Sep 3", "Aug 31 – Sep 2" into dates (demo year). */
+export function timeOffDates(range: string): Date[] {
+  const MONTHS: Record<string, number> = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+  const parts = [...range.matchAll(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)s?(d+)(?:s?[–-]s?(d+)(?!s?[A-Za-z]))?/g)];
+  if (!parts.length) return [];
+  const first = parts[0];
+  const start = new Date(2026, MONTHS[first[1]], parseInt(first[2], 10));
+  let end = start;
+  if (parts.length > 1) {
+    const last = parts[parts.length - 1];
+    end = new Date(2026, MONTHS[last[1]], parseInt(last[3] ?? last[2], 10));
+  } else if (first[3]) {
+    end = new Date(2026, MONTHS[first[1]], parseInt(first[3], 10));
+  }
+  const out: Date[] = [];
+  for (let d = new Date(start); +d <= +end && out.length < 60; d.setDate(d.getDate() + 1)) out.push(new Date(d));
+  return out;
+}
+
+/** Which weekdays in a time-off range the person is normally scheduled ("Friday", ...). */
+export function timeOffConflictDays(state: PortalState, staffId: string, range: string): string[] {
+  const DAY_FULL = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const workDays = new Set(
+    state.shifts.filter((s) => s.staffId === staffId && s.state !== "open").map((s) => s.day)
+  );
+  const hit = new Set<number>();
+  for (const d of timeOffDates(range)) {
+    const our = (d.getDay() + 6) % 7;
+    if (workDays.has(our)) hit.add(our);
+  }
+  return [...hit].sort().map((d) => DAY_FULL[d]);
+}
+
 /** Everything currently waiting on the GM, counted once, shown everywhere. */
 export function needsYouCount(state: PortalState): number {
   const approval = state.runs.some((r) => r.state === "live" && r.outcome?.includes("needs your approval")) ? 1 : 0;

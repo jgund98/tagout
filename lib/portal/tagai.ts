@@ -118,13 +118,16 @@ export function answer(q: string, state: PortalState): AiAnswer {
   // time off
   if (has("time off", "vacation", "pto", "off request")) {
     const pending = state.timeOff.filter((t) => t.state === "pending");
-    if (!pending.length) return { text: "No pending time-off requests.", actions: [{ label: "Open Team", href: "/portal/team" }] };
-    const lines = pending.map((t) => {
-      const p = state.staff.find((st) => st.id === t.staffId);
-      return `${p?.first} (${t.range}, ${t.reason.toLowerCase()})`;
-    });
+    const approved = state.timeOff.filter((t) => t.state === "approved");
+    const name = (t: { staffId: string }) => state.staff.find((st) => st.id === t.staffId)?.first;
+    const approvedLine = approved.length
+      ? ` Already approved: ${approved.map((t) => `${name(t)} (${t.range})`).join(", ")} — excluded from offers those days.`
+      : "";
+    if (!pending.length)
+      return { text: `No pending time-off requests.${approvedLine}`, actions: [{ label: "Open Team", href: "/portal/team" }] };
+    const lines = pending.map((t) => `${name(t)} (${t.range}, ${t.reason.toLowerCase()})`);
     return {
-      text: `${pending.length} pending: ${lines.join("; ")}.`,
+      text: `${pending.length} pending: ${lines.join("; ")}.${approvedLine}`,
       actions: [{ label: "Review requests", href: "/portal/team" }],
     };
   }

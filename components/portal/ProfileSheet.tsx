@@ -17,6 +17,7 @@ export default function ProfileSheet({ person, onClose }: { person: Staff; onClo
 
   const recent = state.feed.filter((f) => f.who === p.id).slice(0, 3);
   const week = state.shifts.filter((s) => s.staffId === p.id && s.state !== "open");
+  const myTimeOff = state.timeOff.filter((t) => t.staffId === p.id);
 
   const save = (patch: Partial<Staff>, note?: string) => {
     dispatch({ type: "STAFF_PATCH", id: p.id, patch });
@@ -207,6 +208,25 @@ export default function ProfileSheet({ person, onClose }: { person: Staff; onClo
             )}
           </div>
         </label>
+
+        {/* their time off, every request on the record */}
+        {myTimeOff.length > 0 && (
+          <div className="mt-5">
+            <p className="text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Time off</p>
+            <div className="mt-1.5 space-y-1.5">
+              {myTimeOff.map((t) => (
+                <div key={t.id} className="flex items-center justify-between rounded-2xl bg-cream px-3.5 py-2">
+                  <p className="min-w-0 truncate text-[13px] font-semibold text-ink/70">
+                    {t.range} <span className="text-ink/35">· {t.reason}</span>
+                  </p>
+                  <Chip tone={t.state === "approved" ? "mint" : t.state === "denied" ? "blush" : "butter"}>
+                    {t.state === "approved" ? "Approved" : t.state === "denied" ? "Declined" : "Pending"}
+                  </Chip>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* their recent activity */}
         {recent.length > 0 && (
