@@ -75,16 +75,32 @@ const SEED_CLIENTS: Client[] = [
 
 const SEED_PIPELINE: { id: string; name: string; step: number; owner: string; note: string }[] = [
   { id: "nona", name: "Nona's Kitchen", step: 2, owner: "Jordan", note: "POS export promised Friday" },
-  { id: "dock", name: "Dockside Grill", step: 4, owner: "Shawn", note: "trial · first cover ran Aug 27" },
+  { id: "dock", name: "Dockside Grill", step: 4, owner: "Sasha", note: "trial · first cover ran Aug 27" },
   { id: "blue", name: "Blue Heron Café", step: 1, owner: "Jordan", note: "signed Aug 28, number pending 10DLC" },
 ];
 
 const SEED_TICKETS: { id: string; client: string; text: string; owner: string; state: "open" | "done"; when: string }[] = [
-  { id: "t1", client: "The Tap Room", text: "Two servers report pickup texts landing in spam. Check 10DLC registration on their number.", owner: "Shawn", state: "open", when: "Today, 2:10 PM" },
+  { id: "t1", client: "The Tap Room", text: "Two servers report pickup texts landing in spam. Check 10DLC registration on their number.", owner: "Sasha", state: "open", when: "Today, 2:10 PM" },
   { id: "t2", client: "Castaways", text: "Deb asked how to hand the account to the new AGM. Walk her through manager invites.", owner: "Jordan", state: "open", when: "Yesterday" },
   { id: "t3", client: "Nona's Kitchen", text: "Roster CSV had duplicate phone numbers. Cleaned and re-imported.", owner: "Jordan", state: "done", when: "Aug 27" },
 ];
 
+type TeamRole = "Owner" | "Admin" | "Support" | "Read-only";
+type TeamMember = { id: string; name: string; role: TeamRole; status: "active" | "disabled" | "invited" };
+
+const ROLE_SCOPES: Record<TeamRole, string> = {
+  Owner: "Everything, including billing and this team",
+  Admin: "Clients, onboarding, support, and team",
+  Support: "Clients and tickets, no billing",
+  "Read-only": "Can view everything, can't change anything",
+};
+
+const ROLE_TONE: Record<TeamRole, "ink" | "mint" | "lav" | "butter"> = {
+  Owner: "ink",
+  Admin: "mint",
+  Support: "lav",
+  "Read-only": "butter",
+};
 const STATUS_META: Record<ClientStatus, { label: string; tone: "mint" | "butter" | "lav" | "blush" }> = {
   live: { label: "Live", tone: "mint" },
   onboarding: { label: "Onboarding", tone: "lav" },
@@ -111,10 +127,16 @@ export default function AdminPage() {
   const [toast, setToast] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
   const [invName, setInvName] = useState("");
-  const [team, setTeam] = useState([
-    { name: "Jordan G.", role: "Owner", scope: "Everything" },
-    { name: "Shawn W.", role: "Support", scope: "Clients + tickets" },
+  const [invRole, setInvRole] = useState<TeamRole>("Support");
+  const [team, setTeam] = useState<TeamMember[]>([
+    { id: "m1", name: "Jordan G.", role: "Owner", status: "active" },
+    { id: "m2", name: "Sasha D.", role: "Support", status: "active" },
   ]);
+  const [editMember, setEditMember] = useState<TeamMember | null>(null);
+
+  const activeOwners = team.filter((m) => m.role === "Owner" && m.status === "active").length;
+  const patchMember = (id: string, p: Partial<TeamMember>) =>
+    setTeam((prev) => prev.map((m) => (m.id === id ? { ...m, ...p } : m)));
 
   const say = (t: string) => {
     setToast(t);
@@ -275,13 +297,23 @@ export default function AdminPage() {
       </div>
       <div className="mt-3 space-y-2">
         {team.map((m) => (
-          <div key={m.name} className="flex items-center justify-between rounded-2xl bg-cream/70 px-4 py-3">
-            <div>
+          <button
+            key={m.id}
+            onClick={() => setEditMember(m)}
+            className={`flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-cream ${
+              m.status === "disabled" ? "bg-cream/40 opacity-60" : "bg-cream/70"
+            }`}
+          >
+            <div className="min-w-0">
               <p className="text-[14px] font-extrabold text-ink">{m.name}</p>
-              <p className="text-[12px] font-semibold text-ink/45">{m.scope}</p>
+              <p className="truncate text-[12px] font-semibold text-ink/45">{ROLE_SCOPES[m.role]}</p>
             </div>
-            <Chip tone={m.role === "Owner" ? "ink" : "lav"}>{m.role}</Chip>
-          </div>
+            <div className="flex shrink-0 items-center gap-1.5">
+              {m.status === "disabled" && <Chip tone="blush">Disabled</Chip>}
+              {m.status === "invited" && <Chip tone="butter">Invite sent</Chip>}
+              <Chip tone={ROLE_TONE[m.role]}>{m.role}</Chip>
+            </div>
+          </button>
         ))}
       </div>
     </section>
@@ -296,10 +328,10 @@ export default function AdminPage() {
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-green">
               <BubbleMark size={20} className="text-white" />
             </span>
-            <div className="leading-tight">
-              <span className="block font-display text-[22px] font-extrabold text-paper">tagout</span>
-              <span className="block text-[10px] font-extrabold uppercase tracking-[0.16em] text-paper/40">HQ</span>
-            </div>
+            <span className="font-display text-[22px] font-extrabold text-paper">tagout</span>
+            <span className="rounded-lg rounded-bl-[4px] bg-green px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-ink">
+              HQ
+            </span>
           </div>
 
           <nav className="mt-7 flex-1 space-y-1" aria-label="Admin">
@@ -563,6 +595,123 @@ export default function AdminPage() {
         )}
       </AnimatePresence>
 
+      {/* manage a teammate: role, access, removal */}
+      <AnimatePresence>
+        {editMember && (() => {
+          const m = team.find((x) => x.id === editMember.id);
+          if (!m) return null;
+          const lastOwner = m.role === "Owner" && m.status === "active" && activeOwners <= 1;
+          return (
+            <motion.div
+              key="member-editor"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 backdrop-blur-sm sm:items-center"
+              onClick={() => setEditMember(null)}
+            >
+              <motion.div
+                initial={{ y: 24 }}
+                animate={{ y: 0 }}
+                exit={{ y: 24, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="max-h-[85dvh] w-full max-w-sm overflow-y-auto overscroll-contain rounded-[28px] bg-white p-6 shadow-lift"
+                role="dialog"
+                aria-label={`Manage ${m.name}`}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="font-display text-[20px] font-extrabold text-ink">{m.name}</p>
+                  {m.status === "disabled" && <Chip tone="blush">Disabled</Chip>}
+                  {m.status === "invited" && <Chip tone="butter">Invite sent</Chip>}
+                </div>
+
+                <p className="mt-4 text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Permissions</p>
+                <div className="mt-1.5 space-y-1.5">
+                  {(Object.keys(ROLE_SCOPES) as TeamRole[]).map((r) => {
+                    const blocked = lastOwner && r !== "Owner";
+                    return (
+                      <button
+                        key={r}
+                        disabled={blocked}
+                        onClick={() => {
+                          patchMember(m.id, { role: r });
+                          say(`${m.name} is now ${r}.`);
+                        }}
+                        className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left transition-colors disabled:opacity-40 ${
+                          m.role === r ? "bg-green-dark text-white" : "bg-cream text-ink"
+                        }`}
+                      >
+                        <span className="text-[13.5px] font-extrabold">
+                          {r}
+                          <span className={`block text-[11.5px] font-semibold ${m.role === r ? "text-white/60" : "text-ink/45"}`}>
+                            {ROLE_SCOPES[r]}
+                          </span>
+                        </span>
+                        {m.role === r && <span aria-hidden>✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+                {lastOwner && (
+                  <p className="mt-2 text-[12px] font-semibold text-ink/45">
+                    The last owner can&apos;t be demoted, disabled, or removed. Make someone else an owner first.
+                  </p>
+                )}
+
+                <div className="mt-5 space-y-2">
+                  {m.status === "invited" && (
+                    <GreenBtn className="w-full" onClick={() => say(`Invite re-sent to ${m.name}.`)}>
+                      Resend invite
+                    </GreenBtn>
+                  )}
+                  {m.status === "active" && !lastOwner && (
+                    <button
+                      onClick={() => {
+                        patchMember(m.id, { status: "disabled" });
+                        say(`${m.name}'s access is off. Their logins stop working now.`);
+                      }}
+                      className="w-full rounded-full border-2 border-ink/10 py-2.5 text-[13.5px] font-extrabold text-ink/55 hover:border-ink/30"
+                    >
+                      Disable access
+                    </button>
+                  )}
+                  {m.status === "disabled" && (
+                    <GreenBtn
+                      className="w-full"
+                      onClick={() => {
+                        patchMember(m.id, { status: "active" });
+                        say(`${m.name} is back on.`);
+                      }}
+                    >
+                      Re-enable access
+                    </GreenBtn>
+                  )}
+                  {!lastOwner && (
+                    <button
+                      onClick={() => {
+                        if (!window.confirm(`Remove ${m.name} from Tagout HQ? This can't be undone.`)) return;
+                        setTeam((prev) => prev.filter((x) => x.id !== m.id));
+                        setEditMember(null);
+                        say(`${m.name} removed.`);
+                      }}
+                      className="w-full rounded-full border-2 border-blush py-2.5 text-[13.5px] font-extrabold text-coral hover:bg-blush/30"
+                    >
+                      Remove from team
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setEditMember(null)}
+                    className="w-full py-1 text-[13.5px] font-bold text-ink/45"
+                  >
+                    Done
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
+
       {/* invite teammate */}
       <AnimatePresence>
         {inviteOpen && (
@@ -581,24 +730,41 @@ export default function AdminPage() {
               className="max-h-[85dvh] w-full max-w-sm overflow-y-auto overscroll-contain rounded-[28px] bg-white p-6 shadow-lift"
             >
               <p className="font-display text-[20px] font-extrabold text-ink">Invite a teammate</p>
-              <p className="mt-1 text-[12.5px] font-semibold text-ink/45">
-                Support scope: clients and tickets, no billing.
-              </p>
               <input
                 value={invName}
                 onChange={(e) => setInvName(e.target.value)}
                 placeholder="Name"
                 className="mt-4 w-full rounded-xl border-2 border-ink/10 px-3.5 py-2.5 text-[14.5px] font-bold text-ink outline-none focus:border-green"
               />
+              <p className="mt-3.5 text-[12px] font-extrabold uppercase tracking-wide text-ink/40">Permissions</p>
+              <div className="mt-1.5 space-y-1.5">
+                {(Object.keys(ROLE_SCOPES) as TeamRole[]).filter((r) => r !== "Owner").map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setInvRole(r)}
+                    className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left transition-colors ${
+                      invRole === r ? "bg-green-dark text-white" : "bg-cream text-ink"
+                    }`}
+                  >
+                    <span className="text-[13.5px] font-extrabold">
+                      {r}
+                      <span className={`block text-[11.5px] font-semibold ${invRole === r ? "text-white/60" : "text-ink/45"}`}>
+                        {ROLE_SCOPES[r]}
+                      </span>
+                    </span>
+                    {invRole === r && <span aria-hidden>✓</span>}
+                  </button>
+                ))}
+              </div>
               <div className="mt-4 flex gap-2">
                 <GreenBtn
                   className="flex-1"
                   disabled={!invName.trim()}
                   onClick={() => {
-                    setTeam((t) => [...t, { name: invName.trim(), role: "Support", scope: "Clients + tickets" }]);
+                    setTeam((t) => [...t, { id: `m-${Date.now()}`, name: invName.trim(), role: invRole, status: "invited" }]);
                     setInviteOpen(false);
                     setInvName("");
-                    say("Invite sent.");
+                    say("Invite sent by text.");
                   }}
                 >
                   Send invite

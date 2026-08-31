@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePortal, shiftHours, uid } from "@/lib/portal/store";
 import { Avatar, AvatarStack, Burst, Chip, StatTile, LiveDot, GreenBtn } from "@/components/portal/ui";
+import { NotifActions, feedNeedsDecision } from "@/components/portal/NotifActions";
 import type { FeedEvent } from "@/lib/portal/data";
 
 const KIND_META: Record<FeedEvent["kind"], { chip: string; tone: "mint" | "lav" | "butter" | "blush" }> = {
@@ -269,17 +270,23 @@ export default function TonightPage() {
                     exit={{ opacity: 0 }}
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     className={`flex items-start gap-3.5 rounded-3xl bg-white p-4 shadow-pop ${
-                      f.fresh ? "ring-2 ring-green/40" : ""
+                      feedNeedsDecision(f, state) ? "border-2 border-coral/30" : f.fresh ? "ring-2 ring-green/40" : ""
                     }`}
                   >
                     <Avatar person={staffOf(f.who)} size={42} />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
+                        {feedNeedsDecision(f, state) && (
+                          <span className="rounded-lg rounded-bl-[4px] bg-coral px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-white">
+                            Needs you
+                          </span>
+                        )}
                         <Chip tone={meta.tone}>{meta.chip}</Chip>
                         <span className="text-[11.5px] font-bold text-ink/35">{f.when}</span>
                       </div>
                       <p className="mt-1.5 text-[15.5px] font-bold leading-snug text-ink">{f.text}</p>
                       {f.sub && <p className="mt-0.5 text-[13.5px] font-medium text-ink/50">{f.sub}</p>}
+                      <NotifActions f={f} />
                     </div>
                   </motion.article>
                   </div>

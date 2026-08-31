@@ -87,13 +87,15 @@ export default function FloorPage() {
     setAssigning(null);
   };
 
-  const dropAt = (info: { point: { x: number; y: number } }) => {
+  // free placement: the piece lands exactly where you let go of it — moved by
+  // the drag delta, never re-centered under the pointer, overlap allowed
+  const dropAt = (cur: { x: number; y: number }, info: { offset: { x: number; y: number } }) => {
     const el = canvasRef.current;
     if (!el) return null;
     const r = el.getBoundingClientRect();
     return {
-      x: Math.round(Math.min(96, Math.max(4, ((info.point.x - r.left) / r.width) * 100)) * 10) / 10,
-      y: Math.round(Math.min(94, Math.max(6, ((info.point.y - r.top) / r.height) * 100)) * 10) / 10,
+      x: Math.round(Math.min(98, Math.max(2, cur.x + (info.offset.x / r.width) * 100)) * 10) / 10,
+      y: Math.round(Math.min(97, Math.max(3, cur.y + (info.offset.y / r.height) * 100)) * 10) / 10,
     };
   };
 
@@ -288,13 +290,15 @@ export default function FloorPage() {
         )}
         {roomFixtures.map((f) => (
           <motion.div
-            key={f.id}
+            // position in the key: committing a move remounts with a clean
+            // transform, so the piece never double-applies the drag offset
+            key={`${f.id}:${f.x}:${f.y}`}
             drag
             dragMomentum={false}
-            dragElastic={0.06}
+            dragElastic={0}
             onDragStart={() => (draggedRef.current = true)}
             onDragEnd={(_, info) => {
-              const p = dropAt(info);
+              const p = dropAt(f, info);
               if (p) dispatch({ type: "FIXTURE_PATCH", id: f.id, patch: p });
               setTimeout(() => (draggedRef.current = false), 50);
             }}
@@ -327,13 +331,13 @@ export default function FloorPage() {
           const { w, ratio } = sizeFor(t);
           return (
             <motion.button
-              key={t.id}
+              key={`${t.id}:${t.x}:${t.y}`}
               drag
               dragMomentum={false}
-              dragElastic={0.06}
+              dragElastic={0}
               onDragStart={() => (draggedRef.current = true)}
               onDragEnd={(_, info) => {
-                const p = dropAt(info);
+                const p = dropAt(t, info);
                 if (p) dispatch({ type: "TABLE_PATCH", id: t.id, patch: p });
                 setTimeout(() => (draggedRef.current = false), 50);
               }}

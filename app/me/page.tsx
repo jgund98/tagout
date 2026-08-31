@@ -262,18 +262,67 @@ export default function MePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-cream pb-28">
+    <div className="min-h-screen bg-cream pb-28 lg:pb-10">
       <Burst show={burst} />
 
+      {/* sidebar (desktop): the same pine rail as the GM portal */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[264px] flex-col p-4 lg:flex">
+        <div className="flex h-full flex-col rounded-[28px] bg-pine px-4 pb-4 pt-5">
+          <button onClick={() => setTab("home")} className="flex items-center gap-2.5 px-2">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-green">
+              <BubbleMark size={20} className="text-white" />
+            </span>
+            <span className="font-display text-[22px] font-extrabold text-paper">tagout</span>
+          </button>
+          <nav className="mt-7 flex-1 space-y-1" aria-label="Staff">
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`flex w-full items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left text-[15px] font-bold transition-colors ${
+                  tab === t.key ? "bg-green text-ink" : "text-paper/65 hover:bg-paper/8 hover:text-paper"
+                }`}
+              >
+                <NavIcon name={t.icon} />
+                {t.label}
+                {t.key === "board" && askedMe && offerState === "open" && (
+                  <span className="ml-auto h-2.5 w-2.5 rounded-full bg-coral" />
+                )}
+                {t.key === "requests" && pendingCount > 0 && (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-coral px-1.5 text-[11px] font-extrabold text-white">
+                    {pendingCount}
+                  </span>
+                )}
+              </button>
+            ))}
+          </nav>
+          <div className="border-t border-paper/10 pt-3">
+            <button
+              onClick={logout}
+              className="flex w-full items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left text-[15px] font-bold text-paper/50 transition-colors hover:bg-paper/8 hover:text-paper"
+            >
+              <NavIcon name="logout" />
+              Log out
+            </button>
+          </div>
+        </div>
+      </aside>
+
       {/* topbar: same anatomy as the GM portal */}
-      <header className="sticky top-0 z-30 border-b border-ink/6 bg-cream/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[640px] items-center justify-between gap-3 px-4">
-          <button onClick={() => setTab("home")} className="flex items-center gap-2">
+      <header className="sticky top-0 z-30 border-b border-ink/6 bg-cream/85 backdrop-blur-xl lg:pl-[264px]">
+        <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
+          <button onClick={() => setTab("home")} className="flex items-center gap-2 lg:hidden">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green">
               <BubbleMark size={16} className="text-white" />
             </span>
             <span className="font-display text-[18px] font-extrabold text-ink">tagout</span>
           </button>
+          <div className="hidden items-center gap-2 lg:flex">
+            <p className="font-display text-[15px] font-extrabold text-ink">{state.houseName}</p>
+            <span className="rounded-lg rounded-bl-[4px] bg-mint px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-green-dark">
+              Staff
+            </span>
+          </div>
           <div className="flex items-center gap-2">
             <PovSwitch current="staff" />
             <div className="relative">
@@ -320,7 +369,8 @@ export default function MePage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[640px] px-4 pt-6">
+      <main className="px-4 pt-6 sm:px-6 lg:pl-[288px] lg:pr-8">
+        <div className="mx-auto w-full max-w-[640px] lg:mx-0 lg:max-w-2xl">
         <AnimatePresence mode="wait">
           <motion.div
             key={tab}
@@ -805,13 +855,14 @@ export default function MePage() {
             )}
           </motion.div>
         </AnimatePresence>
+        </div>
       </main>
 
-      {/* bottom tabs: same bar as the GM portal */}
+      {/* bottom tabs (mobile): same bar as the GM portal */}
       <nav
         aria-label="Staff app"
         style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
-        className="fixed inset-x-3 z-40 mx-auto flex max-w-[640px] justify-around rounded-[24px] bg-pine px-2 py-2"
+        className="fixed inset-x-3 z-40 mx-auto flex max-w-[640px] justify-around rounded-[24px] bg-pine px-2 py-2 lg:hidden"
       >
         {TABS.map((t) => (
           <button

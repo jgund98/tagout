@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePortal, needsYouCount } from "@/lib/portal/store";
 import { Avatar, Chip, PageTitle, GhostBtn } from "@/components/portal/ui";
-import { NotifActions } from "@/components/portal/NotifActions";
+import { NotifActions, feedNeedsDecision } from "@/components/portal/NotifActions";
 import type { FeedEvent } from "@/lib/portal/data";
 
 const KIND_META: Record<FeedEvent["kind"], { chip: string; tone: "mint" | "lav" | "butter" | "blush"; href: string }> = {
@@ -41,16 +41,22 @@ export default function InboxPage() {
 
   const Row = ({ f }: { f: FeedEvent }) => {
     const meta = KIND_META[f.kind];
+    const decide = feedNeedsDecision(f, state);
     return (
       <Link
         href={meta.href}
         className={`flex items-start gap-3 rounded-2xl bg-white p-3.5 shadow-pop transition-transform hover:scale-[1.005] ${
-          f.fresh ? "ring-2 ring-green/40" : ""
+          decide ? "border-2 border-coral/30" : f.fresh ? "ring-2 ring-green/40" : ""
         }`}
       >
         <Avatar person={staffOf(f.who)} size={38} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
+            {decide && (
+              <span className="rounded-lg rounded-bl-[4px] bg-coral px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wide text-white">
+                Needs you
+              </span>
+            )}
             <Chip tone={meta.tone}>{meta.chip}</Chip>
             <span className="text-[12px] font-bold text-ink/35">{f.when}</span>
             {f.fresh && <span className="h-2 w-2 rounded-full bg-green" />}
@@ -91,7 +97,7 @@ export default function InboxPage() {
       )}
 
       {/* filter by type */}
-      <div className="no-scrollbar -mx-1 mb-4 flex gap-2 overflow-x-auto px-1">
+      <div className="no-scrollbar -mx-1 mb-3 flex gap-2 overflow-x-auto px-1 py-1.5 lg:flex-wrap">
         {FILTERS.map((f) => {
           const count = f.key === "all" ? state.feed.length : state.feed.filter((x) => x.kind === f.key).length;
           if (f.key !== "all" && count === 0) return null;

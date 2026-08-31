@@ -130,7 +130,7 @@ export default function TagAiPage() {
 
       {/* suggestions */}
       {msgs.length < 3 && (
-        <div className="no-scrollbar -mx-1 mt-3 flex gap-2 overflow-x-auto px-1">
+        <div className="no-scrollbar -mx-1 mt-3 flex gap-2 overflow-x-auto px-1 py-1.5">
           {SUGGESTIONS.map((sug) => (
             <button
               key={sug}

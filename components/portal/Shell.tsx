@@ -9,7 +9,7 @@ import { usePortal, endDemoSession, needsYouCount } from "@/lib/portal/store";
 import { Avatar, LiveDot } from "./ui";
 import { NavIcon } from "./NavIcon";
 import { PovSwitch } from "./PovSwitch";
-import { NotifActions } from "./NotifActions";
+import { NotifActions, feedNeedsDecision } from "./NotifActions";
 
 const NAV = [
   { href: "/portal", label: "Today", icon: "home" },
@@ -239,18 +239,22 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
             <div className="max-h-[60dvh] space-y-1 overflow-y-auto overscroll-contain">
-              {state.feed.slice(0, 12).map((f) => {
-                const href =
+              {(() => {
+                const decide = state.feed.filter((f) => feedNeedsDecision(f, state));
+                const rest = state.feed.filter((f) => !feedNeedsDecision(f, state)).slice(0, 8);
+                const hrefFor = (f: (typeof state.feed)[number]) =>
                   f.kind === "clock" ? "/portal/hours"
                   : f.kind === "swap" || f.kind === "onboard" ? "/portal/team"
                   : f.kind === "rule" ? "/portal/rules"
                   : "/portal/coverage";
-                return (
+                const row = (f: (typeof state.feed)[number], actionable: boolean) => (
                   <Link
                     key={f.id}
-                    href={href}
+                    href={hrefFor(f)}
                     onClick={() => setNotifOpen(false)}
-                    className="flex items-start gap-2.5 rounded-2xl p-2.5 transition-colors hover:bg-cream"
+                    className={`flex items-start gap-2.5 rounded-2xl p-2.5 transition-colors hover:bg-cream ${
+                      actionable ? "border-2 border-coral/25" : ""
+                    }`}
                   >
                     <Avatar person={staffOf(f.who)} size={30} />
                     <div className="min-w-0">
@@ -260,7 +264,23 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     </div>
                   </Link>
                 );
-              })}
+                return (
+                  <>
+                    {decide.length > 0 && (
+                      <>
+                        <p className="px-2.5 pb-1 pt-1 text-[10.5px] font-extrabold uppercase tracking-[0.14em] text-coral">
+                          Needs a decision
+                        </p>
+                        {decide.map((f) => row(f, true))}
+                        <p className="px-2.5 pb-1 pt-2 text-[10.5px] font-extrabold uppercase tracking-[0.14em] text-ink/35">
+                          Recent
+                        </p>
+                      </>
+                    )}
+                    {rest.map((f) => row(f, false))}
+                  </>
+                );
+              })()}
             </div>
             <Link
               href="/portal/inbox"

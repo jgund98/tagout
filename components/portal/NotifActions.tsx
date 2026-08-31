@@ -1,7 +1,23 @@
 "use client";
 
 import { usePortal, uid } from "@/lib/portal/store";
-import type { FeedEvent } from "@/lib/portal/data";
+import type { FeedEvent, PortalState } from "@/lib/portal/data";
+
+/**
+ * The one notification rule, everywhere: coral means "this is waiting on your
+ * decision, act on it right here"; everything else is a record of what happened.
+ */
+export function feedNeedsDecision(f: FeedEvent, state: PortalState): boolean {
+  const a = f.action;
+  if (!a) return false;
+  if (a.kind === "timeoff") return state.timeOff.some((t) => t.id === a.id && t.state === "pending");
+  if (a.kind === "claim")
+    return (
+      state.claims.some((c) => c.shiftId === a.id && c.staffId === f.who) &&
+      state.shifts.some((s) => s.id === a.id && s.state === "open")
+    );
+  return state.runs.some((r) => r.id === a.id && r.state === "live" && !!r.outcome?.includes("needs your approval"));
+}
 
 /**
  * Inline decisions on actionable notifications: approve or decline right in

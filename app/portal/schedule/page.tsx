@@ -711,7 +711,7 @@ function MobileDayView({
     return (
       <div>
         <ModeToggle mode={mode} setMode={setMode} />
-        <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
+        <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 py-1.5">
           {active.map((p) => (
             <button
               key={p.id}
@@ -774,7 +774,7 @@ function MobileDayView({
   return (
     <div>
       <ModeToggle mode={mode} setMode={setMode} />
-      <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
+      <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 py-1.5">
         {DAYS.map((d, i) => {
           const n = counts[i];
           return (
